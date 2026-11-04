@@ -1,0 +1,4296 @@
+{
+  "schema_version": 1,
+  "last_updated": "04.11.2026, 11:56 CET",
+  "updated_at": "2026-11-04T11:56:21+01:00",
+  "last_attempted_at": "2026-11-04T11:17:02+01:00",
+  "data_mode": "partial",
+  "expected_stock_count": 29,
+  "warnings": [
+    "Historische Multiples, Dividendenreferenzen und Nachkauf-Indikatoren sind vorgegebene, nicht unabhängig geprüfte Referenzwerte, sofern nicht separat belegt; der 5J/10J-Zeitraum ist nicht je Aktie belegt. Tranchen folgen nur den Forward-KGV-Schwellen.",
+    "Der Abruf ist teilweise erfolgreich; Fallbacks und fehlende Felder sind je Aktie ausgewiesen."
+  ],
+  "portfolios": [
+    {
+      "id": "tech",
+      "name": "Tech Stonks",
+      "cluster_order": [
+        "Big Tech",
+        "Semiconducter",
+        "Cybersecurity",
+        "SaaS"
+      ],
+      "stocks": [
+        {
+          "name": "Alphabet",
+          "ticker": "GOOGL",
+          "cluster": "Big Tech",
+          "hist_pe": 24.3,
+          "hist_ps": 6.2,
+          "hist_div": null,
+          "buy_trigger": "Forward P/E < 17x oder Wochen-EMA 50",
+          "current_pe": 14.625587,
+          "forward_pe": 18.139355,
+          "ps_ratio": 7.309102,
+          "div_yield": 0.32,
+          "roe": 44.286,
+          "price": 280.08,
+          "sma200": 340.136549,
+          "rsi14": 22.205192,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:32:47+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:32:48+01:00",
+            "forward_pe": "2026-11-03T15:32:48+01:00",
+            "ps_ratio": "2026-11-03T15:32:48+01:00",
+            "div_yield": "2026-11-03T15:32:48+01:00",
+            "roe": "2026-11-03T15:32:48+01:00",
+            "price": "2026-11-03T15:32:48+01:00",
+            "sma200": "2026-11-03T15:32:49+01:00",
+            "rsi14": "2026-11-03T15:32:49+01:00",
+            "currency": "2026-11-03T15:32:48+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 14.625587,
+          "spread_pe_pct": -39.8124,
+          "sma200_distance_pct": -17.6566,
+          "tranche": "Tranche 1 (Sofortkauf)",
+          "tranche_color": "emerald",
+          "tranche_key": "buy",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:36+00:00",
+            "since": "2004-08-19",
+            "source_url": "https://finance.yahoo.com/quote/GOOGL/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": 0.372776,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": -12.648946,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": -18.477438,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": -27.303872,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": -10.359779,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": -1.042682,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 29.850628,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 14.038012,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 21.875406,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 23.702891,
+                "start": "2004-08-19",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-09-04",
+            "cash_events_count": 10
+          }
+        },
+        {
+          "name": "Meta",
+          "ticker": "META",
+          "cluster": "Big Tech",
+          "hist_pe": 25.9,
+          "hist_ps": 7.8,
+          "hist_div": null,
+          "buy_trigger": "Forward P/E 18x–19x & Tages-RSI < 40",
+          "current_pe": 20.923235,
+          "forward_pe": 17.232286,
+          "ps_ratio": 6.489946,
+          "div_yield": 0.35,
+          "roe": 32.264,
+          "price": 613.26,
+          "sma200": 631.997447,
+          "rsi14": 34.235016,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:32:49+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:32:50+01:00",
+            "forward_pe": "2026-11-03T15:32:50+01:00",
+            "ps_ratio": "2026-11-03T15:32:50+01:00",
+            "div_yield": "2026-11-03T15:32:50+01:00",
+            "roe": "2026-11-03T15:32:50+01:00",
+            "price": "2026-11-03T15:32:50+01:00",
+            "sma200": "2026-11-03T15:32:50+01:00",
+            "rsi14": "2026-11-03T15:32:50+01:00",
+            "currency": "2026-11-03T15:32:50+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 20.923235,
+          "spread_pe_pct": -19.2153,
+          "sma200_distance_pct": -2.9648,
+          "tranche": "Tranche 1 (Sofortkauf)",
+          "tranche_color": "emerald",
+          "tranche_key": "buy",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:36+00:00",
+            "since": "2012-05-18",
+            "source_url": "https://finance.yahoo.com/quote/META/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": 2.356905,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": 0.135447,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": -14.703053,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 2.179818,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": -5.688607,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": -2.299661,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 25.828076,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 13.58251,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 17.979571,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 21.338596,
+                "start": "2012-05-18",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-09-21",
+            "cash_events_count": 11
+          }
+        },
+        {
+          "name": "Broadcom",
+          "ticker": "AVGO",
+          "cluster": "Big Tech",
+          "hist_pe": 65.7,
+          "hist_ps": 8.1,
+          "hist_div": null,
+          "buy_trigger": "Forward P/E 19x–21x oder Tages-SMA 100/200",
+          "current_pe": 42.13446,
+          "forward_pe": 16.948965,
+          "ps_ratio": 17.674646,
+          "div_yield": 0.81,
+          "roe": 44.245,
+          "price": 329.9128,
+          "sma200": 367.461564,
+          "rsi14": 43.632995,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:32:49+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:32:51+01:00",
+            "forward_pe": "2026-11-03T15:32:51+01:00",
+            "ps_ratio": "2026-11-03T15:32:51+01:00",
+            "div_yield": "2026-11-03T15:32:51+01:00",
+            "roe": "2026-11-03T15:32:51+01:00",
+            "price": "2026-11-03T15:32:51+01:00",
+            "sma200": "2026-11-03T15:32:51+01:00",
+            "rsi14": "2026-11-03T15:32:51+01:00",
+            "currency": "2026-11-03T15:32:51+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 42.13446,
+          "spread_pe_pct": -35.8684,
+          "sma200_distance_pct": -10.2184,
+          "tranche": "Tranche 1 (Sofortkauf)",
+          "tranche_color": "emerald",
+          "tranche_key": "buy",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:36+00:00",
+            "since": "2009-08-06",
+            "source_url": "https://finance.yahoo.com/quote/AVGO/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": 3.072338,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": -2.979576,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": -6.479137,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": -20.889476,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": -3.510977,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": -7.713627,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 57.20039,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 46.251496,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 37.985268,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 39.011623,
+                "start": "2009-08-06",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-09-21",
+            "cash_events_count": 64
+          }
+        },
+        {
+          "name": "Amazon",
+          "ticker": "AMZN",
+          "cluster": "Big Tech",
+          "hist_pe": 63.0,
+          "hist_ps": 3.5,
+          "hist_div": null,
+          "buy_trigger": "Forward P/E < 24x oder P/OCF < 18x",
+          "current_pe": 19.999596,
+          "forward_pe": 22.66456,
+          "ps_ratio": 3.354567,
+          "div_yield": 0.0,
+          "roe": 27.416,
+          "price": 247.395,
+          "sma200": 243.479225,
+          "rsi14": 45.634653,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:32:52+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:32:53+01:00",
+            "forward_pe": "2026-11-03T15:32:53+01:00",
+            "ps_ratio": "2026-11-03T15:32:53+01:00",
+            "div_yield": "2026-11-03T15:32:53+01:00",
+            "roe": "2026-11-03T15:32:53+01:00",
+            "price": "2026-11-03T15:32:53+01:00",
+            "sma200": "2026-11-03T15:32:53+01:00",
+            "rsi14": "2026-11-03T15:32:53+01:00",
+            "currency": "2026-11-03T15:32:53+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 19.999596,
+          "spread_pe_pct": -68.2546,
+          "sma200_distance_pct": 1.6083,
+          "tranche": "Tranche 1 (Sofortkauf)",
+          "tranche_color": "emerald",
+          "tranche_key": "buy",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:36+00:00",
+            "since": "1997-05-15",
+            "source_url": "https://finance.yahoo.com/quote/AMZN/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": 2.060008,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": -0.952194,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": -0.329994,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": -6.549619,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 8.608437,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": -1.303149,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 21.834399,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 8.181078,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 20.654897,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 30.511635,
+                "start": "1997-05-15",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": null,
+            "cash_events_count": 0
+          }
+        },
+        {
+          "name": "Nvidia",
+          "ticker": "NVDA",
+          "cluster": "Semiconducter",
+          "hist_pe": 54.9,
+          "hist_ps": 20.5,
+          "hist_div": null,
+          "buy_trigger": "Forward P/E 22x–24x oder Tages-SMA 200",
+          "current_pe": 26.271175,
+          "forward_pe": 13.057507,
+          "ps_ratio": 16.567438,
+          "div_yield": 0.49,
+          "roe": 117.211,
+          "price": 207.87,
+          "sma200": 204.5678,
+          "rsi14": 40.510229,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:32:54+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:32:54+01:00",
+            "forward_pe": "2026-11-03T15:32:54+01:00",
+            "ps_ratio": "2026-11-03T15:32:54+01:00",
+            "div_yield": "2026-11-03T15:32:54+01:00",
+            "roe": "2026-11-03T15:32:54+01:00",
+            "price": "2026-11-03T15:32:54+01:00",
+            "sma200": "2026-11-03T15:32:54+01:00",
+            "rsi14": "2026-11-03T15:32:54+01:00",
+            "currency": "2026-11-03T15:32:54+01:00"
+          },
+          "warnings": [
+            "Aktuelle und nachlaufende Dividendenreferenz weichen ab; Einheit über die passende Referenz geprüft."
+          ],
+          "chart_pe": 26.271175,
+          "spread_pe_pct": -52.1472,
+          "sma200_distance_pct": 1.6142,
+          "tranche": "Tranche 1 (Sofortkauf)",
+          "tranche_color": "emerald",
+          "tranche_key": "buy",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:36+00:00",
+            "since": "1999-01-22",
+            "source_url": "https://finance.yahoo.com/quote/NVDA/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": 2.291401,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": -5.161971,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": -11.65206,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 4.390642,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 11.085449,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 0.147745,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 66.365045,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 50.832462,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 61.939909,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 36.351354,
+                "start": "1999-01-22",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-09-10",
+            "cash_events_count": 56
+          }
+        },
+        {
+          "name": "Microsoft",
+          "ticker": "MSFT",
+          "cluster": "Big Tech",
+          "hist_pe": 33.0,
+          "hist_ps": 11.2,
+          "hist_div": null,
+          "buy_trigger": "Forward P/E 23x–24x oder Test SMA 200",
+          "current_pe": 26.562632,
+          "forward_pe": 21.048555,
+          "ps_ratio": 10.909344,
+          "div_yield": 0.77,
+          "roe": 34.221,
+          "price": 508.94,
+          "sma200": 438.424249,
+          "rsi14": 41.533572,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:32:55+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:32:56+01:00",
+            "forward_pe": "2026-11-03T15:32:56+01:00",
+            "ps_ratio": "2026-11-03T15:32:56+01:00",
+            "div_yield": "2026-11-03T15:32:56+01:00",
+            "roe": "2026-11-03T15:32:56+01:00",
+            "price": "2026-11-03T15:32:56+01:00",
+            "sma200": "2026-11-03T15:32:56+01:00",
+            "rsi14": "2026-11-03T15:32:56+01:00",
+            "currency": "2026-11-03T15:32:56+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 26.562632,
+          "spread_pe_pct": -19.5072,
+          "sma200_distance_pct": 16.0839,
+          "tranche": "Tranche 1 (Sofortkauf)",
+          "tranche_color": "emerald",
+          "tranche_key": "buy",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:36+00:00",
+            "since": "1986-03-13",
+            "source_url": "https://finance.yahoo.com/quote/MSFT/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": 2.735052,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": -1.946065,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": 0.668553,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 26.22062,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 8.41227,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 1.599644,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 14.753558,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 10.204581,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 25.780737,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 25.043442,
+                "start": "1986-03-13",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-08-20",
+            "cash_events_count": 91
+          }
+        },
+        {
+          "name": "ServiceNow",
+          "ticker": "NOW",
+          "cluster": "SaaS",
+          "hist_pe": 147.5,
+          "hist_ps": 15.8,
+          "hist_div": null,
+          "buy_trigger": "Forward P/E < 28x oder P/FCF < 30x",
+          "current_pe": 75.11511,
+          "forward_pe": 21.744518,
+          "ps_ratio": 7.022806,
+          "div_yield": 0.0,
+          "roe": 11.846,
+          "price": 104.41,
+          "sma200": 114.74635,
+          "rsi14": 27.066602,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:32:55+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:32:57+01:00",
+            "forward_pe": "2026-11-03T15:32:57+01:00",
+            "ps_ratio": "2026-11-03T15:32:57+01:00",
+            "div_yield": "2026-11-03T15:32:57+01:00",
+            "roe": "2026-11-03T15:32:57+01:00",
+            "price": "2026-11-03T15:32:57+01:00",
+            "sma200": "2026-11-03T15:32:57+01:00",
+            "rsi14": "2026-11-03T15:32:57+01:00",
+            "currency": "2026-11-03T15:32:57+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 75.11511,
+          "spread_pe_pct": -49.0745,
+          "sma200_distance_pct": -9.008,
+          "tranche": "Tranche 1 (Sofortkauf)",
+          "tranche_color": "emerald",
+          "tranche_key": "buy",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:36+00:00",
+            "since": "2012-06-29",
+            "source_url": "https://finance.yahoo.com/quote/NOW/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": 2.971419,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": -29.474089,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": -18.767674,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 19.745502,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": -28.742084,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": -40.274008,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": -3.466953,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": -4.516493,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 20.599909,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 24.115718,
+                "start": "2012-06-29",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": null,
+            "cash_events_count": 0
+          }
+        },
+        {
+          "name": "Apple",
+          "ticker": "AAPL",
+          "cluster": "Big Tech",
+          "hist_pe": 33.0,
+          "hist_ps": 7.4,
+          "hist_div": null,
+          "buy_trigger": "Abwarten auf Forward P/E < 28x",
+          "current_pe": 36.449333,
+          "forward_pe": 30.57867,
+          "ps_ratio": 10.229804,
+          "div_yield": 0.32,
+          "roe": 148.75101,
+          "price": 327.22,
+          "sma200": 297.3165,
+          "rsi14": 38.323797,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:32:56+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:32:58+01:00",
+            "forward_pe": "2026-11-03T15:32:58+01:00",
+            "ps_ratio": "2026-11-03T15:32:58+01:00",
+            "div_yield": "2026-11-03T15:32:58+01:00",
+            "roe": "2026-11-03T15:32:58+01:00",
+            "price": "2026-11-03T15:32:58+01:00",
+            "sma200": "2026-11-03T15:32:59+01:00",
+            "rsi14": "2026-11-03T15:32:59+01:00",
+            "currency": "2026-11-03T15:32:58+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 36.449333,
+          "spread_pe_pct": 10.4525,
+          "sma200_distance_pct": 10.0578,
+          "tranche": "Hold / Watchlist",
+          "tranche_color": "amber",
+          "tranche_key": "watch",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:37+00:00",
+            "since": "1980-12-12",
+            "source_url": "https://finance.yahoo.com/quote/AAPL/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": -1.897616,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": -4.379145,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": -0.536429,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 18.689631,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 22.42035,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 23.818295,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 23.938954,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 17.568696,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 29.388958,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 19.372387,
+                "start": "1980-12-12",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-08-10",
+            "cash_events_count": 92
+          }
+        },
+        {
+          "name": "AMD",
+          "ticker": "AMD",
+          "cluster": "Semiconducter",
+          "hist_pe": 134.5,
+          "hist_ps": 8.5,
+          "hist_div": null,
+          "buy_trigger": "Forward P/E 28x–32x oder Wochen-SMA 50",
+          "current_pe": 122.00125,
+          "forward_pe": 29.760754,
+          "ps_ratio": 18.901411,
+          "div_yield": 0.0,
+          "roe": 10.196,
+          "price": 478.2449,
+          "sma200": 412.914975,
+          "rsi14": 37.182249,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:32:59+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:00+01:00",
+            "forward_pe": "2026-11-03T15:33:00+01:00",
+            "ps_ratio": "2026-11-03T15:33:00+01:00",
+            "div_yield": "2026-11-03T15:33:00+01:00",
+            "roe": "2026-11-03T15:33:00+01:00",
+            "price": "2026-11-03T15:33:00+01:00",
+            "sma200": "2026-11-03T15:33:00+01:00",
+            "rsi14": "2026-11-03T15:33:00+01:00",
+            "currency": "2026-11-03T15:33:00+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 122.00125,
+          "spread_pe_pct": -9.2928,
+          "sma200_distance_pct": 15.8216,
+          "tranche": "Hold / Watchlist",
+          "tranche_color": "amber",
+          "tranche_key": "watch",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:37+00:00",
+            "since": "1980-03-17",
+            "source_url": "https://finance.yahoo.com/quote/AMD/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": 3.654356,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": -13.629389,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": -23.66424,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 34.215339,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 125.952552,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 86.366264,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 62.731077,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 29.96377,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 53.422732,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 11.403676,
+                "start": "1980-03-17",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": null,
+            "cash_events_count": 0
+          }
+        },
+        {
+          "name": "Arista Networks",
+          "ticker": "ANET",
+          "cluster": "Semiconducter",
+          "hist_pe": 46.5,
+          "hist_ps": 14.5,
+          "hist_div": null,
+          "buy_trigger": "Rücksetzer auf Forward P/E < 38x–40x",
+          "current_pe": 54.555195,
+          "forward_pe": 32.175293,
+          "ps_ratio": 20.105076,
+          "div_yield": 0.0,
+          "roe": 31.476,
+          "price": 168.03,
+          "sma200": 165.5273,
+          "rsi14": 36.933035,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:33:00+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:01+01:00",
+            "forward_pe": "2026-11-03T15:33:01+01:00",
+            "ps_ratio": "2026-11-03T15:33:01+01:00",
+            "div_yield": "2026-11-03T15:33:01+01:00",
+            "roe": "2026-11-03T15:33:01+01:00",
+            "price": "2026-11-03T15:33:01+01:00",
+            "sma200": "2026-11-03T15:33:01+01:00",
+            "rsi14": "2026-11-03T15:33:01+01:00",
+            "currency": "2026-11-03T15:33:01+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 54.555195,
+          "spread_pe_pct": 17.323,
+          "sma200_distance_pct": 1.512,
+          "tranche": "Hold / Watchlist",
+          "tranche_color": "amber",
+          "tranche_key": "watch",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:37+00:00",
+            "since": "2014-06-06",
+            "source_url": "https://finance.yahoo.com/quote/ANET/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": 3.515294,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": -9.139035,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": -18.056427,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": -1.615514,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 29.672598,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 7.81776,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 47.323365,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 39.548704,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 41.914852,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 36.927491,
+                "start": "2014-06-06",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": null,
+            "cash_events_count": 0
+          }
+        },
+        {
+          "name": "Palo Alto Networks",
+          "ticker": "PANW",
+          "cluster": "Cybersecurity",
+          "hist_pe": 173.8,
+          "hist_ps": 11.5,
+          "hist_div": null,
+          "buy_trigger": "EV/FCF < 30x–32x (Earnings-Dip nutzen)",
+          "current_pe": 887.2125,
+          "forward_pe": 72.736206,
+          "ps_ratio": 25.3008,
+          "div_yield": 0.0,
+          "roe": 1.739,
+          "price": 354.885,
+          "sma200": 271.468825,
+          "rsi14": 43.384063,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:33:02+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:03+01:00",
+            "forward_pe": "2026-11-03T15:33:03+01:00",
+            "ps_ratio": "2026-11-03T15:33:03+01:00",
+            "div_yield": "2026-11-03T15:33:03+01:00",
+            "roe": "2026-11-03T15:33:03+01:00",
+            "price": "2026-11-03T15:33:03+01:00",
+            "sma200": "2026-11-03T15:33:03+01:00",
+            "rsi14": "2026-11-03T15:33:03+01:00",
+            "currency": "2026-11-03T15:33:03+01:00"
+          },
+          "warnings": [
+            "Nur der TTM-Chartbalken ist auf 260x begrenzt; Kachel und Tooltip zeigen den Rohwert."
+          ],
+          "chart_pe": 260.0,
+          "spread_pe_pct": 410.479,
+          "sma200_distance_pct": 30.7277,
+          "tranche": "Hold / Watchlist",
+          "tranche_color": "amber",
+          "tranche_key": "watch",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:37+00:00",
+            "since": "2012-07-20",
+            "source_url": "https://finance.yahoo.com/quote/PANW/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": -0.432159,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": -12.820512,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": -13.153452,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 93.395189,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 90.119445,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 59.74092,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 42.197907,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 33.319865,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 30.600276,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 29.351705,
+                "start": "2012-07-20",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": null,
+            "cash_events_count": 0
+          }
+        },
+        {
+          "name": "CrowdStrike",
+          "ticker": "CRWD",
+          "cluster": "Cybersecurity",
+          "hist_pe": 200.0,
+          "hist_ps": 27.1,
+          "hist_div": null,
+          "buy_trigger": "Strikte Disziplin: P/S < 25x oder P/FCF < 35x",
+          "current_pe": 4936.4,
+          "forward_pe": 153.25676,
+          "ps_ratio": 46.834843,
+          "div_yield": 0.0,
+          "roe": 1.461,
+          "price": 246.82,
+          "sma200": 168.549087,
+          "rsi14": 48.34789,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:33:03+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:04+01:00",
+            "forward_pe": "2026-11-03T15:33:04+01:00",
+            "ps_ratio": "2026-11-03T15:33:04+01:00",
+            "div_yield": "2026-11-03T15:33:04+01:00",
+            "roe": "2026-11-03T15:33:04+01:00",
+            "price": "2026-11-03T15:33:04+01:00",
+            "sma200": "2026-11-03T15:33:04+01:00",
+            "rsi14": "2026-11-03T15:33:04+01:00",
+            "currency": "2026-11-03T15:33:04+01:00"
+          },
+          "warnings": [
+            "Nur der TTM-Chartbalken ist auf 260x begrenzt; Kachel und Tooltip zeigen den Rohwert."
+          ],
+          "chart_pe": 260.0,
+          "spread_pe_pct": 2368.2,
+          "sma200_distance_pct": 46.4381,
+          "tranche": "Hold / Watchlist",
+          "tranche_color": "amber",
+          "tranche_key": "watch",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:37+00:00",
+            "since": "2019-06-12",
+            "source_url": "https://finance.yahoo.com/quote/CRWD/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": 1.18688,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": -8.708304,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": -9.391207,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 114.801145,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 108.789135,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 77.330048,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 73.216598,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 29.319221,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": null,
+                "start": null,
+                "end": "2026-11-03",
+                "annualized": true,
+                "reason": "Historie deckt den vollständigen Zeitraum nicht ab"
+              },
+              "all": {
+                "value": 46.538633,
+                "start": "2019-06-12",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": null,
+            "cash_events_count": 0
+          }
+        },
+        {
+          "name": "Cloudflare",
+          "ticker": "NET",
+          "cluster": "Cybersecurity",
+          "hist_pe": 210.0,
+          "hist_ps": 31.1,
+          "hist_div": null,
+          "buy_trigger": "Kompression auf P/S 20x–25x abwarten",
+          "current_pe": 260.0,
+          "forward_pe": 158.63344,
+          "ps_ratio": 38.045048,
+          "div_yield": 0.0,
+          "roe": -14.425999,
+          "price": 268.43,
+          "sma200": 248.9232,
+          "rsi14": 33.582208,
+          "currency": "USD",
+          "source_status": "partial",
+          "as_of": "2026-11-03T14:33:02+00:00",
+          "field_sources": {
+            "current_pe": "initial",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": null,
+            "forward_pe": "2026-11-03T15:33:05+01:00",
+            "ps_ratio": "2026-11-03T15:33:05+01:00",
+            "div_yield": "2026-11-03T15:33:05+01:00",
+            "roe": "2026-11-03T15:33:05+01:00",
+            "price": "2026-11-03T15:33:05+01:00",
+            "sma200": "2026-11-03T15:33:06+01:00",
+            "rsi14": "2026-11-03T15:33:06+01:00",
+            "currency": "2026-11-03T15:33:05+01:00"
+          },
+          "warnings": [
+            "Nicht frisch verfügbar (Quelle je Feld gekennzeichnet): current_pe."
+          ],
+          "chart_pe": 260.0,
+          "spread_pe_pct": 23.8095,
+          "sma200_distance_pct": 7.8365,
+          "tranche": "Hold / Watchlist",
+          "tranche_color": "amber",
+          "tranche_key": "watch",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:37+00:00",
+            "since": "2019-09-13",
+            "source_url": "https://finance.yahoo.com/quote/NET/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": 3.186628,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": -16.528369,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": -21.614579,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 25.802297,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 38.787727,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 10.281728,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 61.928633,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 7.026892,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": null,
+                "start": null,
+                "end": "2026-11-03",
+                "annualized": true,
+                "reason": "Historie deckt den vollständigen Zeitraum nicht ab"
+              },
+              "all": {
+                "value": 46.392241,
+                "start": "2019-09-13",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": null,
+            "cash_events_count": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "value",
+      "name": "Value Stonks",
+      "cluster_order": [
+        "Erstversicherer Europa",
+        "Rückversicherer",
+        "Asien & Japan Finanzen",
+        "Banken USA",
+        "Versicherer USA",
+        "Income-ETFs"
+      ],
+      "stocks": [
+        {
+          "name": "AXA SA",
+          "ticker": "CS.PA",
+          "cluster": "Erstversicherer Europa",
+          "hist_pe": 11.2,
+          "hist_ps": null,
+          "hist_div": 5.4,
+          "buy_trigger": "Forward P/E < 9,5x & Div.-Rendite > 5,7%",
+          "current_pe": 11.654986,
+          "forward_pe": 9.6517,
+          "ps_ratio": 0.903838,
+          "div_yield": 5.4,
+          "roe": 14.881,
+          "price": 43.24,
+          "sma200": 41.6749,
+          "rsi14": 55.233656,
+          "currency": "EUR",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:17:50+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:07+01:00",
+            "forward_pe": "2026-11-03T15:33:07+01:00",
+            "ps_ratio": "2026-11-03T15:33:07+01:00",
+            "div_yield": "2026-11-03T15:33:07+01:00",
+            "roe": "2026-11-03T15:33:07+01:00",
+            "price": "2026-11-03T15:33:07+01:00",
+            "sma200": "2026-11-03T15:33:07+01:00",
+            "rsi14": "2026-11-03T15:33:07+01:00",
+            "currency": "2026-11-03T15:33:07+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 11.654986,
+          "spread_pe_pct": 4.0624,
+          "sma200_distance_pct": 3.7555,
+          "tranche": "Tranche 1 (Sofortkauf)",
+          "tranche_color": "emerald",
+          "tranche_key": "buy",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:37+00:00",
+            "since": "1990-08-24",
+            "source_url": "https://finance.yahoo.com/quote/CS.PA/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "EUR",
+            "periods": {
+              "1d": {
+                "value": 0.186172,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": 1.389543,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": 2.32945,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 11.330012,
+                "start": "2026-04-30",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 11.275651,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 20.673828,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 21.783742,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 17.595692,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 14.08449,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 18.316931,
+                "start": "1990-08-24",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-05-11",
+            "cash_events_count": 43
+          }
+        },
+        {
+          "name": "Sompo Holdings",
+          "ticker": "8630.T",
+          "cluster": "Asien & Japan Finanzen",
+          "hist_pe": 11.5,
+          "hist_ps": null,
+          "hist_div": 3.1,
+          "buy_trigger": "Forward P/E < 10x oder P/B < 1,25x",
+          "current_pe": 21.685087,
+          "forward_pe": 25.947906,
+          "ps_ratio": 1.017715,
+          "div_yield": 2.82,
+          "roe": 14.43,
+          "price": 7083.0,
+          "sma200": 6282.67,
+          "rsi14": 58.104716,
+          "currency": "JPY",
+          "source_status": "live",
+          "as_of": "2026-11-02T06:30:00+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:08+01:00",
+            "forward_pe": "2026-11-03T15:33:08+01:00",
+            "ps_ratio": "2026-11-03T15:33:08+01:00",
+            "div_yield": "2026-11-03T15:33:08+01:00",
+            "roe": "2026-11-03T15:33:08+01:00",
+            "price": "2026-11-03T15:33:08+01:00",
+            "sma200": "2026-11-03T15:33:09+01:00",
+            "rsi14": "2026-11-03T15:33:09+01:00",
+            "currency": "2026-11-03T15:33:08+01:00"
+          },
+          "warnings": [
+            "Aktuelle und nachlaufende Dividendenreferenz weichen ab; Einheit über die passende Referenz geprüft."
+          ],
+          "chart_pe": 21.685087,
+          "spread_pe_pct": 88.566,
+          "sma200_distance_pct": 12.7387,
+          "tranche": "Hold / Watchlist",
+          "tranche_color": "amber",
+          "tranche_key": "watch",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-04",
+            "retrieved_at": "2026-11-04T10:36:37+00:00",
+            "since": "2010-04-01",
+            "source_url": "https://finance.yahoo.com/quote/8630.T/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "JPY",
+            "periods": {
+              "1d": {
+                "value": 0.903572,
+                "start": "2026-11-02",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "1w": {
+                "value": 3.146197,
+                "start": "2026-10-28",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "1m": {
+                "value": 9.566151,
+                "start": "2026-10-02",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "6m": {
+                "value": 27.161342,
+                "start": "2026-05-01",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 37.663469,
+                "start": "2025-12-30",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "1y": {
+                "value": 57.836758,
+                "start": "2025-11-04",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "3y": {
+                "value": 52.6285,
+                "start": "2023-11-02",
+                "end": "2026-11-04",
+                "annualized": true
+              },
+              "5y": {
+                "value": 38.798983,
+                "start": "2021-11-04",
+                "end": "2026-11-04",
+                "annualized": true
+              },
+              "10y": {
+                "value": 25.1945,
+                "start": "2016-11-04",
+                "end": "2026-11-04",
+                "annualized": true
+              },
+              "all": {
+                "value": 16.850121,
+                "start": "2010-04-01",
+                "end": "2026-11-04",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-09-29",
+            "cash_events_count": 30
+          }
+        },
+        {
+          "name": "Zurich Insurance",
+          "ticker": "ZURN.SW",
+          "cluster": "Erstversicherer Europa",
+          "hist_pe": 14.9,
+          "hist_ps": null,
+          "hist_div": 5.1,
+          "buy_trigger": "P/E < 11,5x & Div.-Rendite > 5,0%",
+          "current_pe": 15.96836,
+          "forward_pe": 14.443146,
+          "ps_ratio": 1.21439,
+          "div_yield": 4.81,
+          "roe": 25.695,
+          "price": 625.8,
+          "sma200": 576.974999,
+          "rsi14": 68.49007,
+          "currency": "CHF",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:18:09+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:10+01:00",
+            "forward_pe": "2026-11-03T15:33:10+01:00",
+            "ps_ratio": "2026-11-03T15:33:10+01:00",
+            "div_yield": "2026-11-03T15:33:10+01:00",
+            "roe": "2026-11-03T15:33:10+01:00",
+            "price": "2026-11-03T15:33:10+01:00",
+            "sma200": "2026-11-03T15:33:10+01:00",
+            "rsi14": "2026-11-03T15:33:10+01:00",
+            "currency": "2026-11-03T15:33:10+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 15.96836,
+          "spread_pe_pct": 7.1702,
+          "sma200_distance_pct": 8.4622,
+          "tranche": "Hold / Watchlist",
+          "tranche_color": "amber",
+          "tranche_key": "watch",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:38+00:00",
+            "since": "1998-10-06",
+            "source_url": "https://finance.yahoo.com/quote/ZURN.SW/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "CHF",
+            "periods": {
+              "1d": {
+                "value": 0.288654,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": 1.525978,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": 9.259259,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 15.005524,
+                "start": "2026-04-30",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 9.623198,
+                "start": "2025-12-30",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 18.824275,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 18.870846,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 14.64202,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 15.760788,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 4.670879,
+                "start": "1998-10-06",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-04-10",
+            "cash_events_count": 25
+          }
+        },
+        {
+          "name": "Swiss Re",
+          "ticker": "SREN.SW",
+          "cluster": "Rückversicherer",
+          "hist_pe": 13.8,
+          "hist_ps": null,
+          "hist_div": 5.5,
+          "buy_trigger": "Forward P/E < 10x oder Div.-Rendite > 4,5%",
+          "current_pe": 11.768995,
+          "forward_pe": 11.974915,
+          "ps_ratio": 1.08077,
+          "div_yield": 4.07,
+          "roe": 20.356001,
+          "price": 153.35,
+          "sma200": 132.58275,
+          "rsi14": 65.850579,
+          "currency": "CHF",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:18:05+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:11+01:00",
+            "forward_pe": "2026-11-03T15:33:11+01:00",
+            "ps_ratio": "2026-11-03T15:33:11+01:00",
+            "div_yield": "2026-11-03T15:33:11+01:00",
+            "roe": "2026-11-03T15:33:11+01:00",
+            "price": "2026-11-03T15:33:11+01:00",
+            "sma200": "2026-11-03T15:33:12+01:00",
+            "rsi14": "2026-11-03T15:33:12+01:00",
+            "currency": "2026-11-03T15:33:11+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 11.768995,
+          "spread_pe_pct": -14.7174,
+          "sma200_distance_pct": 15.6636,
+          "tranche": "Tranche 2 (Rücksetzer kaufen)",
+          "tranche_color": "sky",
+          "tranche_key": "dip",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:38+00:00",
+            "since": "1995-04-03",
+            "source_url": "https://finance.yahoo.com/quote/SREN.SW/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "CHF",
+            "periods": {
+              "1d": {
+                "value": -0.130164,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": 1.287127,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": 8.483563,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 21.834062,
+                "start": "2026-04-30",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 21.356202,
+                "start": "2025-12-30",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 10.161746,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 21.418328,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 17.122581,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 11.726599,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 14.772986,
+                "start": "1995-04-03",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-04-14",
+            "cash_events_count": 32
+          }
+        },
+        {
+          "name": "Munich Re",
+          "ticker": "MUV2.DE",
+          "cluster": "Rückversicherer",
+          "hist_pe": 13.5,
+          "hist_ps": null,
+          "hist_div": 4.3,
+          "buy_trigger": "Forward P/E < 11x oder Test Tages-SMA 200",
+          "current_pe": 10.673672,
+          "forward_pe": 11.02567,
+          "ps_ratio": 1.162855,
+          "div_yield": 4.23,
+          "roe": 21.299,
+          "price": 568.8,
+          "sma200": 515.242997,
+          "rsi14": 78.148323,
+          "currency": "EUR",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:18:06+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:13+01:00",
+            "forward_pe": "2026-11-03T15:33:13+01:00",
+            "ps_ratio": "2026-11-03T15:33:13+01:00",
+            "div_yield": "2026-11-03T15:33:13+01:00",
+            "roe": "2026-11-03T15:33:13+01:00",
+            "price": "2026-11-03T15:33:13+01:00",
+            "sma200": "2026-11-03T15:33:13+01:00",
+            "rsi14": "2026-11-03T15:33:13+01:00",
+            "currency": "2026-11-03T15:33:13+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 10.673672,
+          "spread_pe_pct": -20.9358,
+          "sma200_distance_pct": 10.3945,
+          "tranche": "Tranche 1 (Sofortkauf)",
+          "tranche_color": "emerald",
+          "tranche_key": "buy",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:38+00:00",
+            "since": "1998-06-24",
+            "source_url": "https://finance.yahoo.com/quote/MUV2.DE/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "EUR",
+            "periods": {
+              "1d": {
+                "value": 0.387326,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": 2.961362,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": 12.11168,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 11.628823,
+                "start": "2026-04-30",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 6.188352,
+                "start": "2025-12-30",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 11.462091,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 19.499412,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 21.652764,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 17.51301,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 7.037014,
+                "start": "1998-06-24",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-04-30",
+            "cash_events_count": 27
+          }
+        },
+        {
+          "name": "Hannover Rück",
+          "ticker": "HNR1.DE",
+          "cluster": "Rückversicherer",
+          "hist_pe": 14.3,
+          "hist_ps": null,
+          "hist_div": 4.2,
+          "buy_trigger": "Forward P/E < 11,5x & Div.-Rendite > 4,5%",
+          "current_pe": 12.827525,
+          "forward_pe": 12.217168,
+          "ps_ratio": 1.547277,
+          "div_yield": 4.31,
+          "roe": 22.163,
+          "price": 290.8,
+          "sma200": 253.303999,
+          "rsi14": 78.919322,
+          "currency": "EUR",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:11:26+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:14+01:00",
+            "forward_pe": "2026-11-03T15:33:14+01:00",
+            "ps_ratio": "2026-11-03T15:33:14+01:00",
+            "div_yield": "2026-11-03T15:33:14+01:00",
+            "roe": "2026-11-03T15:33:14+01:00",
+            "price": "2026-11-03T15:33:14+01:00",
+            "sma200": "2026-11-03T15:33:15+01:00",
+            "rsi14": "2026-11-03T15:33:15+01:00",
+            "currency": "2026-11-03T15:33:14+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 12.827525,
+          "spread_pe_pct": -10.297,
+          "sma200_distance_pct": 14.8028,
+          "tranche": "Tranche 2 (Rücksetzer kaufen)",
+          "tranche_color": "sky",
+          "tranche_key": "dip",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:38+00:00",
+            "since": "2000-10-23",
+            "source_url": "https://finance.yahoo.com/quote/HNR1.DE/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "EUR",
+            "periods": {
+              "1d": {
+                "value": 0.137361,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": 4.142859,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": 14.352944,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 18.913557,
+                "start": "2026-04-30",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 15.07187,
+                "start": "2025-12-30",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 24.016733,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 16.425248,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 16.685561,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 15.673668,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 13.27125,
+                "start": "2000-10-23",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-05-07",
+            "cash_events_count": 23
+          }
+        },
+        {
+          "name": "MS&AD Insurance",
+          "ticker": "8725.T",
+          "cluster": "Asien & Japan Finanzen",
+          "hist_pe": 9.0,
+          "hist_ps": null,
+          "hist_div": 3.5,
+          "buy_trigger": "Forward P/E < 10,5x oder Div.-Rendite > 3,6%",
+          "current_pe": 8.565416,
+          "forward_pe": 12.669309,
+          "ps_ratio": 0.982518,
+          "div_yield": 2.69,
+          "roe": 16.088,
+          "price": 5210.0,
+          "sma200": 4484.64,
+          "rsi14": 56.119354,
+          "currency": "JPY",
+          "source_status": "live",
+          "as_of": "2026-11-02T06:30:00+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:16+01:00",
+            "forward_pe": "2026-11-03T15:33:16+01:00",
+            "ps_ratio": "2026-11-03T15:33:16+01:00",
+            "div_yield": "2026-11-03T15:33:16+01:00",
+            "roe": "2026-11-03T15:33:16+01:00",
+            "price": "2026-11-03T15:33:16+01:00",
+            "sma200": "2026-11-03T15:33:16+01:00",
+            "rsi14": "2026-11-03T15:33:16+01:00",
+            "currency": "2026-11-03T15:33:16+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 8.565416,
+          "spread_pe_pct": -4.8287,
+          "sma200_distance_pct": 16.1743,
+          "tranche": "Tranche 2 (Rücksetzer kaufen)",
+          "tranche_color": "sky",
+          "tranche_key": "dip",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-04",
+            "retrieved_at": "2026-11-04T10:36:38+00:00",
+            "since": "2008-04-01",
+            "source_url": "https://finance.yahoo.com/quote/8725.T/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "JPY",
+            "periods": {
+              "1d": {
+                "value": -0.479846,
+                "start": "2026-11-02",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "1w": {
+                "value": -0.498945,
+                "start": "2026-10-28",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "1m": {
+                "value": 8.563652,
+                "start": "2026-10-02",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "6m": {
+                "value": 32.028807,
+                "start": "2026-05-01",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 46.18837,
+                "start": "2025-12-30",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "1y": {
+                "value": 70.006873,
+                "start": "2025-11-04",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "3y": {
+                "value": 45.799459,
+                "start": "2023-11-02",
+                "end": "2026-11-04",
+                "annualized": true
+              },
+              "5y": {
+                "value": 38.902318,
+                "start": "2021-11-04",
+                "end": "2026-11-04",
+                "annualized": true
+              },
+              "10y": {
+                "value": 23.094481,
+                "start": "2016-11-04",
+                "end": "2026-11-04",
+                "annualized": true
+              },
+              "all": {
+                "value": 11.8229,
+                "start": "2008-04-01",
+                "end": "2026-11-04",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-09-29",
+            "cash_events_count": 37
+          }
+        },
+        {
+          "name": "Allianz",
+          "ticker": "ALV.DE",
+          "cluster": "Erstversicherer Europa",
+          "hist_pe": 12.5,
+          "hist_ps": null,
+          "hist_div": 5.2,
+          "buy_trigger": "Forward P/E < 11,5x oder Div.-Rendite > 5,5%",
+          "current_pe": 14.495082,
+          "forward_pe": 13.453613,
+          "ps_ratio": 1.395236,
+          "div_yield": 3.9,
+          "roe": 19.612,
+          "price": 442.1,
+          "sma200": 401.9125,
+          "rsi14": 60.690819,
+          "currency": "EUR",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:18:05+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "previous",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:17+01:00",
+            "forward_pe": "2026-11-03T15:33:17+01:00",
+            "ps_ratio": "2026-10-30T14:21:03+01:00",
+            "div_yield": "2026-11-03T15:33:17+01:00",
+            "roe": "2026-11-03T15:33:17+01:00",
+            "price": "2026-11-03T15:33:17+01:00",
+            "sma200": "2026-11-03T15:33:17+01:00",
+            "rsi14": "2026-11-03T15:33:17+01:00",
+            "currency": "2026-11-03T15:33:17+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 14.495082,
+          "spread_pe_pct": 15.9607,
+          "sma200_distance_pct": 9.9991,
+          "tranche": "Hold / Watchlist",
+          "tranche_color": "amber",
+          "tranche_key": "watch",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:38+00:00",
+            "since": "1996-12-16",
+            "source_url": "https://finance.yahoo.com/quote/ALV.DE/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "EUR",
+            "periods": {
+              "1d": {
+                "value": 0.113533,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": 1.402945,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": 5.934642,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 18.592907,
+                "start": "2026-04-30",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 18.137365,
+                "start": "2025-12-30",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 30.687368,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 31.804023,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 22.564208,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 17.752207,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 7.363235,
+                "start": "1996-12-16",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-05-08",
+            "cash_events_count": 27
+          }
+        },
+        {
+          "name": "Tokio Marine",
+          "ticker": "8766.T",
+          "cluster": "Asien & Japan Finanzen",
+          "hist_pe": 12.684,
+          "hist_ps": null,
+          "hist_div": 3.220123649,
+          "buy_trigger": "Rücksetzer auf Forward P/E 12x–13x abwarten",
+          "current_pe": 30.907464,
+          "forward_pe": 19.541453,
+          "ps_ratio": null,
+          "div_yield": 2.838777,
+          "roe": 7.1,
+          "price": 575.6,
+          "sma200": 481.3365,
+          "rsi14": 59.737524,
+          "currency": "JPY",
+          "source_status": "live",
+          "as_of": "2026-11-02T06:30:00+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "unavailable",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:20+01:00",
+            "forward_pe": "2026-11-03T15:33:20+01:00",
+            "ps_ratio": null,
+            "div_yield": "2026-11-03T15:33:19+01:00",
+            "roe": "2026-11-03T15:33:20+01:00",
+            "price": "2026-11-03T15:33:18+01:00",
+            "sma200": "2026-11-03T15:33:20+01:00",
+            "rsi14": "2026-11-03T15:33:20+01:00",
+            "currency": "2026-11-03T15:33:18+01:00"
+          },
+          "warnings": [],
+          "field_metadata": {
+            "hist_pe": {
+              "provider": "Tokio Marine IR",
+              "fact_type": "historical_year_end_pe_mean",
+              "label": "Hist. KGV 5J",
+              "accounting_basis": "J-GAAP",
+              "period": "FY2021–FY2025",
+              "source_url": "https://www.tokiomarinehd.com/en/ir/download/Integrated_Report_2026_Print_e.pdf#page=75",
+              "source_page": 75,
+              "source_printed_page": 74,
+              "verified_at": "2026-10-22",
+              "sample_count": 5,
+              "observations": [
+                {
+                  "fiscal_year": 2021,
+                  "pe": 11.62
+                },
+                {
+                  "fiscal_year": 2022,
+                  "pe": 13.66
+                },
+                {
+                  "fiscal_year": 2023,
+                  "pe": 13.38
+                },
+                {
+                  "fiscal_year": 2024,
+                  "pe": 10.58
+                },
+                {
+                  "fiscal_year": 2025,
+                  "pe": 14.18
+                }
+              ],
+              "method": "Arithmetisches Mittel der fünf vom Emittenten veröffentlichten Jahresend-KGVs FY2021–FY2025: (11,62 + 13,66 + 13,38 + 10,58 + 14,18) ÷ 5 = 12,684×. J-GAAP; kein Durchschnitt täglicher KGVs und keine Neuberechnung aus gerundeten EPS. Laut Berichtsfußnote wenden ausländische IFRS-Tochtergesellschaften seit FY2023 IFRS 17 an; betroffene FY2022-Angaben sind rückwirkend angepasst. Die KGV-Verhältnisse sind bei einheitlicher Kurs-/EPS-Basis unabhängig von Aktiensplits.",
+              "comparable_to_current": false,
+              "comparison_note": "Aktuelles KGV: IFRS; historische Referenz: J-GAAP. Methodenwechsel; kein direkter Bewertungsaufschlag ableitbar."
+            },
+            "hist_div": {
+              "provider": "Tokio Marine IR",
+              "label": "Dividendenreferenz 5J",
+              "period": "FY2021–FY2025",
+              "verified_at": "2026-10-22",
+              "source_url": "https://www.tokiomarinehd.com/en/ir/download/Integrated_Report_2026_Print_e.pdf",
+              "method": "Arithmetisches Mittel der Jahresendrenditen FY2021–FY2025: DPS [85, 100, 123, 172, 218] / Jahresendkurse [2376, 2547, 4703, 5736, 7308] × 100 (einheitliche Aktienbasis); gedruckte Seite 74."
+            },
+            "ps_ratio": {
+              "unavailable_reason": "Yahoo-Aktienzahl/KUV nach Split inkonsistent; keine geprüfte IFRS-KUV-Basis"
+            },
+            "current_pe": {
+              "provider": "Tokio Marine IR",
+              "validation_version": 1,
+              "source_url": "https://www.tokiomarinehd.com/en/ir/download/f5hrqd0000005pb7-att/IFRS_4Q_FY2025_Summary_Report_e.pdf",
+              "retrieved_at": "2026-11-03T15:33:20+01:00",
+              "report_date": "2026-06-26",
+              "report_fiscal_year": 2025,
+              "currency": "JPY",
+              "issued_shares": 1934000000,
+              "split_factor": 15,
+              "fact_type": "ifrs_basic_eps_actual",
+              "fiscal_year": 2025,
+              "label": "KGV FY2025",
+              "period": "FY2025 · IFRS",
+              "as_of": "2026-03-31",
+              "period_end": "2026-03-31",
+              "raw_eps": 279.35,
+              "normalized_eps": 18.623333333333335,
+              "method": "Aktueller JPY-Kurs / berichtetes IFRS Basic EPS FY2025; EPS anhand der ausgewiesenen Aktienzahl auf die aktuelle Aktienbasis normiert (÷ 15). Kein TTM- oder Adjusted-EPS-KGV.",
+              "calculation_price": 575.6,
+              "price_as_of": "2026-11-03T15:33:18+01:00"
+            },
+            "forward_pe": {
+              "provider": "Tokio Marine IR",
+              "validation_version": 1,
+              "source_url": "https://www.tokiomarinehd.com/en/ir/event/presentation/2026/f5hrqd000000a3c1-att/1Q_FY2026_Summary_Report_e.pdf",
+              "retrieved_at": "2026-11-03T15:33:20+01:00",
+              "report_date": "2026-08-12",
+              "report_fiscal_year": 2026,
+              "currency": "JPY",
+              "issued_shares": 1934000000,
+              "split_factor": 15,
+              "fact_type": "ifrs_basic_eps_forecast",
+              "fiscal_year": 2026,
+              "label": "Forward FY2026",
+              "period": "FY2026 · IFRS · Prognose",
+              "as_of": "2026-08-12",
+              "period_end": "2027-03-31",
+              "raw_eps": 441.83,
+              "normalized_eps": 29.455333333333332,
+              "method": "Aktueller JPY-Kurs / offizielle IFRS Basic-EPS-Prognose FY2026; Aktienbasis anhand der ausgewiesenen Aktienzahl geprüft (EPS ÷ 15). Kein Analystenkonsens oder Adjusted EPS.",
+              "calculation_price": 575.6,
+              "price_as_of": "2026-11-03T15:33:18+01:00"
+            },
+            "roe": {
+              "provider": "Tokio Marine IR",
+              "validation_version": 1,
+              "source_url": "https://www.tokiomarinehd.com/en/ir/download/f5hrqd0000005pb7-att/IFRS_4Q_FY2025_Summary_Report_e.pdf",
+              "retrieved_at": "2026-11-03T15:33:20+01:00",
+              "report_date": "2026-06-26",
+              "report_fiscal_year": 2025,
+              "currency": "JPY",
+              "issued_shares": 1934000000,
+              "split_factor": 15,
+              "fact_type": "ifrs_reported_roe",
+              "fiscal_year": 2025,
+              "label": "ROE FY2025",
+              "period": "FY2025 · IFRS",
+              "as_of": "2026-03-31",
+              "period_end": "2026-03-31",
+              "value": 7.1,
+              "method": "Berichtete Ratio of net income to equity attributable to owners of the parent; keine Adjusted-ROE-Prognose."
+            }
+          },
+          "chart_pe": 30.907464,
+          "spread_pe_pct": null,
+          "sma200_distance_pct": 19.5837,
+          "tranche": "Hold / Watchlist",
+          "tranche_color": "amber",
+          "tranche_key": "watch",
+          "dividend_forecast": {
+            "annual_rate": 16.34,
+            "fiscal_year": 2026,
+            "currency": "JPY",
+            "source_url": "https://www.tokiomarinehd.com/ir/stock/return.html",
+            "retrieved_at": "2026-11-03T15:33:19+01:00",
+            "basis": "forecast",
+            "interim_rate": 8.17,
+            "year_end_rate": 8.17,
+            "calculation_price": 575.6,
+            "price_as_of": "2026-11-03T15:33:18+01:00"
+          },
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-04",
+            "retrieved_at": "2026-11-04T10:36:39+00:00",
+            "since": "2000-01-04",
+            "source_url": "https://finance.yahoo.com/quote/8766.T/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum. Tokio Marine: die bestätigte Splitdividende vom 29.09.2026 ist einzeln normalisiert; Yahoo Adj Close wird nicht verwendet.",
+            "currency": "JPY",
+            "periods": {
+              "1d": {
+                "value": 0.538575,
+                "start": "2026-11-02",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "1w": {
+                "value": 4.270272,
+                "start": "2026-10-28",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "1m": {
+                "value": 14.052034,
+                "start": "2026-10-02",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "6m": {
+                "value": 24.29148,
+                "start": "2026-05-01",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 53.901601,
+                "start": "2025-12-30",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "1y": {
+                "value": 56.593596,
+                "start": "2025-11-04",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "3y": {
+                "value": 40.719039,
+                "start": "2023-11-02",
+                "end": "2026-11-04",
+                "annualized": true
+              },
+              "5y": {
+                "value": 38.610908,
+                "start": "2021-11-04",
+                "end": "2026-11-04",
+                "annualized": true
+              },
+              "10y": {
+                "value": 25.193751,
+                "start": "2016-11-04",
+                "end": "2026-11-04",
+                "annualized": true
+              },
+              "all": {
+                "value": null,
+                "start": "2000-01-04",
+                "end": "2026-11-04",
+                "annualized": true,
+                "reason": "Ungeklärter extremer Kurssprung in älterer Tokio-Historie"
+              }
+            },
+            "last_distribution_date": "2026-09-29",
+            "cash_events_count": 45,
+            "cash_corrections": [
+              {
+                "date": "2026-09-29",
+                "original": 122.5,
+                "normalized": 8.166666666666666,
+                "source_url": "https://www.tokiomarinehd.com/ir/stock/return.html",
+                "reason": "Emittenten-Interimsdividende 122,5 JPY auf 15:1-Aktienbasis normiert; nur dieses fehlerhafte Yahoo-Ereignis."
+              }
+            ],
+            "quality_notes": [
+              {
+                "date": "2002-04-01",
+                "reason": "Ungeklärter extremer Kurssprung in älterer Tokio-Historie"
+              },
+              {
+                "date": "2004-04-05",
+                "reason": "Ungeklärter extremer Kurssprung in älterer Tokio-Historie"
+              },
+              {
+                "date": "2005-09-29",
+                "reason": "Ungeklärter extremer Kurssprung in älterer Tokio-Historie"
+              }
+            ]
+          }
+        },
+        {
+          "name": "DBS Group Holdings",
+          "ticker": "D05.SI",
+          "cluster": "Asien & Japan Finanzen",
+          "hist_pe": 11.8,
+          "hist_ps": null,
+          "hist_div": 4.9,
+          "buy_trigger": "Disziplin: Warten auf Forward P/E < 12,5x",
+          "current_pe": 12.095562,
+          "forward_pe": 15.994982,
+          "ps_ratio": 8.893619,
+          "div_yield": 4.43,
+          "roe": 16.165,
+          "price": 70.88,
+          "sma200": 66.1715,
+          "rsi14": 23.335938,
+          "currency": "SGD",
+          "source_status": "live",
+          "as_of": "2026-11-03T09:15:56+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:22+01:00",
+            "forward_pe": "2026-11-03T15:33:22+01:00",
+            "ps_ratio": "2026-11-03T15:33:22+01:00",
+            "div_yield": "2026-11-03T15:33:22+01:00",
+            "roe": "2026-11-03T15:33:22+01:00",
+            "price": "2026-11-03T15:33:22+01:00",
+            "sma200": "2026-11-03T15:33:23+01:00",
+            "rsi14": "2026-11-03T15:33:23+01:00",
+            "currency": "2026-11-03T15:33:22+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 12.095562,
+          "spread_pe_pct": 2.5048,
+          "sma200_distance_pct": 7.1156,
+          "tranche": "Hold / Watchlist",
+          "tranche_color": "amber",
+          "tranche_key": "watch",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-04",
+            "retrieved_at": "2026-11-04T10:36:39+00:00",
+            "since": "2000-01-03",
+            "source_url": "https://finance.yahoo.com/quote/D05.SI/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "SGD",
+            "periods": {
+              "1d": {
+                "value": -0.141081,
+                "start": "2026-11-03",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "1w": {
+                "value": -4.338423,
+                "start": "2026-10-28",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "1m": {
+                "value": -8.327937,
+                "start": "2026-10-02",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "6m": {
+                "value": 23.762885,
+                "start": "2026-05-04",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 30.500836,
+                "start": "2025-12-31",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "1y": {
+                "value": 39.379152,
+                "start": "2025-11-04",
+                "end": "2026-11-04",
+                "annualized": false
+              },
+              "3y": {
+                "value": 40.492527,
+                "start": "2023-11-03",
+                "end": "2026-11-04",
+                "annualized": true
+              },
+              "5y": {
+                "value": 26.163802,
+                "start": "2021-11-03",
+                "end": "2026-11-04",
+                "annualized": true
+              },
+              "10y": {
+                "value": 23.988019,
+                "start": "2016-11-04",
+                "end": "2026-11-04",
+                "annualized": true
+              },
+              "all": {
+                "value": 8.20603,
+                "start": "2000-01-03",
+                "end": "2026-11-04",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-08-14",
+            "cash_events_count": 78
+          }
+        },
+        {
+          "name": "Swiss Life",
+          "ticker": "SLHN.SW",
+          "cluster": "Erstversicherer Europa",
+          "hist_pe": 14.2,
+          "hist_ps": null,
+          "hist_div": 5.1,
+          "buy_trigger": "Forward P/E < 14,5x oder Div.-Rendite > 5,2%",
+          "current_pe": 21.045298,
+          "forward_pe": 18.792765,
+          "ps_ratio": 2.268313,
+          "div_yield": 3.8,
+          "roe": 19.368,
+          "price": 966.4,
+          "sma200": 893.657,
+          "rsi14": 71.435024,
+          "currency": "CHF",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:16:38+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:24+01:00",
+            "forward_pe": "2026-11-03T15:33:24+01:00",
+            "ps_ratio": "2026-11-03T15:33:24+01:00",
+            "div_yield": "2026-11-03T15:33:24+01:00",
+            "roe": "2026-11-03T15:33:24+01:00",
+            "price": "2026-11-03T15:33:24+01:00",
+            "sma200": "2026-11-03T15:33:24+01:00",
+            "rsi14": "2026-11-03T15:33:24+01:00",
+            "currency": "2026-11-03T15:33:24+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 21.045298,
+          "spread_pe_pct": 48.2063,
+          "sma200_distance_pct": 8.1399,
+          "tranche": "Hold / Watchlist",
+          "tranche_color": "amber",
+          "tranche_key": "watch",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:39+00:00",
+            "since": "1995-04-03",
+            "source_url": "https://finance.yahoo.com/quote/SLHN.SW/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "CHF",
+            "periods": {
+              "1d": {
+                "value": 0.562737,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": 2.39813,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": 8.305275,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 9.760344,
+                "start": "2026-04-30",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 9.760344,
+                "start": "2025-12-30",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 14.846245,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 23.319134,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 18.835136,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 19.169987,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 8.309955,
+                "start": "1995-04-03",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-05-11",
+            "cash_events_count": 15
+          }
+        },
+        {
+          "name": "Goldman Sachs",
+          "ticker": "GS",
+          "cluster": "Banken USA",
+          "hist_pe": 14.124815,
+          "hist_ps": null,
+          "hist_div": null,
+          "buy_trigger": "TTM-KGV mindestens 15% unter eigenem 5J-Jahresend-Median, Forward-KGV höchstens auf Referenzniveau, Kurs ≤ SMA 200 und RSI (14) ≤ 50.",
+          "current_pe": 12.884112,
+          "forward_pe": 12.068922,
+          "ps_ratio": 3.673008,
+          "div_yield": 2.23,
+          "roe": 17.712,
+          "price": 896.09,
+          "sma200": 957.138251,
+          "rsi14": 45.505595,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T21:00:03+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-04T11:17:15+01:00",
+            "forward_pe": "2026-11-04T11:17:15+01:00",
+            "ps_ratio": "2026-11-04T11:17:15+01:00",
+            "div_yield": "2026-11-04T11:17:15+01:00",
+            "roe": "2026-11-04T11:17:15+01:00",
+            "price": "2026-11-04T11:17:15+01:00",
+            "sma200": "2026-11-04T11:17:15+01:00",
+            "rsi14": "2026-11-04T11:17:15+01:00",
+            "currency": "2026-11-04T11:17:15+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 12.884112,
+          "spread_pe_pct": -8.7839,
+          "sma200_distance_pct": -6.3782,
+          "tranche": "Tranche 2 (Rücksetzer kaufen)",
+          "tranche_color": "sky",
+          "tranche_key": "dip",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:39+00:00",
+            "since": "1999-05-04",
+            "source_url": "https://finance.yahoo.com/quote/GS/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": -0.292632,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": -1.719731,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": -0.716847,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": -2.087909,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 3.429683,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 16.306117,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 42.968908,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 19.33888,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 20.1208,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 11.22882,
+                "start": "1999-05-04",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-09-01",
+            "cash_events_count": 110
+          },
+          "field_metadata": {
+            "hist_pe": {
+              "provider": "Goldman Sachs IR + Yahoo Finance",
+              "fact_type": "historical_year_end_pe_median",
+              "label": "5J-Median · JE",
+              "accounting_basis": "US-GAAP",
+              "period": "FY2021–FY2025",
+              "source_url": "https://www.goldmansachs.com/investor-relations/financials/8k/2026/8k-01-15-26.pdf#page=15",
+              "price_source_url": "https://finance.yahoo.com/quote/GS/history/",
+              "verified_at": "2026-11-04",
+              "sample_count": 5,
+              "observations": [
+                {
+                  "fiscal_year": 2021,
+                  "price_date": "2021-12-31",
+                  "close": 382.55,
+                  "diluted_eps": 59.45,
+                  "pe": 6.434819176,
+                  "eps_source_url": "https://www.goldmansachs.com/investor-relations/financials/10k/2023/2023-10-k.pdf#page=71"
+                },
+                {
+                  "fiscal_year": 2022,
+                  "price_date": "2022-12-30",
+                  "close": 343.38,
+                  "diluted_eps": 30.06,
+                  "pe": 11.423153693,
+                  "eps_source_url": "https://www.goldmansachs.com/investor-relations/financials/10k/2023/2023-10-k.pdf#page=71"
+                },
+                {
+                  "fiscal_year": 2023,
+                  "price_date": "2023-12-29",
+                  "close": 385.77,
+                  "diluted_eps": 22.87,
+                  "pe": 16.867949279,
+                  "eps_source_url": "https://www.goldmansachs.com/investor-relations/financials/10k/2023/2023-10-k.pdf#page=71"
+                },
+                {
+                  "fiscal_year": 2024,
+                  "price_date": "2024-12-31",
+                  "close": 572.62,
+                  "diluted_eps": 40.54,
+                  "pe": 14.124814998,
+                  "eps_source_url": "https://www.goldmansachs.com/investor-relations/financials/8k/2026/8k-01-15-26.pdf#page=15"
+                },
+                {
+                  "fiscal_year": 2025,
+                  "price_date": "2025-12-31",
+                  "close": 879.0,
+                  "diluted_eps": 51.32,
+                  "pe": 17.127825409,
+                  "eps_source_url": "https://www.goldmansachs.com/investor-relations/financials/8k/2026/8k-01-15-26.pdf#page=15"
+                }
+              ],
+              "method": "Median der fünf Jahresend-KGVs 2021–2025: letzter splitbereinigter Schlusskurs des Jahres in USD ÷ verwässertes GAAP-Jahres-EPS in USD. Kurse ohne Dividendenbereinigung. Nachträglich rekonstruierte Referenz; kein Durchschnitt täglicher TTM-KGVs und kein historisch handelbarer Backtest. Bei Aflac sind 2021–2022 nach LDTI rückwirkend angepasst.",
+              "comparable_to_current": true,
+              "comparison_note": "2023 enthält Belastungen aus dem Rückzug aus dem Konsumentengeschäft. Investmentbanking-Gewinne sind zyklisch; der Median glättet einzelne Jahre, beseitigt diese Risiken aber nicht."
+            }
+          },
+          "buy_indicator": {
+            "version": 1,
+            "status": "watch",
+            "label": "Abwarten",
+            "summary": "3/4 Bedingungen erfüllt. TTM ≤ 12,01×; Forward ≤ 14,12×; Kurs ≤ SMA 200; RSI ≤ 50.",
+            "rule": "TTM-KGV mindestens 15% unter eigenem 5J-Jahresend-Median, Forward-KGV höchstens auf Referenzniveau, Kurs ≤ SMA 200 und RSI (14) ≤ 50. Eigene Screening-Regel mit gewähltem 15%-Puffer, nicht rückgetestet. Forward-KGV ist eine Konsensschätzung und kann auf bereinigten Gewinnen beruhen. TTM-Prüfkurs = aktueller Kurs ÷ TTM-KGV × Prüfschwelle bei unverändertem TTM-EPS; kein Kursziel. Bilanz, Kapitalausstattung und Gewinnqualität vor einem Kauf separat prüfen. 2023 enthält Belastungen aus dem Rückzug aus dem Konsumentengeschäft. Investmentbanking-Gewinne sind zyklisch; der Median glättet einzelne Jahre, beseitigt diese Risiken aber nicht.",
+            "target_pe": 12.006093,
+            "target_price": 835.02,
+            "currency": "USD",
+            "discount_pct": 15,
+            "conditions": [
+              {
+                "key": "current_pe",
+                "label": "TTM-KGV ≤ 85% der eigenen Referenz",
+                "actual": 12.884112,
+                "threshold": 12.006092749999999,
+                "passed": false
+              },
+              {
+                "key": "forward_pe",
+                "label": "Forward-KGV ≤ eigene Referenz",
+                "actual": 12.068922,
+                "threshold": 14.124815,
+                "passed": true
+              },
+              {
+                "key": "sma200",
+                "label": "Kurs ≤ SMA 200",
+                "actual": 896.09,
+                "threshold": 957.138251,
+                "passed": true
+              },
+              {
+                "key": "rsi14",
+                "label": "RSI (14) ≤ 50",
+                "actual": 45.505595,
+                "threshold": 50,
+                "passed": true
+              }
+            ],
+            "as_of": "2026-11-03T21:00:03+00:00",
+            "evaluated_at": "2026-11-04T11:56:21+01:00",
+            "reference_period": "FY2021–FY2025"
+          }
+        },
+        {
+          "name": "JPMorgan Chase",
+          "ticker": "JPM",
+          "cluster": "Banken USA",
+          "hist_pe": 11.091811,
+          "hist_ps": null,
+          "hist_div": null,
+          "buy_trigger": "TTM-KGV mindestens 15% unter eigenem 5J-Jahresend-Median, Forward-KGV höchstens auf Referenzniveau, Kurs ≤ SMA 200 und RSI (14) ≤ 50.",
+          "current_pe": 14.177013,
+          "forward_pe": 13.216252,
+          "ps_ratio": 4.705739,
+          "div_yield": 1.95,
+          "roe": 18.013,
+          "price": 337.98,
+          "sma200": 323.232101,
+          "rsi14": 49.996426,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T21:00:02+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-04T11:17:16+01:00",
+            "forward_pe": "2026-11-04T11:17:16+01:00",
+            "ps_ratio": "2026-11-04T11:17:16+01:00",
+            "div_yield": "2026-11-04T11:17:16+01:00",
+            "roe": "2026-11-04T11:17:16+01:00",
+            "price": "2026-11-04T11:17:16+01:00",
+            "sma200": "2026-11-04T11:17:16+01:00",
+            "rsi14": "2026-11-04T11:17:16+01:00",
+            "currency": "2026-11-04T11:17:16+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 14.177013,
+          "spread_pe_pct": 27.8151,
+          "sma200_distance_pct": 4.5626,
+          "tranche": "Hold / Watchlist",
+          "tranche_color": "amber",
+          "tranche_key": "watch",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:39+00:00",
+            "since": "1980-03-17",
+            "source_url": "https://finance.yahoo.com/quote/JPM/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": -0.763396,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": 0.652194,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": 2.19128,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 9.185526,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 6.89632,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 11.343565,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 36.05595,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 17.556399,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 20.427237,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 13.241074,
+                "start": "1980-03-17",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-10-06",
+            "cash_events_count": 172
+          },
+          "field_metadata": {
+            "hist_pe": {
+              "provider": "JPMorgan Chase IR + Yahoo Finance",
+              "fact_type": "historical_year_end_pe_median",
+              "label": "5J-Median · JE",
+              "accounting_basis": "US-GAAP",
+              "period": "FY2021–FY2025",
+              "source_url": "https://www.jpmorganchase.com/ir/annual-report/2025/ar-ceo-letters",
+              "price_source_url": "https://finance.yahoo.com/quote/JPM/history/",
+              "verified_at": "2026-11-04",
+              "sample_count": 5,
+              "observations": [
+                {
+                  "fiscal_year": 2021,
+                  "price_date": "2021-12-31",
+                  "close": 158.35,
+                  "diluted_eps": 15.36,
+                  "pe": 10.309244792,
+                  "eps_source_url": "https://www.jpmorganchase.com/ir/annual-report/2025/ar-ceo-letters"
+                },
+                {
+                  "fiscal_year": 2022,
+                  "price_date": "2022-12-30",
+                  "close": 134.1,
+                  "diluted_eps": 12.09,
+                  "pe": 11.091811414,
+                  "eps_source_url": "https://www.jpmorganchase.com/ir/annual-report/2025/ar-ceo-letters"
+                },
+                {
+                  "fiscal_year": 2023,
+                  "price_date": "2023-12-29",
+                  "close": 170.1,
+                  "diluted_eps": 16.23,
+                  "pe": 10.480591497,
+                  "eps_source_url": "https://www.jpmorganchase.com/ir/annual-report/2025/ar-ceo-letters"
+                },
+                {
+                  "fiscal_year": 2024,
+                  "price_date": "2024-12-31",
+                  "close": 239.71,
+                  "diluted_eps": 19.75,
+                  "pe": 12.13721519,
+                  "eps_source_url": "https://www.jpmorganchase.com/ir/annual-report/2025/ar-ceo-letters"
+                },
+                {
+                  "fiscal_year": 2025,
+                  "price_date": "2025-12-31",
+                  "close": 322.22,
+                  "diluted_eps": 20.02,
+                  "pe": 16.094905095,
+                  "eps_source_url": "https://www.jpmorganchase.com/ir/annual-report/2025/ar-ceo-letters"
+                }
+              ],
+              "method": "Median der fünf Jahresend-KGVs 2021–2025: letzter splitbereinigter Schlusskurs des Jahres in USD ÷ verwässertes GAAP-Jahres-EPS in USD. Kurse ohne Dividendenbereinigung. Nachträglich rekonstruierte Referenz; kein Durchschnitt täglicher TTM-KGVs und kein historisch handelbarer Backtest. Bei Aflac sind 2021–2022 nach LDTI rückwirkend angepasst.",
+              "comparable_to_current": true,
+              "comparison_note": "2021 profitierte von Reserveauflösungen; 2024 enthält einen Netto-Visa-Sondereffekt. Kreditkosten und Kapitalquoten vor einem Nachkauf separat prüfen."
+            }
+          },
+          "buy_indicator": {
+            "version": 1,
+            "status": "watch",
+            "label": "Abwarten",
+            "summary": "1/4 Bedingungen erfüllt. TTM ≤ 9,43×; Forward ≤ 11,09×; Kurs ≤ SMA 200; RSI ≤ 50.",
+            "rule": "TTM-KGV mindestens 15% unter eigenem 5J-Jahresend-Median, Forward-KGV höchstens auf Referenzniveau, Kurs ≤ SMA 200 und RSI (14) ≤ 50. Eigene Screening-Regel mit gewähltem 15%-Puffer, nicht rückgetestet. Forward-KGV ist eine Konsensschätzung und kann auf bereinigten Gewinnen beruhen. TTM-Prüfkurs = aktueller Kurs ÷ TTM-KGV × Prüfschwelle bei unverändertem TTM-EPS; kein Kursziel. Bilanz, Kapitalausstattung und Gewinnqualität vor einem Kauf separat prüfen. 2021 profitierte von Reserveauflösungen; 2024 enthält einen Netto-Visa-Sondereffekt. Kreditkosten und Kapitalquoten vor einem Nachkauf separat prüfen.",
+            "target_pe": 9.428039,
+            "target_price": 224.76,
+            "currency": "USD",
+            "discount_pct": 15,
+            "conditions": [
+              {
+                "key": "current_pe",
+                "label": "TTM-KGV ≤ 85% der eigenen Referenz",
+                "actual": 14.177013,
+                "threshold": 9.428039349999999,
+                "passed": false
+              },
+              {
+                "key": "forward_pe",
+                "label": "Forward-KGV ≤ eigene Referenz",
+                "actual": 13.216252,
+                "threshold": 11.091811,
+                "passed": false
+              },
+              {
+                "key": "sma200",
+                "label": "Kurs ≤ SMA 200",
+                "actual": 337.98,
+                "threshold": 323.232101,
+                "passed": false
+              },
+              {
+                "key": "rsi14",
+                "label": "RSI (14) ≤ 50",
+                "actual": 49.996426,
+                "threshold": 50,
+                "passed": true
+              }
+            ],
+            "as_of": "2026-11-03T21:00:02+00:00",
+            "evaluated_at": "2026-11-04T11:56:21+01:00",
+            "reference_period": "FY2021–FY2025"
+          }
+        },
+        {
+          "name": "Morgan Stanley",
+          "ticker": "MS",
+          "cluster": "Banken USA",
+          "hist_pe": 15.813836,
+          "hist_ps": null,
+          "hist_div": null,
+          "buy_trigger": "TTM-KGV mindestens 15% unter eigenem 5J-Jahresend-Median, Forward-KGV höchstens auf Referenzniveau, Kurs ≤ SMA 200 und RSI (14) ≤ 50.",
+          "current_pe": 14.757336,
+          "forward_pe": 13.612901,
+          "ps_ratio": 3.649784,
+          "div_yield": 2.47,
+          "roe": null,
+          "price": 186.09,
+          "sma200": 194.2888,
+          "rsi14": 45.97758,
+          "currency": "USD",
+          "source_status": "partial",
+          "as_of": "2026-11-03T21:02:24+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "unavailable",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-04T11:17:17+01:00",
+            "forward_pe": "2026-11-04T11:17:17+01:00",
+            "ps_ratio": "2026-11-04T11:17:17+01:00",
+            "div_yield": "2026-11-04T11:17:17+01:00",
+            "roe": null,
+            "price": "2026-11-04T11:17:17+01:00",
+            "sma200": "2026-11-04T11:17:18+01:00",
+            "rsi14": "2026-11-04T11:17:18+01:00",
+            "currency": "2026-11-04T11:17:17+01:00"
+          },
+          "warnings": [
+            "Nicht frisch verfügbar (Quelle je Feld gekennzeichnet): roe."
+          ],
+          "chart_pe": 14.757336,
+          "spread_pe_pct": -6.6809,
+          "sma200_distance_pct": -4.2199,
+          "tranche": "Hold / Watchlist",
+          "tranche_color": "amber",
+          "tranche_key": "watch",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:39+00:00",
+            "since": "1993-02-23",
+            "source_url": "https://finance.yahoo.com/quote/MS/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": 0.19383,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": 0.182527,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": -1.607289,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": -0.996717,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 7.191881,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 16.283381,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 38.523171,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 16.2501,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 22.330738,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 12.61031,
+                "start": "1993-02-23",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-10-30",
+            "cash_events_count": 136
+          },
+          "field_metadata": {
+            "hist_pe": {
+              "provider": "Morgan Stanley IR + Yahoo Finance",
+              "fact_type": "historical_year_end_pe_median",
+              "label": "5J-Median · JE",
+              "accounting_basis": "US-GAAP",
+              "period": "FY2021–FY2025",
+              "source_url": "https://www.morganstanley.com/content/dam/msdotcom/en/about-us-ir/shareholder/10k2025/10k1225.pdf#page=29",
+              "price_source_url": "https://finance.yahoo.com/quote/MS/history/",
+              "verified_at": "2026-11-04",
+              "sample_count": 5,
+              "observations": [
+                {
+                  "fiscal_year": 2021,
+                  "price_date": "2021-12-31",
+                  "close": 98.16,
+                  "diluted_eps": 8.03,
+                  "pe": 12.224159402,
+                  "eps_source_url": "https://www.morganstanley.com/about-us-ir/shareholder/10k2023/10k1223.pdf#page=31"
+                },
+                {
+                  "fiscal_year": 2022,
+                  "price_date": "2022-12-30",
+                  "close": 85.02,
+                  "diluted_eps": 6.15,
+                  "pe": 13.824390244,
+                  "eps_source_url": "https://www.morganstanley.com/about-us-ir/shareholder/10k2023/10k1223.pdf#page=31"
+                },
+                {
+                  "fiscal_year": 2023,
+                  "price_date": "2023-12-29",
+                  "close": 93.25,
+                  "diluted_eps": 5.18,
+                  "pe": 18.001930502,
+                  "eps_source_url": "https://www.morganstanley.com/about-us-ir/shareholder/10k2023/10k1223.pdf#page=31"
+                },
+                {
+                  "fiscal_year": 2024,
+                  "price_date": "2024-12-31",
+                  "close": 125.72,
+                  "diluted_eps": 7.95,
+                  "pe": 15.813836478,
+                  "eps_source_url": "https://www.morganstanley.com/content/dam/msdotcom/en/about-us-ir/shareholder/10k2025/10k1225.pdf#page=29"
+                },
+                {
+                  "fiscal_year": 2025,
+                  "price_date": "2025-12-31",
+                  "close": 177.53,
+                  "diluted_eps": 10.21,
+                  "pe": 17.387855044,
+                  "eps_source_url": "https://www.morganstanley.com/content/dam/msdotcom/en/about-us-ir/shareholder/10k2025/10k1225.pdf#page=29"
+                }
+              ],
+              "method": "Median der fünf Jahresend-KGVs 2021–2025: letzter splitbereinigter Schlusskurs des Jahres in USD ÷ verwässertes GAAP-Jahres-EPS in USD. Kurse ohne Dividendenbereinigung. Nachträglich rekonstruierte Referenz; kein Durchschnitt täglicher TTM-KGVs und kein historisch handelbarer Backtest. Bei Aflac sind 2021–2022 nach LDTI rückwirkend angepasst.",
+              "comparable_to_current": true,
+              "comparison_note": "2023 enthält zusätzliche FDIC-, Rechts-, Personal- und Integrationskosten. GAAP-ROE und bereinigtes ROTCE sind unterschiedliche Kennzahlen; ein fehlendes ROE wird nicht ersetzt."
+            }
+          },
+          "buy_indicator": {
+            "version": 1,
+            "status": "watch",
+            "label": "Abwarten",
+            "summary": "3/4 Bedingungen erfüllt. TTM ≤ 13,44×; Forward ≤ 15,81×; Kurs ≤ SMA 200; RSI ≤ 50.",
+            "rule": "TTM-KGV mindestens 15% unter eigenem 5J-Jahresend-Median, Forward-KGV höchstens auf Referenzniveau, Kurs ≤ SMA 200 und RSI (14) ≤ 50. Eigene Screening-Regel mit gewähltem 15%-Puffer, nicht rückgetestet. Forward-KGV ist eine Konsensschätzung und kann auf bereinigten Gewinnen beruhen. TTM-Prüfkurs = aktueller Kurs ÷ TTM-KGV × Prüfschwelle bei unverändertem TTM-EPS; kein Kursziel. Bilanz, Kapitalausstattung und Gewinnqualität vor einem Kauf separat prüfen. 2023 enthält zusätzliche FDIC-, Rechts-, Personal- und Integrationskosten. GAAP-ROE und bereinigtes ROTCE sind unterschiedliche Kennzahlen; ein fehlendes ROE wird nicht ersetzt.",
+            "target_pe": 13.441761,
+            "target_price": 169.5,
+            "currency": "USD",
+            "discount_pct": 15,
+            "conditions": [
+              {
+                "key": "current_pe",
+                "label": "TTM-KGV ≤ 85% der eigenen Referenz",
+                "actual": 14.757336,
+                "threshold": 13.4417606,
+                "passed": false
+              },
+              {
+                "key": "forward_pe",
+                "label": "Forward-KGV ≤ eigene Referenz",
+                "actual": 13.612901,
+                "threshold": 15.813836,
+                "passed": true
+              },
+              {
+                "key": "sma200",
+                "label": "Kurs ≤ SMA 200",
+                "actual": 186.09,
+                "threshold": 194.2888,
+                "passed": true
+              },
+              {
+                "key": "rsi14",
+                "label": "RSI (14) ≤ 50",
+                "actual": 45.97758,
+                "threshold": 50,
+                "passed": true
+              }
+            ],
+            "as_of": "2026-11-03T21:02:24+00:00",
+            "evaluated_at": "2026-11-04T11:56:21+01:00",
+            "reference_period": "FY2021–FY2025"
+          }
+        },
+        {
+          "name": "Aflac",
+          "ticker": "AFL",
+          "cluster": "Versicherer USA",
+          "hist_pe": 10.604113,
+          "hist_ps": null,
+          "hist_div": null,
+          "buy_trigger": "TTM-KGV mindestens 15% unter eigenem 5J-Jahresend-Median, Forward-KGV höchstens auf Referenzniveau, Kurs ≤ SMA 200 und RSI (14) ≤ 50.",
+          "current_pe": 13.337634,
+          "forward_pe": 16.287834,
+          "ps_ratio": 3.441619,
+          "div_yield": 1.97,
+          "roe": 16.908,
+          "price": 124.04,
+          "sma200": 116.0224,
+          "rsi14": 66.307413,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T21:00:03+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-04T11:17:18+01:00",
+            "forward_pe": "2026-11-04T11:17:18+01:00",
+            "ps_ratio": "2026-11-04T11:17:18+01:00",
+            "div_yield": "2026-11-04T11:17:18+01:00",
+            "roe": "2026-11-04T11:17:18+01:00",
+            "price": "2026-11-04T11:17:18+01:00",
+            "sma200": "2026-11-04T11:17:19+01:00",
+            "rsi14": "2026-11-04T11:17:19+01:00",
+            "currency": "2026-11-04T11:17:18+01:00"
+          },
+          "warnings": [],
+          "chart_pe": 13.337634,
+          "spread_pe_pct": 25.7779,
+          "sma200_distance_pct": 6.9104,
+          "tranche": "Hold / Watchlist",
+          "tranche_color": "amber",
+          "tranche_key": "watch",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:40+00:00",
+            "since": "1980-03-17",
+            "source_url": "https://finance.yahoo.com/quote/AFL/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": -0.441444,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": 1.680468,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": 11.206742,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 11.036763,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 14.275153,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 18.425047,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 17.151805,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": 19.900118,
+                "start": "2021-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "10y": {
+                "value": 16.345571,
+                "start": "2016-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "all": {
+                "value": 17.949377,
+                "start": "1980-03-17",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-08-19",
+            "cash_events_count": 169
+          },
+          "field_metadata": {
+            "hist_pe": {
+              "provider": "Aflac IR + Yahoo Finance",
+              "fact_type": "historical_year_end_pe_median",
+              "label": "5J-Median · JE",
+              "accounting_basis": "US-GAAP",
+              "period": "FY2021–FY2025",
+              "source_url": "https://investors.aflac.com/press-releases/press-release-details/2026/Aflac-Incorporated-Announces-Fourth-Quarter-Results-Reports-Fourth-Quarter-Net-Earnings-of-1-4-Billion-Reiterates-Increase-in-First-Quarter-Dividend-of-5-2/default.aspx",
+              "price_source_url": "https://finance.yahoo.com/quote/AFL/history/",
+              "verified_at": "2026-11-04",
+              "sample_count": 5,
+              "observations": [
+                {
+                  "fiscal_year": 2021,
+                  "price_date": "2021-12-31",
+                  "close": 58.39,
+                  "diluted_eps": 6.25,
+                  "pe": 9.3424,
+                  "eps_source_url": "https://investors.aflac.com/files/doc_downloads/shareholder-meeting/2024/AFL-12-31-23-10-K.pdf#page=88"
+                },
+                {
+                  "fiscal_year": 2022,
+                  "price_date": "2022-12-30",
+                  "close": 71.94,
+                  "diluted_eps": 6.93,
+                  "pe": 10.380952381,
+                  "eps_source_url": "https://investors.aflac.com/files/doc_downloads/shareholder-meeting/2024/AFL-12-31-23-10-K.pdf#page=88"
+                },
+                {
+                  "fiscal_year": 2023,
+                  "price_date": "2023-12-29",
+                  "close": 82.5,
+                  "diluted_eps": 7.78,
+                  "pe": 10.604113111,
+                  "eps_source_url": "https://investors.aflac.com/files/doc_downloads/shareholder-meeting/2024/AFL-12-31-23-10-K.pdf#page=88"
+                },
+                {
+                  "fiscal_year": 2024,
+                  "price_date": "2024-12-31",
+                  "close": 103.44,
+                  "diluted_eps": 9.63,
+                  "pe": 10.741433022,
+                  "eps_source_url": "https://investors.aflac.com/press-releases/press-release-details/2026/Aflac-Incorporated-Announces-Fourth-Quarter-Results-Reports-Fourth-Quarter-Net-Earnings-of-1-4-Billion-Reiterates-Increase-in-First-Quarter-Dividend-of-5-2/default.aspx"
+                },
+                {
+                  "fiscal_year": 2025,
+                  "price_date": "2025-12-31",
+                  "close": 110.27,
+                  "diluted_eps": 6.82,
+                  "pe": 16.168621701,
+                  "eps_source_url": "https://investors.aflac.com/press-releases/press-release-details/2026/Aflac-Incorporated-Announces-Fourth-Quarter-Results-Reports-Fourth-Quarter-Net-Earnings-of-1-4-Billion-Reiterates-Increase-in-First-Quarter-Dividend-of-5-2/default.aspx"
+                }
+              ],
+              "method": "Median der fünf Jahresend-KGVs 2021–2025: letzter splitbereinigter Schlusskurs des Jahres in USD ÷ verwässertes GAAP-Jahres-EPS in USD. Kurse ohne Dividendenbereinigung. Nachträglich rekonstruierte Referenz; kein Durchschnitt täglicher TTM-KGVs und kein historisch handelbarer Backtest. Bei Aflac sind 2021–2022 nach LDTI rückwirkend angepasst.",
+              "comparable_to_current": true,
+              "comparison_note": "2021–2022 sind nach LDTI rückwirkend angepasst (2021: 6,25 USD). Anlage-, Derivate- und Währungseffekte beeinflussen GAAP-Gewinne erheblich; deshalb zusätzlich die Forward-Bewertung prüfen."
+            }
+          },
+          "buy_indicator": {
+            "version": 1,
+            "status": "watch",
+            "label": "Abwarten",
+            "summary": "0/4 Bedingungen erfüllt. TTM ≤ 9,01×; Forward ≤ 10,60×; Kurs ≤ SMA 200; RSI ≤ 50.",
+            "rule": "TTM-KGV mindestens 15% unter eigenem 5J-Jahresend-Median, Forward-KGV höchstens auf Referenzniveau, Kurs ≤ SMA 200 und RSI (14) ≤ 50. Eigene Screening-Regel mit gewähltem 15%-Puffer, nicht rückgetestet. Forward-KGV ist eine Konsensschätzung und kann auf bereinigten Gewinnen beruhen. TTM-Prüfkurs = aktueller Kurs ÷ TTM-KGV × Prüfschwelle bei unverändertem TTM-EPS; kein Kursziel. Bilanz, Kapitalausstattung und Gewinnqualität vor einem Kauf separat prüfen. 2021–2022 sind nach LDTI rückwirkend angepasst (2021: 6,25 USD). Anlage-, Derivate- und Währungseffekte beeinflussen GAAP-Gewinne erheblich; deshalb zusätzlich die Forward-Bewertung prüfen.",
+            "target_pe": 9.013496,
+            "target_price": 83.83,
+            "currency": "USD",
+            "discount_pct": 15,
+            "conditions": [
+              {
+                "key": "current_pe",
+                "label": "TTM-KGV ≤ 85% der eigenen Referenz",
+                "actual": 13.337634,
+                "threshold": 9.01349605,
+                "passed": false
+              },
+              {
+                "key": "forward_pe",
+                "label": "Forward-KGV ≤ eigene Referenz",
+                "actual": 16.287834,
+                "threshold": 10.604113,
+                "passed": false
+              },
+              {
+                "key": "sma200",
+                "label": "Kurs ≤ SMA 200",
+                "actual": 124.04,
+                "threshold": 116.0224,
+                "passed": false
+              },
+              {
+                "key": "rsi14",
+                "label": "RSI (14) ≤ 50",
+                "actual": 66.307413,
+                "threshold": 50,
+                "passed": false
+              }
+            ],
+            "as_of": "2026-11-03T21:00:03+00:00",
+            "evaluated_at": "2026-11-04T11:56:21+01:00",
+            "reference_period": "FY2021–FY2025"
+          }
+        },
+        {
+          "name": "JPMorgan Nasdaq Equity Premium Income ETF",
+          "ticker": "JEPQ",
+          "cluster": "Income-ETFs",
+          "asset_type": "etf",
+          "fund_kind": "equity_income_options",
+          "fund_inception": "2022-05-03",
+          "fund_source": "https://am.jpmorgan.com/content/dam/jpm-am-aem/americas/us/en/literature/fact-sheet/etfs/FS-JEPQ.PDF",
+          "hist_pe": null,
+          "hist_ps": null,
+          "hist_div": null,
+          "buy_trigger": "ETF separat bewerten; kein automatisches Kaufsignal.",
+          "distribution_yield_label": "Ausschüttungsrendite (12M)",
+          "distribution_yield_method": "Ausschüttungen je Anteil der letzten 12 Monate nach Ex-Tag / aktueller Kurs × 100; keine Gesamtrendite.",
+          "current_pe": 26.025764,
+          "forward_pe": null,
+          "ps_ratio": null,
+          "div_yield": null,
+          "roe": null,
+          "price": 56.55,
+          "sma200": 59.0509,
+          "rsi14": 31.675385,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-03T14:33:24+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "unavailable",
+            "ps_ratio": "unavailable",
+            "div_yield": "unavailable",
+            "roe": "unavailable",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live",
+            "distribution_yield_ttm": "live",
+            "distributions_per_share_ttm": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-03T15:33:25+01:00",
+            "forward_pe": null,
+            "ps_ratio": null,
+            "div_yield": null,
+            "roe": null,
+            "price": "2026-11-03T15:33:25+01:00",
+            "sma200": "2026-11-03T15:33:26+01:00",
+            "rsi14": "2026-11-03T15:33:26+01:00",
+            "currency": "2026-11-03T15:33:25+01:00",
+            "distribution_yield_ttm": "2026-11-03T15:33:26+01:00",
+            "distributions_per_share_ttm": "2026-11-03T15:33:26+01:00"
+          },
+          "warnings": [],
+          "distribution_yield_ttm": 11.335102,
+          "distributions_per_share_ttm": 6.41,
+          "distribution_as_of": "2026-11-03",
+          "chart_pe": 26.025764,
+          "spread_pe_pct": null,
+          "sma200_distance_pct": -4.2352,
+          "tranche": "ETF · separat bewerten",
+          "tranche_color": "slate",
+          "tranche_key": "unavailable",
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-03",
+            "retrieved_at": "2026-11-04T10:36:39+00:00",
+            "since": "2022-05-04",
+            "source_url": "https://finance.yahoo.com/quote/JEPQ/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum. JEPQ: die zuletzt veröffentlichten Barausschüttungen stammen vom Fondsanbieter; sie ersetzen Yahoo-Ereignisse am selben Ex-Tag und werden nicht doppelt addiert. Quelle: https://am.jpmorgan.com/FundsMarketingHandler/historicalData?cusip=46654Q203&country=us&role=adv&userLoggedIn=false&language=en",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": 0.62233,
+                "start": "2026-11-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1w": {
+                "value": -4.300544,
+                "start": "2026-10-27",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1m": {
+                "value": -6.401417,
+                "start": "2026-10-02",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "6m": {
+                "value": 2.304137,
+                "start": "2026-05-01",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 7.470495,
+                "start": "2025-12-31",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "1y": {
+                "value": 8.356174,
+                "start": "2025-11-03",
+                "end": "2026-11-03",
+                "annualized": false
+              },
+              "3y": {
+                "value": 18.198887,
+                "start": "2023-11-03",
+                "end": "2026-11-03",
+                "annualized": true
+              },
+              "5y": {
+                "value": null,
+                "start": null,
+                "end": "2026-11-03",
+                "annualized": true,
+                "reason": "Historie deckt den vollständigen Zeitraum nicht ab"
+              },
+              "10y": {
+                "value": null,
+                "start": null,
+                "end": "2026-11-03",
+                "annualized": true,
+                "reason": "Historie deckt den vollständigen Zeitraum nicht ab"
+              },
+              "all": {
+                "value": 14.43186,
+                "start": "2022-05-04",
+                "end": "2026-11-03",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-11-02",
+            "cash_events_count": 54,
+            "cash_source_url": "https://am.jpmorgan.com/FundsMarketingHandler/historicalData?cusip=46654Q203&country=us&role=adv&userLoggedIn=false&language=en",
+            "cash_retrieved_at": "2026-11-04T11:42:25+01:00",
+            "issuer_cash_events": [
+              {
+                "date": "2025-12-01",
+                "dividend": 0.55323,
+                "capital_gain": 0.0
+              },
+              {
+                "date": "2025-12-31",
+                "dividend": 0.5761,
+                "capital_gain": 0.0
+              },
+              {
+                "date": "2026-02-02",
+                "dividend": 0.46572,
+                "capital_gain": 0.0
+              },
+              {
+                "date": "2026-03-02",
+                "dividend": 0.509,
+                "capital_gain": 0.0
+              },
+              {
+                "date": "2026-04-01",
+                "dividend": 0.5586,
+                "capital_gain": 0.0
+              },
+              {
+                "date": "2026-05-01",
+                "dividend": 0.59095,
+                "capital_gain": 0.0
+              },
+              {
+                "date": "2026-06-01",
+                "dividend": 0.56444,
+                "capital_gain": 0.0
+              },
+              {
+                "date": "2026-07-01",
+                "dividend": 0.63658,
+                "capital_gain": 0.0
+              },
+              {
+                "date": "2026-08-03",
+                "dividend": 0.70497,
+                "capital_gain": 0.0
+              },
+              {
+                "date": "2026-09-01",
+                "dividend": 0.68255,
+                "capital_gain": 0.0
+              },
+              {
+                "date": "2026-10-01",
+                "dividend": 0.56687,
+                "capital_gain": 0.0
+              },
+              {
+                "date": "2026-11-02",
+                "dividend": 0.53922,
+                "capital_gain": 0.0
+              }
+            ],
+            "issuer_cash": {
+              "provider": "JPMorgan AM",
+              "source_url": "https://am.jpmorgan.com/FundsMarketingHandler/historicalData?cusip=46654Q203&country=us&role=adv&userLoggedIn=false&language=en",
+              "retrieved_at": "2026-11-04T11:42:25+01:00",
+              "event_count": 12
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "status_counts": {
+    "live": 27,
+    "partial": 2
+  }
+}
