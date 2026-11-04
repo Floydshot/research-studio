@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
+from copy import deepcopy
 from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor
 from html.parser import HTMLParser
@@ -24,12 +25,13 @@ import multiprocessing as mp
 import os
 from pathlib import Path
 import re
+from statistics import median
 import sys
 import tempfile
 import time
 from typing import Any, Callable
 from urllib.request import Request, urlopen
-from urllib.parse import urljoin, urlparse
+from urllib.parse import quote, urljoin, urlparse
 from zoneinfo import ZoneInfo
 
 
@@ -58,6 +60,17 @@ TOKIO_HIST_DIV_SOURCE = "https://www.tokiomarinehd.com/en/ir/download/Integrated
 TOKIO_HIST_PE_OBSERVATIONS = ((2021, 11.62), (2022, 13.66), (2023, 13.38), (2024, 10.58), (2025, 14.18))
 TOKIO_HIST_PE_MEAN = round(math.fsum(pe for _, pe in TOKIO_HIST_PE_OBSERVATIONS) / len(TOKIO_HIST_PE_OBSERVATIONS), 6)
 TOKYO = ZoneInfo("Asia/Tokyo")
+RETURN_PERIODS = ("1d", "1w", "1m", "6m", "ytd", "1y", "3y", "5y", "10y", "all")
+RETURN_VERSION = 1
+JEPQ_RETURN_CASH_SOURCE = "https://am.jpmorgan.com/FundsMarketingHandler/historicalData?cusip=46654Q203&country=us&role=adv&userLoggedIn=false&language=en"
+RETURN_METHOD = (
+    "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen "
+    "Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. "
+    "Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss "
+    "am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. "
+    "3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. "
+    "All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum."
+)
 
 
 def tokio_historical_pe_metadata() -> dict[str, Any]:
@@ -76,6 +89,113 @@ def tokio_historical_pe_metadata() -> dict[str, Any]:
                 "bei einheitlicher Kurs-/EPS-Basis unabhängig von Aktiensplits."),
         comparable_to_current=False,
         comparison_note="Aktuelles KGV: IFRS; historische Referenz: J-GAAP. Methodenwechsel; kein direkter Bewertungsaufschlag ableitbar.")
+
+
+# Verified fiscal-year diluted GAAP EPS, paired with split-adjusted (not
+# dividend-adjusted) USD Close on the final trading session of that year.
+# These are five ex-post annual observations, not a daily TTM backtest.
+US_PE_REFERENCES = {
+    "GS": dict(provider="Goldman Sachs IR + Yahoo Finance", eps=(59.45, 30.06, 22.87, 40.54, 51.32),
+               closes=(382.55, 343.38, 385.77, 572.62, 879.00),
+               early_source="https://www.goldmansachs.com/investor-relations/financials/10k/2023/2023-10-k.pdf#page=71",
+               late_source="https://www.goldmansachs.com/investor-relations/financials/8k/2026/8k-01-15-26.pdf#page=15",
+               note="2023 enthält Belastungen aus dem Rückzug aus dem Konsumentengeschäft. Investmentbanking-Gewinne sind zyklisch; der Median glättet einzelne Jahre, beseitigt diese Risiken aber nicht."),
+    "JPM": dict(provider="JPMorgan Chase IR + Yahoo Finance", eps=(15.36, 12.09, 16.23, 19.75, 20.02),
+                closes=(158.35, 134.10, 170.10, 239.71, 322.22),
+                early_source="https://www.jpmorganchase.com/ir/annual-report/2025/ar-ceo-letters",
+                late_source="https://www.jpmorganchase.com/ir/annual-report/2025/ar-ceo-letters",
+                note="2021 profitierte von Reserveauflösungen; 2024 enthält einen Netto-Visa-Sondereffekt. Kreditkosten und Kapitalquoten vor einem Nachkauf separat prüfen."),
+    "MS": dict(provider="Morgan Stanley IR + Yahoo Finance", eps=(8.03, 6.15, 5.18, 7.95, 10.21),
+               closes=(98.16, 85.02, 93.25, 125.72, 177.53),
+               early_source="https://www.morganstanley.com/about-us-ir/shareholder/10k2023/10k1223.pdf#page=31",
+               late_source="https://www.morganstanley.com/content/dam/msdotcom/en/about-us-ir/shareholder/10k2025/10k1225.pdf#page=29",
+               note="2023 enthält zusätzliche FDIC-, Rechts-, Personal- und Integrationskosten. GAAP-ROE und bereinigtes ROTCE sind unterschiedliche Kennzahlen; ein fehlendes ROE wird nicht ersetzt."),
+    "AFL": dict(provider="Aflac IR + Yahoo Finance", eps=(6.25, 6.93, 7.78, 9.63, 6.82),
+                closes=(58.39, 71.94, 82.50, 103.44, 110.27),
+                early_source="https://investors.aflac.com/files/doc_downloads/shareholder-meeting/2024/AFL-12-31-23-10-K.pdf#page=88",
+                late_source="https://investors.aflac.com/press-releases/press-release-details/2026/Aflac-Incorporated-Announces-Fourth-Quarter-Results-Reports-Fourth-Quarter-Net-Earnings-of-1-4-Billion-Reiterates-Increase-in-First-Quarter-Dividend-of-5-2/default.aspx",
+                note="2021–2022 sind nach LDTI rückwirkend angepasst (2021: 6,25 USD). Anlage-, Derivate- und Währungseffekte beeinflussen GAAP-Gewinne erheblich; deshalb zusätzlich die Forward-Bewertung prüfen."),
+}
+US_PE_DATES = ("2021-12-31", "2022-12-30", "2023-12-29", "2024-12-31", "2025-12-31")
+
+
+def us_historical_pe_metadata(ticker: str) -> dict[str, Any]:
+    ref = US_PE_REFERENCES[ticker]
+    observations = [dict(fiscal_year=2021 + i, price_date=US_PE_DATES[i], close=close,
+                         diluted_eps=eps, pe=round(close / eps, 9),
+                         eps_source_url=ref["early_source"] if i < 3 else ref["late_source"])
+                    for i, (close, eps) in enumerate(zip(ref["closes"], ref["eps"]))]
+    return dict(provider=ref["provider"], fact_type="historical_year_end_pe_median",
+                label="5J-Median · JE", accounting_basis="US-GAAP", period="FY2021–FY2025",
+                source_url=ref["late_source"], price_source_url=f"https://finance.yahoo.com/quote/{ticker}/history/",
+                verified_at="2026-11-04", sample_count=5, observations=observations,
+                method="Median der fünf Jahresend-KGVs 2021–2025: letzter splitbereinigter Schlusskurs des Jahres in USD ÷ verwässertes GAAP-Jahres-EPS in USD. Kurse ohne Dividendenbereinigung. Nachträglich rekonstruierte Referenz; kein Durchschnitt täglicher TTM-KGVs und kein historisch handelbarer Backtest. Bei Aflac sind 2021–2022 nach LDTI rückwirkend angepasst.",
+                comparable_to_current=True, comparison_note=ref["note"])
+
+
+def apply_us_historical_reference(stock: dict[str, Any]) -> None:
+    if stock.get("ticker") not in US_PE_REFERENCES:
+        return
+    meta = us_historical_pe_metadata(stock["ticker"])
+    stock["hist_pe"] = round(median(close / eps for close, eps in zip(
+        US_PE_REFERENCES[stock["ticker"]]["closes"], US_PE_REFERENCES[stock["ticker"]]["eps"])), 6)
+    stock.setdefault("field_metadata", {})["hist_pe"] = meta
+    stock["buy_trigger"] = "TTM-KGV mindestens 15% unter eigenem 5J-Jahresend-Median, Forward-KGV höchstens auf Referenzniveau, Kurs ≤ SMA 200 und RSI (14) ≤ 50."
+
+
+def add_buy_indicator(stock: dict[str, Any], now: datetime | None = None) -> None:
+    """Evaluate an explicit, conservative screen; never turn old data green."""
+    if stock.get("ticker") not in US_PE_REFERENCES:
+        return
+    now = now or datetime.now(timezone.utc)
+    stamp = iso_now(now)
+    reference_pe = finite_number(stock.get("hist_pe"))
+    target = reference_pe * 0.85 if reference_pe and reference_pe > 0 else None
+    fields = ("current_pe", "forward_pe", "price", "sma200", "rsi14", "currency")
+
+    def fresh(field: str) -> bool:
+        if stock.get("field_sources", {}).get(field) != "live":
+            return False
+        try:
+            instant = datetime.fromisoformat(stock.get("field_updated_at", {}).get(field) or "")
+            if instant.tzinfo is None:
+                return False
+            return -300 <= (now - instant).total_seconds() <= 4 * 86400
+        except (ValueError, TypeError):
+            return False
+
+    values = {field: finite_number(stock.get(field)) for field in fields if field != "currency"}
+    valid = target is not None and stock.get("currency") == "USD" and all(fresh(field) for field in fields)
+    valid = valid and all(values[field] is not None and values[field] > 0 for field in ("current_pe", "forward_pe", "price", "sma200"))
+    valid = valid and values["rsi14"] is not None and 0 <= values["rsi14"] <= 100
+    try:
+        quote_time = datetime.fromisoformat(stock.get("as_of") or "")
+        valid = valid and quote_time.tzinfo is not None and -300 <= (now - quote_time).total_seconds() <= 4 * 86400
+    except (TypeError, ValueError):
+        valid = False
+    checks = [("current_pe", "TTM-KGV ≤ 85% der eigenen Referenz", target),
+              ("forward_pe", "Forward-KGV ≤ eigene Referenz", reference_pe),
+              ("sma200", "Kurs ≤ SMA 200", values["sma200"]),
+              ("rsi14", "RSI (14) ≤ 50", 50)]
+    conditions = []
+    for key, label, threshold in checks:
+        actual = values["price"] if key == "sma200" else values[key]
+        conditions.append(dict(key=key, label=label, actual=actual, threshold=threshold,
+                               passed=actual <= threshold if valid else None))
+    passed = sum(item["passed"] is True for item in conditions)
+    state = "unavailable" if not valid else "eligible" if passed == len(conditions) else "watch"
+    target_price = values["price"] / values["current_pe"] * target if valid else None
+    target_text = format(target, ".2f").replace(".", ",") if valid else ""
+    reference_text = format(reference_pe, ".2f").replace(".", ",") if valid else ""
+    summary = (f"{passed}/4 Bedingungen erfüllt. TTM ≤ {target_text}×; Forward ≤ {reference_text}×; Kurs ≤ SMA 200; RSI ≤ 50." if valid
+               else "Keine Auswertung: positive aktuelle KGVs, Kurs, SMA 200, RSI und USD-Kursbasis müssen frisch bestätigt sein.")
+    stock["buy_indicator"] = dict(version=1, status=state,
+        label={"eligible": "Nachkauf prüfen", "watch": "Abwarten", "unavailable": "Daten prüfen"}[state],
+        summary=summary, rule=stock.get("buy_trigger", "") + " Eigene Screening-Regel mit gewähltem 15%-Puffer, nicht rückgetestet. Forward-KGV ist eine Konsensschätzung und kann auf bereinigten Gewinnen beruhen. TTM-Prüfkurs = aktueller Kurs ÷ TTM-KGV × Prüfschwelle bei unverändertem TTM-EPS; kein Kursziel. Bilanz, Kapitalausstattung und Gewinnqualität vor einem Kauf separat prüfen. " + US_PE_REFERENCES[stock["ticker"]]["note"],
+        target_pe=round(target, 6) if target is not None else None,
+        target_price=round(target_price, 2) if target_price is not None else None,
+        currency=stock.get("currency"), discount_pct=15, conditions=conditions,
+        as_of=stock.get("as_of"), evaluated_at=stamp, reference_period="FY2021–FY2025")
 
 
 def reference(name: str, ticker: str, cluster: str, hist_pe: float | None,
@@ -180,6 +300,7 @@ def add_derived(stock: dict[str, Any], portfolio_id: str) -> None:
     comparable = stock.get("field_metadata", {}).get("hist_pe", {}).get("comparable_to_current") is not False
     spread = finite_number((raw / hist_pe - 1) * 100) if comparable and raw is not None and raw > 0 and hist_pe is not None and hist_pe > 0 else None
     stock["spread_pe_pct"] = round(spread, 4) if spread is not None else None
+    add_buy_indicator(stock)
     price, sma = stock.get("price"), stock.get("sma200")
     distance = finite_number((price / sma - 1) * 100) if price and sma else None
     stock["sma200_distance_pct"] = round(distance, 4) if distance is not None else None
@@ -217,6 +338,7 @@ def build_seed_data(now: datetime | None = None) -> dict[str, Any]:
                          field_updated_at={field: None for field in NUMERIC_FIELDS}, warnings=[INITIAL_WARNING])
             stock["field_sources"]["currency"] = "unavailable"
             stock["field_updated_at"]["currency"] = None
+            apply_us_historical_reference(stock)
             if stock["ticker"] == TOKIO_TICKER:
                 # Verified year-end references retain their own explicit period
                 # and basis; the J-GAAP KGV series is not comparable to IFRS.
@@ -772,10 +894,324 @@ def calculate_distributions(history: Any) -> tuple[dict[str, Any], list[str]]:
     return dict(distributions_per_share_ttm=total, distribution_as_of=end.date().isoformat()), []
 
 
+def unavailable_period_returns(ticker: str, reason: str) -> dict[str, Any]:
+    return dict(
+        version=RETURN_VERSION, basis="total_return", source_status="unavailable",
+        as_of=None, retrieved_at=None, since=None,
+        source_url=f"https://finance.yahoo.com/quote/{quote(ticker, safe='')}/history/",
+        method=RETURN_METHOD,
+        periods={key: dict(value=None, start=None, end=None,
+                           annualized=key in {"3y", "5y", "10y", "all"}, reason=reason)
+                 for key in RETURN_PERIODS})
+
+
+def parse_jepq_return_cash(payload: Any, retrieved_at: str | None = None) -> dict[str, Any]:
+    """Validate the issuer's published cash events for the fixed JEPQ CUSIP."""
+    stamp = retrieved_at or iso_now()
+    retrieved = datetime.fromisoformat(stamp)
+    if retrieved.tzinfo is None or not isinstance(payload, dict) or payload.get("fundTypeCode") != "N_ETF":
+        raise ValueError("JEPQ-Emittentenantwort ist nicht eindeutig als ETF bestätigt")
+    dividends = payload.get("dividendsDistributionHistoryList")
+    capital_gains = payload.get("capitalGainsDistributionHistoryList")
+    if not isinstance(dividends, list) or len(dividends) < 2 or not isinstance(capital_gains, list):
+        raise ValueError("JEPQ-Ausschüttungshistorie fehlt beim Emittenten")
+    events = {}
+    for item in dividends:
+        if not isinstance(item, dict):
+            raise ValueError("Ungültiger JEPQ-Ausschüttungsdatensatz")
+        try:
+            ex_date = datetime.strptime(item.get("exDate", ""), "%Y-%m-%d").date()
+            pay_date = datetime.strptime(item.get("payDate", ""), "%Y-%m-%d").date()
+        except (TypeError, ValueError) as exc:
+            raise ValueError("Ungültiger JEPQ-Ex- oder Auszahlungstag") from exc
+        amount = finite_number(item.get("dividendAmount"))
+        if amount is None or amount <= 0 or pay_date < ex_date or ex_date.isoformat() in events:
+            raise ValueError("JEPQ-Barausschüttung ist nicht eindeutig")
+        events[ex_date.isoformat()] = dict(date=ex_date.isoformat(), dividend=amount, capital_gain=0.0)
+    # A new capital-gain schema must not be silently added twice or ignored.
+    # JEPQ's verified current response reports no separate capital-gain events.
+    if capital_gains:
+        raise ValueError("Separate JEPQ-Kapitalgewinnzahlungen benötigen eine eindeutig bestätigte Feldbasis")
+    return dict(provider="JPMorgan Asset Management", source_url=JEPQ_RETURN_CASH_SOURCE,
+                retrieved_at=stamp, events=[events[key] for key in sorted(events)])
+
+
+def fetch_jepq_return_cash() -> dict[str, Any]:
+    request = Request(JEPQ_RETURN_CASH_SOURCE, headers={"User-Agent": "research-studio/1.0", "Accept": "application/json"})
+    with urlopen(request, timeout=8) as response:
+        body = response.read(2_000_001)
+    if len(body) > 2_000_000:
+        raise ValueError("JEPQ-Emittentenantwort überschreitet das Größenlimit")
+    return parse_jepq_return_cash(json.loads(body), iso_now())
+
+
+def _completed_return_history(history: Any, info: dict[str, Any], now: datetime) -> Any:
+    """Exclude future/current incomplete daily bars without changing SMA input."""
+    import pandas as pd
+    if not isinstance(history.index, pd.DatetimeIndex):
+        raise ValueError("Renditehistorie enthält keine gültigen Tagesdaten")
+    zone_name = info.get("exchangeTimezoneName")
+    if not isinstance(zone_name, str):
+        zone_name = str(history.index.tz) if history.index.tz is not None else "UTC"
+    try:
+        zone = ZoneInfo(zone_name)
+    except (ValueError, KeyError):
+        zone = timezone.utc
+    local_now = now.astimezone(zone)
+    local_index = history.index.tz_convert(zone) if history.index.tz is not None else history.index.tz_localize(zone)
+    dates = local_index.date
+    keep_today = False
+    # Prefer the exchange's actual session boundary where Yahoo provides it.
+    trading = info.get("currentTradingPeriod", {})
+    regular = trading.get("regular", {}) if isinstance(trading, dict) else {}
+    end_epoch = finite_number(regular.get("end")) if isinstance(regular, dict) else None
+    has_today_boundary = False
+    if end_epoch is not None:
+        try:
+            end = datetime.fromtimestamp(end_epoch, zone)
+            if end.date() == local_now.date():
+                has_today_boundary = True
+                keep_today = now.timestamp() >= end_epoch + 30 * 60
+        except (OverflowError, OSError, ValueError):
+            pass
+    if not has_today_boundary:
+        closes = {"America/New_York": (16, 30), "US/Eastern": (16, 30),
+                  "Asia/Tokyo": (16, 0), "Asia/Singapore": (17, 30),
+                  "Europe/Berlin": (18, 0), "Europe/Paris": (18, 0),
+                  "Europe/Zurich": (18, 0)}
+        hour_minute = closes.get(zone_name)
+        if hour_minute is not None:
+            keep_today = (local_now.hour, local_now.minute) >= hour_minute
+    mask = [date < local_now.date() or (date == local_now.date() and keep_today) for date in dates]
+    return history.loc[mask]
+
+
+def calculate_period_returns(history: Any, ticker: str, info: dict[str, Any] | None = None,
+                             retrieved_at: str | None = None, issuer_cash: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Reinvest cash dividends on raw split-adjusted Close, never Adj Close."""
+    import pandas as pd
+    stamp = retrieved_at or iso_now()
+    now = datetime.fromisoformat(stamp)
+    if now.tzinfo is None:
+        raise ValueError("Rendite-Abrufzeitpunkt hat keine Zeitzone")
+    if history is None or history.empty or "Close" not in history or "Dividends" not in history:
+        raise ValueError("Vollständige Kurs-/Ausschüttungshistorie fehlt")
+    frame = history.sort_index().copy()
+    frame = frame.loc[~frame.index.duplicated(keep="last")]
+    frame = _completed_return_history(frame, info or {}, now)
+    if frame.empty:
+        raise ValueError("Keine abgeschlossenen Handelssitzungen verfügbar")
+    close = pd.to_numeric(frame["Close"], errors="coerce")
+    dividend = pd.to_numeric(frame["Dividends"], errors="coerce")
+    capital = pd.to_numeric(frame["Capital Gains"], errors="coerce") if "Capital Gains" in frame else pd.Series(0.0, index=frame.index)
+    issuer_cash_applied = []
+    if ticker == "JEPQ" and issuer_cash is not None:
+        if issuer_cash.get("provider") != "JPMorgan Asset Management" or issuer_cash.get("source_url") != JEPQ_RETURN_CASH_SOURCE:
+            raise ValueError("JEPQ-Ausschüttungsquelle nicht bestätigt")
+        dates_to_indices = {index.date().isoformat(): index for index in frame.index}
+        seen_cash_dates = set()
+        for item in issuer_cash.get("events", []):
+            date = item.get("date") if isinstance(item, dict) else None
+            amount = finite_number(item.get("dividend")) if isinstance(item, dict) else None
+            gain = finite_number(item.get("capital_gain")) if isinstance(item, dict) else None
+            if not isinstance(date, str) or date in seen_cash_dates or amount is None or amount < 0 or gain is None or gain < 0:
+                raise ValueError("JEPQ-Emittentenereignisse nicht eindeutig")
+            seen_cash_dates.add(date)
+            if date in dates_to_indices:
+                index = dates_to_indices[date]
+                dividend.loc[index] = amount
+                capital.loc[index] = gain
+                issuer_cash_applied.append(dict(date=date, dividend=amount, capital_gain=gain))
+    bad_dates = {}
+    for index in frame.index:
+        if finite_number(close.loc[index]) is None or close.loc[index] <= 0:
+            bad_dates[index.date()] = "Ungültiger Schlusskurs im Zeitraum"
+        if (finite_number(dividend.loc[index]) is None or dividend.loc[index] < 0 or
+                finite_number(capital.loc[index]) is None or capital.loc[index] < 0):
+            bad_dates[index.date()] = "Ungültige Ausschüttung im Zeitraum"
+    corrections = []
+    if ticker == TOKIO_TICKER:
+        # Yahoo's one malformed 15:1 split-day event retains the old share basis.
+        # Older cash events are already normalized: never divide them again.
+        for index in frame.index:
+            if index.date().isoformat() != "2026-09-29":
+                continue
+            amount = finite_number(dividend.loc[index])
+            split = finite_number(frame.loc[index, "Stock Splits"]) if "Stock Splits" in frame else None
+            if amount is not None and math.isclose(amount, 122.5, abs_tol=0.000001) and split == 15:
+                dividend.loc[index] = amount / 15
+                corrections.append(dict(date="2026-09-29", original=122.5, normalized=122.5 / 15,
+                                        source_url=TOKIO_DIVIDEND_SOURCE,
+                                        reason="Emittenten-Interimsdividende 122,5 JPY auf 15:1-Aktienbasis normiert; nur dieses fehlerhafte Yahoo-Ereignis."))
+            elif amount is None or not math.isclose(amount, 122.5 / 15, abs_tol=0.01):
+                bad_dates[index.date()] = "Tokio-Splitdividende nicht eindeutig auf einheitlicher Aktienbasis bestätigt"
+    valid = close.map(lambda value: finite_number(value) is not None and value > 0)
+    close = close.loc[valid]
+    dividend = dividend.loc[valid]
+    capital = capital.loc[valid]
+    if len(close) < 2:
+        raise ValueError("Weniger als zwei gültige abgeschlossene Tageskurse")
+    # Separate capital-gain cash is added only when it is independently reported;
+    # duplicated identical nonzero fields are ambiguous and not double-counted.
+    duplicate_cash = (dividend > 0) & (capital > 0) & ((dividend - capital).abs() < 0.0000001)
+    for index in duplicate_cash[duplicate_cash].index:
+        bad_dates[index.date()] = "Ausschüttung und Kapitalgewinnzahlung doppelt oder nicht eindeutig getrennt"
+    cash = dividend + capital
+    ratios = close / close.shift(1)
+    if ticker == TOKIO_TICKER:
+        # The provider's early Tokio history contains unexplained unit jumps.
+        # Only windows crossing such a jump are ineligible, not the whole row.
+        for index in ratios.index[1:]:
+            ratio = float(ratios.loc[index])
+            if ratio > 1.8 or ratio < 0.5:
+                bad_dates[index.date()] = "Ungeklärter extremer Kurssprung in älterer Tokio-Historie"
+    factors = (close + cash) / close.shift(1)
+    dates = pd.DatetimeIndex([pd.Timestamp(index.date()) for index in close.index])
+    end = dates[-1]
+    first = dates[0]
+    result = dict(version=RETURN_VERSION, basis="total_return", source_status="live",
+                  as_of=end.date().isoformat(), retrieved_at=stamp, since=first.date().isoformat(),
+                  source_url=f"https://finance.yahoo.com/quote/{quote(ticker, safe='')}/history/",
+                  method=RETURN_METHOD, currency=(info or {}).get("currency"), periods={})
+    cash_dates = [index.date().isoformat() for index in cash[cash > 0].index]
+    result["last_distribution_date"] = cash_dates[-1] if cash_dates else None
+    result["cash_events_count"] = len(cash_dates)
+    if ticker == "JEPQ":
+        # JEPQ distributes monthly. The known Yahoo max-history endpoint can
+        # omit recent events; an old cash tail is not a complete total return.
+        if not cash_dates or (end.date() - datetime.strptime(cash_dates[-1], "%Y-%m-%d").date()).days > 45:
+            raise ValueError("JEPQ-Barausschüttungen nicht vollständig: letzter bestätigter Ex-Tag liegt mehr als 45 Tage zurück")
+        if issuer_cash_applied:
+            result["cash_source_url"] = JEPQ_RETURN_CASH_SOURCE
+            result["cash_retrieved_at"] = issuer_cash.get("retrieved_at")
+            result["issuer_cash_events"] = issuer_cash_applied
+            result["issuer_cash"] = dict(provider="JPMorgan AM", source_url=JEPQ_RETURN_CASH_SOURCE,
+                                         retrieved_at=issuer_cash.get("retrieved_at"), event_count=len(issuer_cash_applied))
+            result["method"] += " JEPQ: die zuletzt veröffentlichten Barausschüttungen stammen vom Fondsanbieter; sie ersetzen Yahoo-Ereignisse am selben Ex-Tag und werden nicht doppelt addiert. Quelle: " + JEPQ_RETURN_CASH_SOURCE
+    if corrections:
+        result["cash_corrections"] = corrections
+        result["method"] += " Tokio Marine: die bestätigte Splitdividende vom 29.09.2026 ist einzeln normalisiert; Yahoo Adj Close wird nicht verwendet."
+    if bad_dates:
+        result["quality_notes"] = [dict(date=date.isoformat(), reason=reason) for date, reason in sorted(bad_dates.items())]
+    cutoffs = {"1w": end - pd.DateOffset(weeks=1), "1m": end - pd.DateOffset(months=1),
+               "6m": end - pd.DateOffset(months=6), "ytd": pd.Timestamp(end.year - 1, 12, 31),
+               "1y": end - pd.DateOffset(years=1), "3y": end - pd.DateOffset(years=3),
+               "5y": end - pd.DateOffset(years=5), "10y": end - pd.DateOffset(years=10)}
+    for key in RETURN_PERIODS:
+        annualized = key in {"3y", "5y", "10y"} or (key == "all" and (end - first).days >= 365.2425)
+        entry = dict(value=None, start=None, end=result["as_of"], annualized=annualized)
+        if key == "1d":
+            start_index = len(close) - 2
+        elif key == "all":
+            start_index = 0
+        else:
+            cutoff = cutoffs[key]
+            eligible = dates <= cutoff
+            if not eligible.any():
+                entry["reason"] = "Historie deckt den vollständigen Zeitraum nicht ab"
+                result["periods"][key] = entry
+                continue
+            start_index = int(eligible.nonzero()[0][-1])
+            if (cutoff - dates[start_index]).days > 10:
+                entry["reason"] = "Kein ausreichend naher Handelsschluss am Zeitraumstart"
+                result["periods"][key] = entry
+                continue
+        start = dates[start_index]
+        entry["start"] = start.date().isoformat()
+        elapsed = (end - start).days
+        problems = [reason for date, reason in bad_dates.items() if start.date() < date <= end.date()]
+        if elapsed <= 0:
+            entry["reason"] = "Zeitraum umfasst keine vollständige Handelssitzung"
+        elif key == "1d" and elapsed > 10:
+            entry["reason"] = "Vorherige Handelssitzung liegt mehr als zehn Kalendertage zurück"
+        elif problems:
+            entry["reason"] = problems[0]
+        else:
+            growth = finite_number(factors.iloc[start_index + 1:].prod(skipna=False))
+            if growth is None or growth <= 0:
+                entry["reason"] = "Gesamtrendite aus Kursen und Ausschüttungen nicht gültig berechenbar"
+            else:
+                try:
+                    value = (growth ** (365.2425 / elapsed) - 1) * 100 if annualized else (growth - 1) * 100
+                except (OverflowError, ValueError):
+                    value = None
+                value = finite_number(value)
+                if value is None:
+                    entry["reason"] = "Gesamtrendite außerhalb des gültigen Zahlenbereichs"
+                else:
+                    entry["value"] = round(value, 6)
+        result["periods"][key] = entry
+    return result
+
+
+def valid_period_returns(value: Any, ticker: str, stamp: str) -> dict[str, Any] | None:
+    """Accept only this documented total-return schema, including cached rows."""
+    if not isinstance(value, dict) or value.get("version") != RETURN_VERSION or value.get("basis") != "total_return":
+        return None
+    if value.get("source_status") not in {"live", "previous"}:
+        return None
+    expected_url = f"https://finance.yahoo.com/quote/{quote(ticker, safe='')}/history/"
+    if value.get("source_url") != expected_url:
+        return None
+    try:
+        now = datetime.fromisoformat(stamp)
+        retrieved = datetime.fromisoformat(value.get("retrieved_at", ""))
+        end = datetime.strptime(value.get("as_of", ""), "%Y-%m-%d").date()
+        first = datetime.strptime(value.get("since", ""), "%Y-%m-%d").date()
+        if retrieved.tzinfo is None or now.tzinfo is None or retrieved > now or end > retrieved.astimezone(TOKYO).date() or first >= end:
+            return None
+    except (TypeError, ValueError):
+        return None
+    periods = value.get("periods")
+    if not isinstance(periods, dict) or set(periods) != set(RETURN_PERIODS):
+        return None
+    has_value = False
+    for key, period in periods.items():
+        if not isinstance(period, dict) or type(period.get("annualized")) is not bool or period.get("end") != value["as_of"]:
+            return None
+        raw = period.get("value")
+        if raw is None:
+            if not isinstance(period.get("reason"), str):
+                return None
+            continue
+        number = finite_number(raw)
+        if number is None or number <= -100:
+            return None
+        try:
+            start = datetime.strptime(period.get("start", ""), "%Y-%m-%d").date()
+        except (TypeError, ValueError):
+            return None
+        if not first <= start < end:
+            return None
+        if key in {"3y", "5y", "10y"} and not period["annualized"]:
+            return None
+        if key in {"1d", "1w", "1m", "6m", "ytd", "1y"} and period["annualized"]:
+            return None
+        if key == "all" and period["annualized"] != ((end - first).days >= 365.2425):
+            return None
+        has_value = True
+    return deepcopy(value) if has_value else None
+
+
+def apply_period_returns(stock: dict[str, Any], previous: dict[str, Any], payload: dict[str, Any], stamp: str) -> None:
+    fresh = valid_period_returns(payload.get("returns"), stock["ticker"], stamp)
+    prior = valid_period_returns(previous.get("returns"), stock["ticker"], stamp)
+    if fresh and (not prior or fresh["as_of"] >= prior["as_of"]):
+        fresh["source_status"] = "live"
+        stock["returns"] = fresh
+    elif prior:
+        prior["source_status"] = "previous"
+        prior["refresh_note"] = payload.get("returns_error") or "Kein neuerer bestätigter Gesamtrendite-Datenstand; geprüfter Vorwert mit ursprünglichem Stichtag."
+        stock["returns"] = prior
+    else:
+        stock["returns"] = unavailable_period_returns(stock["ticker"], payload.get("returns_error") or "Gesamtrenditehistorie noch nicht verfügbar")
+
+
 def _fetch_worker(ticker: str, pipe: Any, attempts: int) -> None:
     """Separate process gives even Ticker.info a hard overall time limit."""
     try:
         import yfinance as yf
+        info = {}
         # Each endpoint also has its own bounded retry, in addition to watchdog.
         for endpoint in ("info", "history"):
             for attempt in range(attempts):
@@ -816,6 +1252,17 @@ def _fetch_worker(ticker: str, pipe: Any, attempts: int) -> None:
                 pipe.send(dict(issuer_metrics=metrics, warnings=notes))
             except Exception as exc:
                 pipe.send(dict(warnings=[f"Tokio Marine IFRS: {type(exc).__name__}: {str(exc)[:180]}"]))
+        # Optional long-term history comes last, preserving the fundamentals
+        # already sent even if this endpoint reaches the overall watchdog.
+        try:
+            security = yf.Ticker(ticker)
+            long_history = security.history(period="max", interval="1d", auto_adjust=False, actions=True, timeout=12)
+            metadata = security.get_history_metadata()
+            return_info = {**(metadata if isinstance(metadata, dict) else {}), **info}
+            issuer_cash = fetch_jepq_return_cash() if ticker == "JEPQ" else None
+            pipe.send(dict(returns=calculate_period_returns(long_history, ticker, return_info, iso_now(), issuer_cash)))
+        except Exception as exc:
+            pipe.send(dict(returns_error=f"Gesamtrendite-Historie: {type(exc).__name__}: {str(exc)[:180]}"))
         pipe.send(dict(done=True))
     except Exception as exc:
         pipe.send(dict(warnings=[f"Abruf: {type(exc).__name__}: {str(exc)[:180]}"]))
@@ -962,6 +1409,9 @@ def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[st
         stock["warnings"].append("Nicht frisch verfügbar (Quelle je Feld gekennzeichnet): " + ", ".join(fallback_fields) + ".")
     if stock["field_sources"]["price"] != stock["field_sources"]["sma200"] and stock["price"] and stock["sma200"]:
         stock["warnings"].append("SMA-Abstand kombiniert unterschiedlich aktuelle Kurs-/SMA-Daten; Feldzeitpunkte beachten.")
+    # The run stamp is its start, while this optional endpoint arrives later.
+    # Validate against the actual merge time without changing its source stamp.
+    apply_period_returns(stock, previous, payload, iso_now())
     add_derived(stock, portfolio_id)
     return stock
 
