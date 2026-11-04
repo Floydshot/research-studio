@@ -97,6 +97,8 @@ CHART_CAPPED_TICKERS = frozenset({"NOW", "PANW", "CRWD", "NET"})
 EU_INSURANCE = "Erstversicherer Europa"
 ASIA = "Asien & Japan Finanzen"
 REINSURANCE = "Rückversicherer"
+US_BANKS = "Banken USA"
+US_INSURANCE = "Versicherer USA"
 PORTFOLIOS = [
     dict(id="tech", name="Tech Stonks", cluster_order=[BIG_TECH, SEMICONDUCTOR, CYBERSECURITY, SAAS], stocks=[
         reference("Alphabet", "GOOGL", BIG_TECH, 24.3, "Forward P/E < 17x oder Wochen-EMA 50", 16.9, 16.8, hist_ps=6.2, ps_ratio=6.5),
@@ -113,7 +115,7 @@ PORTFOLIOS = [
         reference("CrowdStrike", "CRWD", CYBERSECURITY, 200.0, "Strikte Disziplin: P/S < 25x oder P/FCF < 35x", 250.0, 208.3, hist_ps=27.1, ps_ratio=43.2),
         reference("Cloudflare", "NET", CYBERSECURITY, 210.0, "Kompression auf P/S 20x–25x abwarten", 260.0, 226.9, hist_ps=31.1, ps_ratio=41.7),
     ]),
-    dict(id="value", name="Value Stonks", cluster_order=[EU_INSURANCE, REINSURANCE, ASIA, "Income-ETFs"], stocks=[
+    dict(id="value", name="Value Stonks", cluster_order=[EU_INSURANCE, REINSURANCE, ASIA, US_BANKS, US_INSURANCE, "Income-ETFs"], stocks=[
         reference("AXA SA", "CS.PA", EU_INSURANCE, 11.2, "Forward P/E < 9,5x & Div.-Rendite > 5,7%", 8.5, 8.3, hist_div=5.4, div_yield=6.0, roe=15.0),
         reference("Sompo Holdings", "8630.T", ASIA, 11.5, "Forward P/E < 10x oder P/B < 1,25x", 8.9, 9.5, hist_div=3.1, div_yield=3.4, roe=14.0),
         reference("Zurich Insurance", "ZURN.SW", EU_INSURANCE, 14.9, "P/E < 11,5x & Div.-Rendite > 5,0%", 9.0, 9.8, hist_div=5.1, div_yield=5.2, roe=36.0),
@@ -125,6 +127,10 @@ PORTFOLIOS = [
         reference("Tokio Marine", "8766.T", ASIA, TOKIO_HIST_PE_MEAN, "Rücksetzer auf Forward P/E 12x–13x abwarten", None, None, hist_div=3.220123649, div_yield=None, roe=None),
         reference("DBS Group Holdings", "D05.SI", ASIA, 11.8, "Disziplin: Warten auf Forward P/E < 12,5x", 17.8, 16.6, hist_div=4.9, div_yield=4.3, roe=16.2),
         reference("Swiss Life", "SLHN.SW", EU_INSURANCE, 14.2, "Forward P/E < 14,5x oder Div.-Rendite > 5,2%", 19.5, 17.2, hist_div=5.1, div_yield=4.8, roe=15.0),
+        reference("Goldman Sachs", "GS", US_BANKS, None, "Noch kein individueller Nachkauf-Indikator hinterlegt.", None, None),
+        reference("JPMorgan Chase", "JPM", US_BANKS, None, "Noch kein individueller Nachkauf-Indikator hinterlegt.", None, None),
+        reference("Morgan Stanley", "MS", US_BANKS, None, "Noch kein individueller Nachkauf-Indikator hinterlegt.", None, None),
+        reference("Aflac", "AFL", US_INSURANCE, None, "Noch kein individueller Nachkauf-Indikator hinterlegt.", None, None),
         dict(name="JPMorgan Nasdaq Equity Premium Income ETF", ticker="JEPQ",
              cluster="Income-ETFs", asset_type="etf", fund_kind="equity_income_options",
              fund_inception="2022-05-03", fund_source=ETF_SOURCE,
