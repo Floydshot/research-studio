@@ -89,6 +89,53 @@
     @media(max-width:420px) { .topbar { flex-wrap: wrap; } .brand { flex: 1 1 175px; } }
     @media print { .theme-toggle { display: none; } .trigger-text,.technical-value { color: #111; } }
     .data-links { flex: none; } .metric-source[href] { text-underline-offset: 2px; }
+    :root { --returns-positive: #287b68; --returns-negative: #a74654; }
+    :root[data-theme=light] { --returns-positive: #50aa9a; --returns-negative: #d58c93; }
+    .returns-panel { margin-top: 25px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); overflow: hidden; }
+    .returns-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 17px 19px 15px; }
+    .returns-heading .section-desc { line-height: 1.6; }
+    .returns-export { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 5px 8px; border: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 10px; }
+    .returns-export svg { width: 13px; height: 13px; }
+    .returns-export:hover { color: var(--text); border-color: var(--faint); }
+    .returns-scroll { overflow-x: auto; overscroll-behavior-x: contain; scrollbar-color: var(--line) transparent; scrollbar-width: thin; }
+    .returns-table { width: 100%; min-width: 980px; border-collapse: separate; border-spacing: 0; font-variant-numeric: tabular-nums; font-size: 11px; }
+    .returns-table th,.returns-table td { padding: 13px 10px; border-top: 1px solid var(--line-soft); text-align: right; white-space: nowrap; }
+    .returns-table thead th { background: var(--surface-2); color: var(--muted); font-size: 10px; font-weight: 500; padding-top: 10px; padding-bottom: 10px; }
+    .returns-table th:first-child { position: sticky; left: 0; z-index: 1; text-align: left; width: 260px; min-width: 215px; max-width: 300px; background: var(--surface); border-right: 1px solid var(--line-soft); box-shadow: 4px 0 7px #00000008; }
+    .returns-table thead th:first-child { z-index: 2; background: var(--surface-2); }
+    .returns-sort { display: inline-flex; align-items: center; justify-content: flex-end; gap: 4px; width: 100%; padding: 0; border: 0; background: transparent; color: inherit; font-size: inherit; border-radius: 2px; }
+    .returns-table th:first-child .returns-sort { justify-content: flex-start; }
+    .returns-sort-arrow { font-size: 12px; color: var(--teal); min-width: 9px; }
+    .returns-position { display: block; max-width: 275px; padding: 0; border: 0; background: transparent; color: var(--text); text-align: left; font-size: 11px; font-weight: 500; border-radius: 2px; overflow: hidden; text-overflow: ellipsis; }
+    .returns-position:hover { text-decoration: underline; text-underline-offset: 3px; }
+    .returns-ticker { display: block; font-size: 9px; color: var(--faint); margin-bottom: 2px; font-weight: 400; }
+    .returns-status { display: block; margin-top: 4px; font-size: 8px; color: var(--faint); font-weight: 400; text-decoration: none; }
+    a.returns-status:hover { text-decoration: underline; text-underline-offset: 2px; }
+    .returns-status a { color: inherit; text-decoration: none; } .returns-status a:hover { text-decoration: underline; text-underline-offset: 2px; }
+    .returns-status.previous { color: var(--amber); }
+    .returns-cell { color: var(--text); }
+    .returns-cell.positive { background: color-mix(in srgb,var(--returns-positive) var(--heat-strength),var(--surface)); }
+    .returns-cell.negative { background: color-mix(in srgb,var(--returns-negative) var(--heat-strength),var(--surface)); }
+    .returns-cell.unavailable { color: var(--faint); }
+    .returns-table tr.selected th:first-child { box-shadow: inset 3px 0 var(--sky),4px 0 7px #00000008; }
+    .returns-table tr.selected .returns-position { color: var(--sky); }
+    .returns-table tbody tr:hover td { box-shadow: inset 0 1px var(--line),inset 0 -1px var(--line); }
+    .returns-note { padding: 11px 19px 13px; color: var(--faint); font-size: 10px; line-height: 1.7; border-top: 1px solid var(--line-soft); margin: 0; }
+    .returns-empty { padding: 22px 19px; color: var(--muted); font-size: 11px; margin: 0; border-top: 1px solid var(--line-soft); }
+    @media(max-width:700px) { .returns-panel { margin-top: 20px; } .returns-heading { padding: 14px 13px 12px; gap: 10px; } .returns-export span { display: none; } .returns-table { min-width: 890px; font-size: 10px; } .returns-table th,.returns-table td { padding: 12px 9px; } .returns-table th:first-child { min-width: 160px; width: 160px; max-width: 160px; } .returns-position { max-width: 142px; font-size: 10px; } .returns-status { font-size: 8px; } .returns-note { padding: 10px 13px 12px; font-size: 9px; } }
+    @media print { .returns-scroll { overflow: visible; } .returns-table { min-width: 0; font-size: 8px; } .returns-table th,.returns-table td { padding: 6px 3px; } .returns-table th:first-child { position: static; min-width: 100px; } .returns-export { display: none; } }
+
+    .indicator-status { display: inline-block; margin: 1px 0 4px; font-size: 10px; font-weight: 600; color: var(--amber); }
+    .indicator-status.eligible { color: var(--teal); }
+    .indicator-status.unavailable { color: var(--muted); }
+    .indicator-summary { display: block; }
+    .indicator-target { display: block; margin-top: 4px; font-size: 9px; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .indicator-detail { margin-top: 5px; font-size: 9px; color: var(--muted); cursor: default; }
+    .indicator-detail summary { cursor: pointer; color: var(--sky); width: fit-content; }
+    .indicator-detail p { margin: 5px 0; line-height: 1.6; }
+    .indicator-conditions { margin: 5px 0; padding-left: 15px; }
+    .indicator-conditions li { margin: 2px 0; }
+
   </style>
 </head>
 <body>
@@ -114,6 +161,12 @@
           <div class="details-heading"><h2>Werte im Detail <span id="details-count" class="details-count"></span></h2><span class="details-help">Auswahl verknüpft Kacheln und Diagramm</span></div>
           <div id="cards" class="cards" aria-live="polite" aria-label="Aktien, ETFs und Nachkauf-Indikatoren"></div>
           <div id="empty" class="empty" hidden><strong>Keine passenden Werte</strong><p>Für diese Kombination aus Cluster und Suche gibt es keine Treffer.</p><button type="button" id="reset-filters">Filter zurücksetzen</button></div>
+          <section id="returns-panel" class="returns-panel" aria-labelledby="returns-title">
+            <div class="returns-heading"><div><h2 id="returns-title" class="section-title">Returns by period</h2><p class="section-desc">Gesamtrendite inklusive reinvestierter Dividenden und ETF-Ausschüttungen</p></div><button type="button" id="returns-export" class="returns-export" aria-label="Angezeigte Renditen als CSV herunterladen" title="Angezeigte Renditen als CSV herunterladen"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2v10m-4-4 4 4 4-4M3 13v4h14v-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>CSV</span></button></div>
+            <div id="returns-scroll" class="returns-scroll" role="region" aria-label="Renditen nach Zeitraum, horizontal scrollbar" tabindex="0"><table id="returns-table" class="returns-table"><caption class="sr-only">Gesamtrenditen der angezeigten Positionen in ihrer jeweiligen Handelswährung. Zeiträume ab drei Jahren und All Time sind annualisiert, soweit mindestens ein Jahr Historie vorliegt.</caption><thead id="returns-head"></thead><tbody id="returns-body"></tbody></table></div>
+            <p id="returns-empty" class="returns-empty" hidden>Für die gewählten Filter sind keine Positionen vorhanden.</p>
+            <p class="returns-note">In jeweiliger Handelswährung, ohne Steuern und Gebühren. * 3Y, 5Y und 10Y: Rendite pro Jahr (p. a.). All Time: seit dem ersten verfügbaren Kurs, ab einem Jahr Historie ebenfalls p. a. Fehlende oder nicht bestätigte Historie: —. Die Tabelle folgt den Filtern oben; jede Position wird einzeln betrachtet.</p>
+          </section>
         </section>
         <footer class="footer"><p>Aktien-Tranchen folgen der festen Forward-P/E-Regel; individuelle Nachkauf-Indikatoren werden separat angezeigt. JEPQ wird als ETF separat betrachtet: Fonds-KGV und Ausschüttungen sind keine Unternehmenskennzahlen. Quellenstatus steht an jeder Kennzahl.</p><span class="data-links"><a href="https://finance.yahoo.com/" target="_blank" rel="noopener noreferrer">Yahoo Finance ↗</a> · <a href="https://www.tokiomarinehd.com/ir/stock/return.html" target="_blank" rel="noopener noreferrer">Tokio Marine IR ↗</a></span></footer>
       </div>
@@ -127,6 +180,9 @@
     const $ = id => document.getElementById(id);
     const state = { data: null, portfolio: 'tech', cluster: 'Alle', metric: 'pe', sort: 'forward', search: '', selected: null, visible: [], chart: null, request: null };
     let toastTimer = null, refreshSequence = 0;
+    const returnColumns = [['1d', '1D'], ['1w', '1W'], ['1m', '1M'], ['6m', '6M'], ['ytd', 'YTD'], ['1y', '1Y'], ['3y', '3Y*'], ['5y', '5Y*'], ['10y', '10Y*'], ['all', 'ALL TIME*']];
+    const returnsSort = { tech: { key: 'name', direction: 1 }, value: { key: 'name', direction: 1 } };
+
     function syncThemeButton() {
       const light = document.documentElement.dataset.theme === 'light';
       const action = 'Zu ' + (light ? 'Dark Mode' : 'Light Mode') + ' wechseln';
@@ -192,11 +248,13 @@
       const urls = ['https://www.tokiomarinehd.com/ir/stock/return.html', 'https://www.tokiomarinehd.com/en/ir/stock/return.html'];
       return stock.ticker === '8766.T' && forecast && forecast.basis === 'forecast' && forecast.currency === 'JPY' && positive(forecast.annual_rate) !== null && urls.includes(forecast.source_url) && ['live', 'previous'].includes(source(stock, 'div_yield')) && number(stock.div_yield) !== null ? forecast : null;
     }
+    function httpsSource(value) { try { const url = new URL(value); return url.protocol === 'https:' ? url.href : null; } catch (_) { return null; } }
     function issuerMetric(stock, field) {
-      const meta = stock.ticker === '8766.T' && stock.field_metadata && stock.field_metadata[field];
+      const meta = stock.field_metadata && stock.field_metadata[field];
       if (!meta || typeof meta !== 'object') return null;
       const url = typeof meta.source_url === 'string' ? meta.source_url : '';
-      return meta.unavailable_reason || meta.provider === 'Tokio Marine IR' && (url.startsWith('https://www.tokiomarinehd.com/') || url.startsWith('https://www2.jpx.co.jp/disc/87660/')) ? meta : null;
+      if (stock.ticker === '8766.T') return meta.unavailable_reason || meta.provider === 'Tokio Marine IR' && (url.startsWith('https://www.tokiomarinehd.com/') || url.startsWith('https://www2.jpx.co.jp/disc/87660/')) ? meta : null;
+      return ['GS', 'JPM', 'MS', 'AFL'].includes(stock.ticker) && field === 'hist_pe' && meta.provider && meta.accounting_basis && meta.verified_at && meta.method && httpsSource(url) ? meta : null;
     }
     function metricLabel(stock, field, fallback) { const meta = issuerMetric(stock, field); return meta && meta.label ? meta.label : fallback; }
     function comparableHistoricalPE(stock) {
@@ -207,7 +265,7 @@
       const status = source(stock, field);
       const meta = issuerMetric(stock, field);
       if (meta && meta.unavailable_reason) return field === 'hist_pe' ? 'nicht vergleichbar' : 'nicht verfügbar';
-      if (meta && meta.verified_at && field === 'hist_pe') return 'J-GAAP · IR';
+      if (meta && meta.verified_at && field === 'hist_pe') return stock.ticker === '8766.T' ? 'J-GAAP · IR' : meta.source_label || meta.accounting_basis + ' · IR / Kurse';
       if (meta && meta.verified_at && field === 'hist_div') return 'IR-Referenz';
       return meta && ['live', 'previous'].includes(status) || field === 'div_yield' && dividendForecast(stock) ? status === 'previous' ? 'IR-Vorwert' : 'Tokio Marine IR' : sourceText[status];
     }
@@ -220,7 +278,8 @@
       if (meta) {
         if (meta.unavailable_reason) return meta.unavailable_reason;
         const checked = meta.retrieved_at || meta.verified_at;
-        return fieldSourceText(stock, field) + (meta.period ? ' · ' + meta.period : '') + (meta.as_of ? ' · Stichtag: ' + meta.as_of : '') + (meta.report_date ? ' · Bericht: ' + meta.report_date : '') + (checked && dateText(checked) ? ' · ' + (meta.retrieved_at ? 'Abruf: ' + dateText(checked) + ' (Berlin)' : 'Geprüft: ' + meta.verified_at) : '') + (meta.method ? ' · ' + meta.method : '') + (positive(meta.normalized_eps) !== null ? ' · Splitbereinigtes EPS: ' + fmt(meta.normalized_eps, 4) + ' JPY' : '') + (positive(meta.calculation_price) !== null ? ' · Kursbasis: ' + fmt(meta.calculation_price, 2) + ' JPY' : '') + (meta.source_url ? ' · Quelle: ' + meta.source_url : '');
+        const observations = Array.isArray(meta.observations) ? meta.observations.map(item => 'FY' + item.fiscal_year + ': ' + (positive(item.pe) === null ? '—' : fmt(item.pe, 3) + '×') + (positive(item.diluted_eps) !== null ? ', verw. EPS ' + fmt(item.diluted_eps, 2) : '') + (positive(item.close) !== null ? ', Schlusskurs ' + fmt(item.close, 2) : '') + (item.price_date ? ' (' + item.price_date + ')' : '') + (httpsSource(item.eps_source_url) ? ' · EPS-Quelle: ' + item.eps_source_url : '')).join('; ') : '';
+        return fieldSourceText(stock, field) + (meta.provider ? ' · ' + meta.provider : '') + (meta.period ? ' · ' + meta.period : '') + (meta.as_of ? ' · Stichtag: ' + meta.as_of : '') + (meta.report_date ? ' · Bericht: ' + meta.report_date : '') + (checked && dateText(checked) ? ' · ' + (meta.retrieved_at ? 'Abruf: ' + dateText(checked) + ' (Berlin)' : 'Geprüft: ' + meta.verified_at) : '') + (meta.method ? ' · ' + meta.method : '') + (observations ? ' · Beobachtungen: ' + observations : '') + (meta.comparison_note ? ' · ' + meta.comparison_note : '') + (positive(meta.normalized_eps) !== null ? ' · Splitbereinigtes EPS: ' + fmt(meta.normalized_eps, 4) + ' JPY' : '') + (positive(meta.calculation_price) !== null ? ' · Kursbasis: ' + fmt(meta.calculation_price, 2) + ' JPY' : '') + (meta.source_url ? ' · Quelle: ' + meta.source_url : '') + (httpsSource(meta.price_source_url) ? ' · Kursquelle: ' + meta.price_source_url : '');
       }
       const forecast = field === 'div_yield' ? dividendForecast(stock) : null;
       const calculationPrice = forecast && positive(forecast.calculation_price) !== null ? forecast.calculation_price : stock.price;
@@ -274,7 +333,7 @@
       const eligible = data.filter(comparableHistoricalPE);
       const below = eligible.filter(stock => stock.current_pe < stock.hist_pe).length;
       const buys = data.filter(stock => trancheKey(stock) === 'buy').length;
-      const values = [ ['Werte im Vergleich', data.length, '/ ' + portfolio().stocks.length, state.cluster === 'Alle' ? 'Gesamtes Portfolio' : state.cluster], ['Tranche 1 · Forward-Regel', buys, 'Aktien', state.portfolio === 'tech' ? 'Forward P/E < 24,0×' : 'Forward P/E ≤ 11,3×'], ['Median Forward P/E', median === null ? '—' : fmt(median) + '×', '', forward.length + ' verfügbare Schätzungen'], ['KGV unter hist. Referenz', below, '/ ' + eligible.length, 'Vergleich mit Vorgabe (5J/10J)'] ];
+      const values = [ ['Werte im Vergleich', data.length, '/ ' + portfolio().stocks.length, state.cluster === 'Alle' ? 'Gesamtes Portfolio' : state.cluster], ['Tranche 1 · Forward-Regel', buys, 'Aktien', state.portfolio === 'tech' ? 'Forward P/E < 24,0×' : 'Forward P/E ≤ 11,3×'], ['Median Forward P/E', median === null ? '—' : fmt(median) + '×', '', forward.length + ' verfügbare Schätzungen'], ['KGV unter hist. Referenz', below, '/ ' + eligible.length, 'Belegte Referenz oder Vorgabe (5J/10J)'] ];
       const root = $('summary'); root.replaceChildren(); values.forEach((item, index) => { const card = el('div', 'summary-item'); card.append(el('p', 'summary-label', item[0])); const value = el('div', 'summary-value' + (index === 1 ? ' teal' : ''), item[1]); if (item[2]) value.append(el('small', '', item[2])); card.append(value, el('div', 'summary-note', item[3])); root.append(card); });
     }
     function metricCell(stock, label, value, field, reference = false, highlight = false) {
@@ -284,7 +343,7 @@
       val.title = meta || !reference ? provenance(stock, field) : 'Feste Nutzervorgabe (5J/10J); Zeitraum nicht unabhängig verifiziert.';
       cell.append(val);
       const status = reference && (!meta || meta.verified_at) ? 'reference' : source(stock, field), forecast = !reference && field === 'div_yield' ? dividendForecast(stock) : null;
-      const url = issuer ? meta.source_url : forecast ? forecast.source_url : null;
+      const url = httpsSource(issuer ? meta.source_url : forecast ? forecast.source_url : null);
       const labelNode = el(url ? 'a' : 'span', 'metric-source ' + (status === 'reference' ? 'reference' : status === 'live' ? 'fresh' : status === 'unavailable' ? '' : 'fallback'), reference && !meta ? 'Vorgabe (5J/10J)' : fieldSourceText(stock, field));
       if (url) { labelNode.href = url; labelNode.target = '_blank'; labelNode.rel = 'noopener noreferrer'; labelNode.addEventListener('click', event => event.stopPropagation()); labelNode.addEventListener('keydown', event => event.stopPropagation()); }
       labelNode.title = val.title; cell.append(labelNode); return cell;
@@ -292,13 +351,49 @@
     function select(ticker, fromChart = false) {
       state.selected = state.selected === ticker ? null : ticker;
       document.querySelectorAll('.stock-card').forEach(card => { const active = card.dataset.ticker === state.selected; card.classList.toggle('selected', active); card.setAttribute('aria-pressed', String(active)); });
-      renderSelection(); renderChart();
+      renderSelection(); renderChart(); renderReturns();
       $('announcer').textContent = state.selected ? state.selected + ' im Vergleich ausgewählt.' : 'Auswahl aufgehoben.';
       if (fromChart && state.selected) { const card = [...document.querySelectorAll('.stock-card')].find(item => item.dataset.ticker === state.selected); if (card) { card.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'nearest' }); card.focus({ preventScroll: true }); } }
     }
     function renderSelection() {
       const root = $('selection-label'); root.replaceChildren();
       if (state.selected) { const stock = state.visible.find(item => item.ticker === state.selected); if (stock) { root.append(el('span', '', stock.name + ' ausgewählt')); const clear = el('button', 'clear-selection', 'Aufheben'); clear.type = 'button'; clear.addEventListener('click', () => select(state.selected)); root.append(clear); } }
+    }
+    function renderBuyIndicator(stock, trigger) {
+      const indicator = stock.buy_indicator;
+      if (!['GS', 'JPM', 'MS', 'AFL'].includes(stock.ticker) || !indicator || typeof indicator !== 'object') return false;
+      const valid = indicator.version === 1 && ['eligible', 'watch', 'unavailable'].includes(indicator.status) && typeof indicator.summary === 'string' && typeof indicator.rule === 'string' && Array.isArray(indicator.conditions);
+      const asOf = valid && typeof indicator.as_of === 'string' ? new Date(indicator.as_of).getTime() : NaN;
+      const freshStamp = value => { const stamp = typeof value === 'string' ? new Date(value).getTime() : NaN; return Number.isFinite(stamp) && stamp <= Date.now() + 5 * 60 * 1000 && Date.now() - stamp <= 4 * 24 * 3600 * 1000; };
+      const fresh = valid && ['live', 'partial'].includes(mode()) && freshStamp(indicator.as_of) && ['price', 'current_pe', 'forward_pe', 'sma200', 'rsi14', 'currency'].every(field => stock.field_sources && stock.field_sources[field] === 'live' && stock.field_updated_at && freshStamp(stock.field_updated_at[field]));
+      const checked = valid && indicator.conditions.length > 0 && indicator.conditions.every(item => item && typeof item.label === 'string' && [true, false, null].includes(item.passed));
+      const status = !fresh || !checked || indicator.status === 'eligible' && !indicator.conditions.every(item => item.passed === true) ? 'unavailable' : indicator.status;
+      const label = { eligible: 'Nachkauf prüfen', watch: 'Abwarten', unavailable: 'Daten prüfen' }[status];
+      const summary = status === 'unavailable' && indicator.status !== 'unavailable' ? 'Ein aktueller, vollständiger Datenabruf ist für die Bewertung erforderlich.' : valid ? indicator.summary : 'Der Nachkauf-Indikator enthält keine gültige Bewertung.';
+      trigger.dataset.indicatorStatus = status;
+      const text = el('span', 'trigger-text'), badge = el('span', 'indicator-status ' + status, label);
+      const conditions = checked ? indicator.conditions.map(item => (item.passed === true ? '✓ ' : item.passed === false ? '× ' : '— ') + item.label + (number(item.actual) !== null ? ' · aktuell ' + fmt(item.actual, 2) : '') + (number(item.threshold) !== null ? ' · Schwelle ' + fmt(item.threshold, 2) : '')) : [];
+      const explanation = [valid ? indicator.rule : '', ...conditions, valid && indicator.reference_period ? 'Referenz: ' + indicator.reference_period : '', Number.isFinite(asOf) ? 'Datenstand: ' + dateText(indicator.as_of) + ' (Berlin)' : 'Kein bestätigter Datenstand'].filter(Boolean).join('\n');
+      text.title = explanation;
+      text.append(badge, el('span', 'indicator-summary', summary));
+      if (fresh && positive(indicator.target_price) !== null && typeof indicator.currency === 'string') { const target = el('span', 'indicator-target', 'TTM-Prüfschwelle: ≤ ' + fmt(indicator.target_price, 2) + ' ' + indicator.currency); target.title = 'Bei unverändertem aktuellen TTM-EPS; kein Kursziel. Weitere Bedingungen separat prüfen.'; text.append(target); }
+      trigger.append(text);
+      const details = el('details', 'indicator-detail'); details.append(el('summary', '', 'Regel & Datenstand'));
+      if (valid) details.append(el('p', '', indicator.rule));
+      if (conditions.length) { const list = el('ul', 'indicator-conditions'); conditions.forEach(condition => list.append(el('li', '', condition))); details.append(list); }
+      details.append(el('p', '', (valid && indicator.reference_period ? 'Referenz: ' + indicator.reference_period + ' · ' : '') + (Number.isFinite(asOf) ? 'Stand: ' + dateText(indicator.as_of) + ' (Berlin)' : 'Kein bestätigter Datenstand')));
+      const historical = issuerMetric(stock, 'hist_pe');
+      if (historical) {
+        const sources = new Map();
+        if (httpsSource(historical.source_url)) sources.set(historical.source_url, 'IR-Bericht');
+        if (Array.isArray(historical.observations)) historical.observations.forEach(item => { if (httpsSource(item.eps_source_url) && !sources.has(item.eps_source_url)) sources.set(item.eps_source_url, 'EPS-Bericht ab FY' + item.fiscal_year); });
+        if (httpsSource(historical.price_source_url)) sources.set(historical.price_source_url, 'Jahresendkurse');
+        const links = el('p', 'indicator-sources');
+        for (const [url, name] of sources) { if (links.childNodes.length) links.append(document.createTextNode(' · ')); const link = el('a', '', name + ' ↗'); link.href = url; link.target = '_blank'; link.rel = 'noopener noreferrer'; links.append(link); }
+        if (links.childNodes.length) details.append(links);
+      }
+      details.addEventListener('click', event => event.stopPropagation()); details.addEventListener('keydown', event => event.stopPropagation());
+      trigger.append(details); return true;
     }
     function renderCards() {
       const container = $('cards'); container.replaceChildren();
@@ -317,10 +412,10 @@
           card.append(metrics, el('p', 'fund-note', 'Ausschüttungen der letzten 12 Monate ÷ aktueller Kurs. Fonds-KGV: Bewertung der enthaltenen Aktien; keine historische Referenz hinterlegt.'));
         } else {
           metrics.append(metricCell(stock, 'TTM P/E', peText(stock.current_pe), 'current_pe'), metricCell(stock, 'Hist. P/E', peText(stock.hist_pe), 'hist_pe', true), metricCell(stock, 'Forward P/E', peText(stock.forward_pe), 'forward_pe', false, true), state.portfolio === 'tech' ? metricCell(stock, 'P/S', number(stock.ps_ratio) === null ? '—' : fmt(stock.ps_ratio) + '×', 'ps_ratio') : metricCell(stock, dividendForecast(stock) ? 'Div. (Prognose)' : 'Div.-Rendite', percent(stock.div_yield), 'div_yield')); card.append(metrics);
-          const valuation = el('div', 'valuation-row'), historical = issuerMetric(stock, 'hist_pe'); const spread = comparableHistoricalPE(stock) ? (Number(stock.current_pe) / Number(stock.hist_pe) - 1) * 100 : null; const methodsDiffer = historical && historical.comparable_to_current === false; const spreadNode = el('span', 'spread' + (spread === null ? '' : spread < 0 ? ' discount' : ' premium'), methodsDiffer ? 'IFRS / J-GAAP' : spread === null ? 'P/E-Abstand nicht verfügbar' : signedPercent(spread) + ' TTM vs. Referenz'); spreadNode.title = methodsDiffer ? historical.comparison_note || 'Aktuelles IFRS-KGV und historische J-GAAP-Referenz sind nur eingeschränkt vergleichbar; kein direkter Bewertungsaufschlag.' : 'Vergleich des TTM-P/E mit der festen historischen Nutzervorgabe; kein Kurspotenzial.'; valuation.append(spreadNode);
+          const valuation = el('div', 'valuation-row'), historical = issuerMetric(stock, 'hist_pe'); const spread = comparableHistoricalPE(stock) ? (Number(stock.current_pe) / Number(stock.hist_pe) - 1) * 100 : null; const methodsDiffer = historical && historical.comparable_to_current === false; const spreadNode = el('span', 'spread' + (spread === null ? '' : spread < 0 ? ' discount' : ' premium'), methodsDiffer ? stock.ticker === '8766.T' ? 'IFRS / J-GAAP' : 'KGV-Basis abweichend' : spread === null ? 'P/E-Abstand nicht verfügbar' : signedPercent(spread) + ' TTM vs. Referenz'); spreadNode.title = methodsDiffer ? historical.comparison_note || 'Aktuelles und historisches KGV haben unterschiedliche Berechnungsgrundlagen; kein direkter Bewertungsabstand ableitbar.' : historical ? 'Vergleich des TTM-KGV mit ' + (historical.label || 'der belegten historischen Referenz') + (historical.period ? ' (' + historical.period + ')' : '') + '. ' + (historical.comparison_note || '') + ' Kein Kurspotenzial.' : 'Vergleich des TTM-P/E mit der festen historischen Nutzervorgabe; kein Kurspotenzial.'; valuation.append(spreadNode);
           const companion = state.portfolio === 'tech' ? 'Hist. P/S ' + (number(stock.hist_ps) === null ? '—' : fmt(stock.hist_ps) + '×') : metricLabel(stock, 'roe', 'ROE') + ' ' + percent(stock.roe); const companionNode = el('span', '', companion); companionNode.title = state.portfolio === 'tech' ? 'Feste Nutzervorgabe (5J/10J)' : provenance(stock, 'roe'); if (state.portfolio === 'value') companionNode.append(el('span', 'technical-source', '· ' + fieldSourceText(stock, 'roe'))); valuation.append(companionNode); card.append(valuation);
         }
-        const trigger = el('div', 'trigger'); trigger.append(el('span', 'trigger-label', etf ? 'ETF-Einordnung' : 'Persönlicher Nachkauf-Indikator'), el('span', 'trigger-text', stock.buy_trigger || 'Kein individueller Indikator hinterlegt')); card.append(trigger);
+        const trigger = el('div', 'trigger'); trigger.append(el('span', 'trigger-label', etf ? 'ETF-Einordnung' : 'Persönlicher Nachkauf-Indikator')); if (!renderBuyIndicator(stock, trigger)) trigger.append(el('span', 'trigger-text', stock.buy_trigger || 'Kein individueller Indikator hinterlegt')); card.append(trigger);
         const technicals = el('div', 'technicals'); const rsi = el('span', '', 'RSI (14)'); const rsiValue = el('span', 'technical-value', fmt(stock.rsi14)); rsiValue.title = provenance(stock, 'rsi14'); rsi.append(rsiValue); if (source(stock, 'rsi14') !== 'live' && number(stock.rsi14) !== null) rsi.append(el('span', 'technical-source', '(' + sourceText[source(stock, 'rsi14')] + ')'));
         let distance = number(stock.sma200_distance_pct); if (distance === null && positive(stock.sma200) !== null && positive(stock.price) !== null) distance = (Number(stock.price) / Number(stock.sma200) - 1) * 100;
         const sma = el('span', '', 'SMA 200'); const smaValue = el('span', 'technical-value', signedPercent(distance)); smaValue.title = 'SMA 200: ' + fmt(stock.sma200, 2) + (stock.currency ? ' ' + stock.currency : '') + ' · ' + provenance(stock, 'sma200') + '; Kurs: ' + provenance(stock, 'price'); sma.append(smaValue); if (number(stock.sma200) !== null && (source(stock, 'sma200') !== 'live' || source(stock, 'price') !== 'live')) sma.append(el('span', 'technical-source', '(Fallback)')); technicals.append(rsi, sma); card.append(technicals);
@@ -330,6 +425,120 @@
       $('details-count').textContent = ' · ' + state.visible.length + ' von ' + portfolio().stocks.length;
       $('empty').hidden = !!state.visible.length;
     }
+    function returnData(stock) {
+      const data = stock.returns;
+      return data && typeof data === 'object' && data.basis === 'total_return' && data.periods && typeof data.periods === 'object' ? data : null;
+    }
+    function returnPeriod(stock, key) {
+      const data = returnData(stock), period = data && data.periods[key];
+      return period && typeof period === 'object' ? period : null;
+    }
+    function returnNumber(stock, key) { const period = returnPeriod(stock, key); return period ? number(period.value) : null; }
+    function returnDate(value) {
+      if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+      const parts = value.split('-'); return parts[2] + '.' + parts[1] + '.' + parts[0];
+    }
+    function returnStatus(stock) {
+      const data = returnData(stock);
+      if (!data || !Object.values(data.periods).some(period => period && number(period.value) !== null)) return 'unavailable';
+      return data.source_status === 'previous' || mode() === 'stale' ? 'previous' : data.source_status === 'live' ? 'live' : 'unavailable';
+    }
+    function returnSourceUrl(stock) {
+      const data = returnData(stock);
+      if (!data || typeof data.source_url !== 'string') return null;
+      try { const url = new URL(data.source_url); return url.protocol === 'https:' && url.hostname === 'finance.yahoo.com' ? url.href : null; } catch (_) { return null; }
+    }
+    function returnCashSourceUrl(stock) {
+      const data = returnData(stock);
+      if (stock.ticker !== 'JEPQ' || !data || typeof data.cash_source_url !== 'string') return null;
+      try { const url = new URL(data.cash_source_url); return url.protocol === 'https:' && url.hostname === 'am.jpmorgan.com' && url.pathname === '/FundsMarketingHandler/historicalData' && url.searchParams.get('cusip') === '46654Q203' ? url.href : null; } catch (_) { return null; }
+    }
+    function returnPeriodNotes(stock, key) {
+      const data = returnData(stock), period = returnPeriod(stock, key);
+      if (!data || !period || !returnDate(period.start) || !returnDate(period.end)) return [];
+      const relevant = item => item && returnDate(item.date) && item.date > period.start && item.date <= period.end;
+      const notes = [];
+      if (Array.isArray(data.cash_corrections)) data.cash_corrections.filter(relevant).forEach(item => {
+        let text = 'Ausschüttungskorrektur ' + item.date + ': ' + (item.reason || 'Aktienbasis bereinigt');
+        if (typeof item.source_url === 'string') { try { const url = new URL(item.source_url); if (url.protocol === 'https:' && url.hostname === 'www.tokiomarinehd.com') text += ' · Emittentenquelle: ' + url.href; } catch (_) {} }
+        notes.push(text);
+      });
+      if (Array.isArray(data.quality_notes)) data.quality_notes.filter(relevant).forEach(item => { if (typeof item.reason === 'string') notes.push('Datenhinweis ' + item.date + ': ' + item.reason); });
+      return notes;
+    }
+    function returnTitle(stock, key) {
+      const data = returnData(stock), period = returnPeriod(stock, key), value = returnNumber(stock, key);
+      const parts = ['Gesamtrendite inklusive reinvestierter Dividenden und Ausschüttungen', 'Handelswährung: ' + (stock.currency || 'nicht verfügbar')];
+      if (period && period.start && period.end) parts.push('Zeitraum: ' + period.start + ' bis ' + period.end);
+      if (period && value !== null) parts.push(period.annualized ? 'Annualisiert (p. a.)' : 'Gesamte Veränderung im Zeitraum');
+      if (data && data.since && key === 'all') parts.push('Erster verfügbarer Kurs: ' + data.since);
+      if (data && data.as_of) parts.push('Kursstand: ' + data.as_of);
+      if (data && data.retrieved_at && dateText(data.retrieved_at)) parts.push('Abruf: ' + dateText(data.retrieved_at) + ' (Berlin)');
+      if (returnStatus(stock) === 'previous') parts.push('Vorwert: kein frisch bestätigter Abruf');
+      if (value === null) parts.push(period && period.reason || 'Keine bestätigte Historie für diesen Zeitraum verfügbar');
+      if (data && data.method) parts.push(data.method);
+      const url = returnSourceUrl(stock); if (url) parts.push('Quelle: ' + url);
+      const cashUrl = returnCashSourceUrl(stock);
+      if (cashUrl) { parts.push('Ausschüttungsquelle: JPMorgan Asset Management · ' + cashUrl); if (data.cash_retrieved_at && dateText(data.cash_retrieved_at)) parts.push('Ausschüttungsabruf: ' + dateText(data.cash_retrieved_at) + ' (Berlin)'); }
+      parts.push(...returnPeriodNotes(stock, key));
+      return parts.join(' · ');
+    }
+    function sortedReturns() {
+      const sort = returnsSort[state.portfolio];
+      return [...state.visible].sort((a, b) => {
+        if (sort.key === 'name') return sort.direction * a.name.localeCompare(b.name, 'de');
+        const av = returnNumber(a, sort.key), bv = returnNumber(b, sort.key);
+        if (av === null && bv === null) return a.name.localeCompare(b.name, 'de');
+        if (av === null) return 1; if (bv === null) return -1;
+        return sort.direction * (av - bv) || a.name.localeCompare(b.name, 'de');
+      });
+    }
+    function renderReturns() {
+      const head = $('returns-head'), body = $('returns-body'), sort = returnsSort[state.portfolio], rows = sortedReturns(); head.replaceChildren(); body.replaceChildren();
+      const header = el('tr');
+      [['name', 'Position'], ...returnColumns].forEach(([key, label]) => {
+        const th = el('th'); th.scope = 'col'; th.setAttribute('aria-sort', sort.key === key ? sort.direction === 1 ? 'ascending' : 'descending' : 'none');
+        const button = el('button', 'returns-sort', label); button.type = 'button'; button.dataset.returnSort = key;
+        button.title = label + ' sortieren'; button.setAttribute('aria-label', label + ' ' + (sort.key === key && sort.direction === 1 ? 'absteigend' : 'aufsteigend') + ' sortieren');
+        button.append(el('span', 'returns-sort-arrow', sort.key === key ? sort.direction === 1 ? '↑' : '↓' : ''));
+        button.addEventListener('click', () => { sort.direction = sort.key === key ? -sort.direction : key === 'name' ? 1 : -1; sort.key = key; renderReturns(); document.querySelector('[data-return-sort="' + key + '"]').focus(); });
+        th.append(button); header.append(th);
+      });
+      head.append(header);
+      rows.forEach(stock => {
+        const row = el('tr', stock.ticker === state.selected ? 'selected' : ''); row.dataset.returnTicker = stock.ticker;
+        const position = el('th'); position.scope = 'row';
+        const button = el('button', 'returns-position'); button.type = 'button'; button.setAttribute('aria-pressed', String(stock.ticker === state.selected)); button.setAttribute('aria-label', stock.name + ' (' + stock.ticker + ') im Diagramm auswählen');
+        button.append(el('span', 'returns-ticker', stock.ticker), document.createTextNode(stock.name)); button.addEventListener('click', () => select(stock.ticker)); position.append(button);
+        const data = returnData(stock), status = returnStatus(stock), url = returnSourceUrl(stock), cashUrl = returnCashSourceUrl(stock), date = data && returnDate(data.as_of);
+        const prefix = (date ? 'Stand ' + date + ' · ' : '') + (status === 'previous' ? 'Vorwert · ' : '');
+        const source = el(cashUrl || !url ? 'span' : 'a', 'returns-status' + (status === 'previous' ? ' previous' : ''), cashUrl ? undefined : prefix + (status === 'unavailable' ? 'Historie nicht verfügbar' : 'Yahoo Finance')); source.title = returnTitle(stock, 'all');
+        if (cashUrl) {
+          source.append(document.createTextNode(prefix));
+          const yahooLink = el(url ? 'a' : 'span', '', 'Yahoo'); if (url) { yahooLink.href = url; yahooLink.target = '_blank'; yahooLink.rel = 'noopener noreferrer'; } source.append(yahooLink, document.createTextNode(' · '));
+          const cashLink = el('a', '', 'JPMorgan'); cashLink.href = cashUrl; cashLink.target = '_blank'; cashLink.rel = 'noopener noreferrer'; cashLink.title = 'Barausschüttungen: JPMorgan Asset Management'; source.append(cashLink);
+        } else if (url) { source.href = url; source.target = '_blank'; source.rel = 'noopener noreferrer'; }
+        position.append(source); row.append(position);
+        returnColumns.forEach(([key]) => {
+          const value = returnNumber(stock, key), cell = el('td', 'returns-cell' + (value === null ? ' unavailable' : value > 0 ? ' positive' : value < 0 ? ' negative' : ''), value === null ? '—' : (value > 0 ? '+' : '') + fmt(value, 2) + '%');
+          cell.dataset.returnPeriod = key; cell.title = returnTitle(stock, key);
+          if (value !== null && value !== 0) { const magnitude = Math.abs(value), strength = magnitude < 1 ? 12 : magnitude < 5 ? 22 : magnitude < 10 ? 34 : magnitude < 20 ? 48 : magnitude < 40 ? 62 : 78; cell.style.setProperty('--heat-strength', strength + '%'); }
+          row.append(cell);
+        });
+        body.append(row);
+      });
+      $('returns-scroll').hidden = !rows.length; $('returns-empty').hidden = !!rows.length; $('returns-export').disabled = !rows.length;
+    }
+    function exportReturns() {
+      const rows = sortedReturns(); if (!rows.length) return;
+      const clean = value => { const text = String(value === undefined || value === null ? '' : value); return '"' + text.replace(/"/g, '""') + '"'; };
+      const columns = ['Ticker', 'Position', 'Handelswährung', 'Kursstand', 'Quellenstatus', ...returnColumns.flatMap(([, label]) => [label + ' (%)', label + ' Start', label + ' Ende', label + ' Annualisiert']), 'Basis', 'Kurs-/Historienquelle', 'Ausschüttungsquelle', 'Ausschüttungsabruf', 'Berechnungshinweise'];
+      const lines = [columns.map(clean).join(';')];
+      rows.forEach(stock => { const data = returnData(stock); const values = [stock.ticker, stock.name, stock.currency, data && data.as_of, returnStatus(stock)]; returnColumns.forEach(([key]) => { const period = returnPeriod(stock, key), value = returnNumber(stock, key); values.push(value === null ? '' : String(value).replace('.', ','), period && period.start, period && period.end, period && value !== null ? period.annualized ? 'ja' : 'nein' : ''); }); values.push('Gesamtrendite inklusive reinvestierter Dividenden und Ausschüttungen', returnSourceUrl(stock) || '', returnCashSourceUrl(stock) || '', data && data.cash_retrieved_at || '', returnPeriodNotes(stock, 'all').join(' · ')); lines.push(values.map(clean).join(';')); });
+      const blob = new Blob(['\ufeff' + lines.join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8;' }), url = URL.createObjectURL(blob), link = document.createElement('a');
+      link.href = url; link.download = 'research-studio-' + state.portfolio + '-returns.csv'; link.hidden = true; document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
     function chartLabel(stock, series) { const meta = issuerMetric(stock, series.field); if (meta && meta.label) return meta.label + (meta.period ? ' · ' + meta.period : ''); if (series.field === 'current_pe' && !isETF(stock)) return 'KGV (TTM)'; if (series.field === 'div_yield' && dividendForecast(stock)) return 'Dividendenrendite (Prognose FY' + dividendForecast(stock).fiscal_year + ')'; return isETF(stock) && series.field === 'div_yield' ? 'Ausschüttungsrendite (12M)' : isETF(stock) && series.field === 'current_pe' ? 'Fonds-KGV' : series.label; }
     function chartText(stock, field) { const raw = metricValue(stock, field); return field.includes('pe') ? peText(raw) : state.portfolio === 'value' && state.metric === 'secondary' ? percent(raw) : fmt(raw) + (number(raw) === null ? '' : '×'); }
     function chartSeries(colors = chartPalette()) {
@@ -351,6 +560,7 @@
     function renderChart() {
       const colors = chartPalette(), series = chartSeries(colors), legend = $('legend'); legend.replaceChildren();
       const notes = ['Historische Referenzen: Nutzervorgaben (5J/10J), sofern nicht separat belegt.'];
+      if (state.visible.some(stock => ['GS', 'JPM', 'MS', 'AFL'].includes(stock.ticker) && issuerMetric(stock, 'hist_pe'))) notes.push('GS, JPM, MS und AFL: 5J-Referenz aus Jahresendkursen und berichteten verwässerten GAAP-Jahresgewinnen; Methode, Zeitraum und Quellen stehen an der Kennzahl.');
       if (state.visible.some(stock => stock.ticker === '8766.T')) notes.push('Tokio Marine: 5J-Referenz = Mittel der Jahresend-KGVs FY2021–FY2025 (J-GAAP); aktuelle KGVs nach IFRS, daher nur eingeschränkt vergleichbar.');
       if (state.visible.some(isETF)) notes.push('JEPQ: Fonds-KGV und Ausschüttungen (12M), ohne historische Referenz.');
       document.querySelector('.chart-note span').textContent = notes.join(' ');
@@ -367,7 +577,7 @@
     }
     function render() {
       state.visible = stocks(); if (state.selected && !state.visible.some(stock => stock.ticker === state.selected)) state.selected = null;
-      renderSummary(); renderCards(); renderSelection(); renderChart();
+      renderSummary(); renderCards(); renderSelection(); renderChart(); renderReturns();
       $('announcer').textContent = state.visible.length + ' Werte angezeigt.';
     }
     function changePortfolio(id) {
@@ -422,6 +632,7 @@
         if (state.request === controller) { state.request = null; $('loading').hidden = true; setRefreshBusy(false); if (notify && notice) showToast(...notice); }
       }
     }
+    $('returns-export').addEventListener('click', exportReturns);
     $('reload').addEventListener('click', () => load({ notify: true }));
     $('toast-close').addEventListener('click', dismissToast);
     $('refresh-toast').addEventListener('mouseenter', () => clearTimeout(toastTimer));
