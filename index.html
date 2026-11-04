@@ -671,9 +671,9 @@
       [['name', 'Position'], ...returnColumns].forEach(([key, label]) => {
         const th = el('th'); th.scope = 'col'; th.setAttribute('aria-sort', key === 'name' && sort.key === 'category' ? 'other' : sort.key === key ? sort.direction === 1 ? 'ascending' : 'descending' : 'none');
         const button = el('button', 'returns-sort', label); button.type = 'button'; button.dataset.returnSort = key;
-        button.title = label + ' sortieren'; button.setAttribute('aria-label', label + ' ' + (sort.key === key && sort.direction === 1 ? 'absteigend' : 'aufsteigend') + ' sortieren');
+        button.title = key === 'name' ? 'Kategorienreihenfolge wiederherstellen' : label + ' sortieren'; button.setAttribute('aria-label', key === 'name' ? 'Positionen nach Kategorienreihenfolge sortieren' : label + ' ' + (sort.key === key && sort.direction === 1 ? 'absteigend' : 'aufsteigend') + ' sortieren');
         button.append(el('span', 'returns-sort-arrow', sort.key === key ? sort.direction === 1 ? '↑' : '↓' : ''));
-        button.addEventListener('click', () => { sort.direction = sort.key === key ? -sort.direction : key === 'name' ? 1 : -1; sort.key = key; renderReturns(); document.querySelector('[data-return-sort="' + key + '"]').focus(); });
+        button.addEventListener('click', () => { if (key === 'name') { sort.key = 'category'; sort.direction = 1; } else { sort.direction = sort.key === key ? -sort.direction : -1; sort.key = key; } renderReturns(); document.querySelector('[data-return-sort="' + key + '"]').focus(); });
         th.append(button); header.append(th);
       });
       head.append(header);
