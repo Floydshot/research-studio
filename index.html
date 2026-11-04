@@ -105,7 +105,6 @@
     .returns-sort-arrow { font-size: 12px; color: var(--teal); min-width: 9px; }
     .returns-position { display: block; max-width: 275px; padding: 0; border: 0; background: transparent; color: var(--text); text-align: left; font-size: 11px; font-weight: 500; border-radius: 2px; overflow: hidden; text-overflow: ellipsis; }
     .returns-position:hover { text-decoration: underline; text-underline-offset: 3px; }
-    .returns-ticker { display: block; font-size: 9px; color: var(--faint); margin-bottom: 2px; font-weight: 400; }
     .returns-cell { color: var(--text); }
     .returns-cell.positive { background: color-mix(in srgb,var(--returns-positive) var(--heat-strength),var(--surface)); }
     .returns-cell.negative { background: color-mix(in srgb,var(--returns-negative) var(--heat-strength),var(--surface)); }
@@ -139,6 +138,8 @@
     .returns-position { display: flex; align-items: center; gap: 8px; width: 100%; }
     .returns-position-copy { display: block; min-width: 0; flex: 1; }
     .returns-name { display: block; white-space: normal; overflow-wrap: anywhere; }
+    .returns-category { display: block; margin-top: 2px; font-size: 9px; line-height: 1.4; font-weight: 400; color: #9ca3af; white-space: normal; overflow-wrap: anywhere; }
+    [data-theme=light] .returns-category { color: #6b7280; }
 
   </style>
 </head>
@@ -680,8 +681,8 @@
         const row = el('tr', stock.ticker === state.selected ? 'selected' : ''); row.dataset.returnTicker = stock.ticker;
         const position = el('th'); position.scope = 'row';
         const label = stock.name + (stock.cluster ? ' – ' + stock.cluster : '');
-        const button = el('button', 'returns-position'); button.type = 'button'; button.setAttribute('aria-pressed', String(stock.ticker === state.selected)); button.setAttribute('aria-label', label + ' (' + stock.ticker + ') im Diagramm auswählen');
-        const labels = el('span', 'returns-position-copy'); labels.append(el('span', 'returns-ticker', stock.ticker), el('span', 'returns-name', label)); button.append(companyLogo(stock.ticker, 'returns-logo'), labels); button.addEventListener('click', () => select(stock.ticker)); position.append(button);
+        const button = el('button', 'returns-position'); button.type = 'button'; button.setAttribute('aria-pressed', String(stock.ticker === state.selected)); button.setAttribute('aria-label', label + ' im Diagramm auswählen');
+        const labels = el('span', 'returns-position-copy'); labels.append(el('span', 'returns-name', stock.name)); if (stock.cluster) labels.append(el('span', 'returns-category', stock.cluster)); button.append(companyLogo(stock.ticker, 'returns-logo'), labels); button.addEventListener('click', () => select(stock.ticker)); position.append(button);
         row.append(position);
         returnColumns.forEach(([key]) => {
           const value = returnNumber(stock, key), cell = el('td', 'returns-cell' + (value === null ? ' unavailable' : value > 0 ? ' positive' : value < 0 ? ' negative' : ''), value === null ? '—' : (value > 0 ? '+' : '') + fmt(value, 2) + '%');
