@@ -535,11 +535,12 @@
     }
     function renderBuyIndicator(stock, trigger) {
       const indicator = stock.buy_indicator;
-      if (!['GS', 'JPM', 'MS', 'AFL'].includes(stock.ticker) || !indicator || typeof indicator !== 'object') return false;
+      if (!['GS', 'JPM', 'MS', 'AFL', 'TSM'].includes(stock.ticker) || !indicator || typeof indicator !== 'object') return false;
       const valid = indicator.version === 1 && ['eligible', 'watch', 'unavailable'].includes(indicator.status) && typeof indicator.summary === 'string' && typeof indicator.rule === 'string' && Array.isArray(indicator.conditions);
       const asOf = valid && typeof indicator.as_of === 'string' ? new Date(indicator.as_of).getTime() : NaN;
       const freshStamp = value => { const stamp = typeof value === 'string' ? new Date(value).getTime() : NaN; return Number.isFinite(stamp) && stamp <= Date.now() + 5 * 60 * 1000 && Date.now() - stamp <= 4 * 24 * 3600 * 1000; };
-      const fresh = valid && ['live', 'partial'].includes(mode()) && freshStamp(indicator.as_of) && ['price', 'current_pe', 'forward_pe', 'sma200', 'rsi14', 'currency'].every(field => stock.field_sources && stock.field_sources[field] === 'live' && stock.field_updated_at && freshStamp(stock.field_updated_at[field]));
+      const validTSM = stock.ticker !== 'TSM' || stock.currency === 'USD' && indicator.currency === 'USD' && ['price', 'current_pe', 'forward_pe', 'sma200'].every(field => positive(stock[field]) !== null) && number(stock.rsi14) !== null && Number(stock.rsi14) >= 0 && Number(stock.rsi14) <= 100 && freshStamp(stock.technicals_as_of);
+      const fresh = valid && validTSM && ['live', 'partial'].includes(mode()) && freshStamp(indicator.as_of) && ['price', 'current_pe', 'forward_pe', 'sma200', 'rsi14', 'currency'].every(field => stock.field_sources && stock.field_sources[field] === 'live' && stock.field_updated_at && freshStamp(stock.field_updated_at[field]));
       const checked = valid && indicator.conditions.length > 0 && indicator.conditions.every(item => item && typeof item.label === 'string' && [true, false, null].includes(item.passed));
       const status = !fresh || !checked || indicator.status === 'eligible' && !indicator.conditions.every(item => item.passed === true) ? 'unavailable' : indicator.status;
       const label = { eligible: 'Nachkauf prüfen', watch: 'Abwarten', unavailable: 'Daten prüfen' }[status];
@@ -557,11 +558,14 @@
       if (conditions.length) { const list = el('ul', 'indicator-conditions'); conditions.forEach(condition => list.append(el('li', '', condition))); details.append(list); }
       details.append(el('p', '', (valid && indicator.reference_period ? 'Referenz: ' + indicator.reference_period + ' · ' : '') + (Number.isFinite(asOf) ? 'Stand: ' + dateText(indicator.as_of) + ' (Berlin)' : 'Kein bestätigter Datenstand')));
       const historical = issuerMetric(stock, 'hist_pe');
+      const sources = new Map();
       if (historical) {
-        const sources = new Map();
         if (httpsSource(historical.source_url)) sources.set(historical.source_url, 'IR-Bericht');
         if (Array.isArray(historical.observations)) historical.observations.forEach(item => { if (httpsSource(item.eps_source_url) && !sources.has(item.eps_source_url)) sources.set(item.eps_source_url, 'EPS-Bericht ab FY' + item.fiscal_year); });
         if (httpsSource(historical.price_source_url)) sources.set(historical.price_source_url, 'Jahresendkurse');
+      }
+      if (Array.isArray(indicator.sources)) indicator.sources.forEach(item => { if (item && typeof item.label === 'string' && item.label.trim() && httpsSource(item.url)) sources.set(httpsSource(item.url), item.label); });
+      if (sources.size) {
         const links = el('p', 'indicator-sources');
         for (const [url, name] of sources) { if (links.childNodes.length) links.append(document.createTextNode(' · ')); const link = el('a', '', name + ' ↗'); link.href = url; link.target = '_blank'; link.rel = 'noopener noreferrer'; links.append(link); }
         if (links.childNodes.length) details.append(links);
