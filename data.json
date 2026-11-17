@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "last_updated": "16.11.2026, 17:16 CET",
-  "updated_at": "2026-11-16T17:16:42+01:00",
+  "last_updated": "17.11.2026, 11:29 CET",
+  "updated_at": "2026-11-17T11:29:24+01:00",
   "last_attempted_at": "2026-11-16T17:16:42+01:00",
   "data_mode": "partial",
-  "expected_stock_count": 29,
+  "expected_stock_count": 30,
   "warnings": [
     "Historische Multiples, Dividendenreferenzen und Nachkauf-Indikatoren sind vorgegebene, nicht unabhängig geprüfte Referenzwerte, sofern nicht separat belegt; der 5J/10J-Zeitraum ist nicht je Aktie belegt. Tranchen folgen nur den Forward-KGV-Schwellen.",
     "Der Abruf ist teilweise erfolgreich; Fallbacks und fehlende Felder sind je Aktie ausgewiesen."
@@ -1260,6 +1260,153 @@
             },
             "last_distribution_date": null,
             "cash_events_count": 0
+          }
+        },
+        {
+          "name": "TSMC",
+          "ticker": "TSM",
+          "cluster": "Semiconducter",
+          "hist_pe": null,
+          "hist_ps": null,
+          "hist_div": null,
+          "buy_trigger": "Noch kein individueller Nachkauf-Indikator hinterlegt.",
+          "current_pe": 24.202852,
+          "forward_pe": 15.969441,
+          "ps_ratio": 12.888128,
+          "div_yield": 1.01,
+          "roe": 41.86,
+          "price": 373.45,
+          "sma200": 403.266501,
+          "rsi14": 38.689142,
+          "currency": "USD",
+          "source_status": "live",
+          "as_of": "2026-11-16T21:00:02+00:00",
+          "field_sources": {
+            "current_pe": "live",
+            "forward_pe": "live",
+            "ps_ratio": "live",
+            "div_yield": "live",
+            "roe": "live",
+            "price": "live",
+            "sma200": "live",
+            "rsi14": "live",
+            "currency": "live"
+          },
+          "field_updated_at": {
+            "current_pe": "2026-11-17T11:29:26+01:00",
+            "forward_pe": "2026-11-17T11:29:26+01:00",
+            "ps_ratio": "2026-11-17T11:29:26+01:00",
+            "div_yield": "2026-11-17T11:29:26+01:00",
+            "roe": "2026-11-17T11:29:26+01:00",
+            "price": "2026-11-17T11:29:26+01:00",
+            "sma200": "2026-11-17T11:29:26+01:00",
+            "rsi14": "2026-11-17T11:29:26+01:00",
+            "currency": "2026-11-17T11:29:26+01:00"
+          },
+          "warnings": [
+            "Aktuelle und nachlaufende Dividendenreferenz weichen ab; Einheit über die passende Referenz geprüft."
+          ],
+          "chart_pe": 24.202852,
+          "spread_pe_pct": null,
+          "sma200_distance_pct": -7.3937,
+          "tranche": "Tranche 1 (Sofortkauf)",
+          "tranche_color": "emerald",
+          "tranche_key": "buy",
+          "field_metadata": {
+            "ps_ratio": {
+              "provider": "Yahoo Finance",
+              "validation_version": 1,
+              "source_url": "https://finance.yahoo.com/quote/TSM/",
+              "quote_currency": "USD",
+              "financial_currency": "TWD",
+              "method": "Marktkapitalisierung (USD) × USD/TWD (TWD je USD) ÷ TTM-Umsatz (TWD); keine zusätzliche ADS-Umrechnung.",
+              "calculation_inputs": {
+                "market_cap_usd": 1936888430592.0,
+                "total_revenue_twd": 4944817553408.0,
+                "usd_twd_rate": 32.90299987792969
+              },
+              "fx_source_url": "https://finance.yahoo.com/quote/TWD%3DX/",
+              "fx_as_of": "2026-11-17T00:00:00+00:00",
+              "fx_retrieved_at": "2026-11-17T11:29:26+01:00",
+              "quote_as_of": "2026-11-16T21:00:02+00:00",
+              "info_retrieved_at": "2026-11-17T11:29:26+01:00",
+              "retrieved_at": "2026-11-17T11:29:26+01:00"
+            }
+          },
+          "returns": {
+            "version": 1,
+            "basis": "total_return",
+            "source_status": "live",
+            "as_of": "2026-11-16",
+            "retrieved_at": "2026-11-17T11:29:26+01:00",
+            "since": "1997-10-09",
+            "source_url": "https://finance.yahoo.com/quote/TSM/history/",
+            "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
+            "currency": "USD",
+            "periods": {
+              "1d": {
+                "value": -6.340129,
+                "start": "2026-11-13",
+                "end": "2026-11-16",
+                "annualized": false
+              },
+              "1w": {
+                "value": -3.903552,
+                "start": "2026-11-09",
+                "end": "2026-11-16",
+                "annualized": false
+              },
+              "1m": {
+                "value": -9.490796,
+                "start": "2026-10-16",
+                "end": "2026-11-16",
+                "annualized": false
+              },
+              "6m": {
+                "value": -7.187108,
+                "start": "2026-05-15",
+                "end": "2026-11-16",
+                "annualized": false
+              },
+              "ytd": {
+                "value": 23.836224,
+                "start": "2025-12-31",
+                "end": "2026-11-16",
+                "annualized": false
+              },
+              "1y": {
+                "value": 32.489532,
+                "start": "2025-11-14",
+                "end": "2026-11-16",
+                "annualized": false
+              },
+              "3y": {
+                "value": 57.971866,
+                "start": "2023-11-16",
+                "end": "2026-11-16",
+                "annualized": true
+              },
+              "5y": {
+                "value": 27.931685,
+                "start": "2021-11-16",
+                "end": "2026-11-16",
+                "annualized": true
+              },
+              "10y": {
+                "value": 31.758673,
+                "start": "2016-11-16",
+                "end": "2026-11-16",
+                "annualized": true
+              },
+              "all": {
+                "value": 17.841051,
+                "start": "1997-10-09",
+                "end": "2026-11-16",
+                "annualized": true
+              }
+            },
+            "last_distribution_date": "2026-09-16",
+            "cash_events_count": 45
           }
         },
         {
@@ -4303,7 +4450,7 @@
     }
   ],
   "status_counts": {
-    "live": 27,
+    "live": 28,
     "partial": 2
   }
 }
