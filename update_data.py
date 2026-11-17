@@ -147,6 +147,95 @@ def apply_us_historical_reference(stock: dict[str, Any]) -> None:
     stock["buy_trigger"] = "TTM-KGV mindestens 15% unter eigenem 5J-Jahresend-Median, Forward-KGV höchstens auf Referenzniveau, Kurs ≤ SMA 200 und RSI (14) ≤ 50."
 
 
+# Audited Taiwan-IFRS annual USD EPS per ADS and USD revenue. The issuer
+# translates annual results at the annual weighted-average FX rate. One ADS
+# already represents five ordinary shares; never multiply the USD EPS by five.
+TSM_HISTORICAL_INPUTS = ({'fiscal_year': 2021,
+  'price_date': '2021-12-31',
+  'close': 120.31,
+  'diluted_eps': 4.12,
+  'eps_unit': 'USD je ADS',
+  'revenue_usd': 56822000000,
+  'ordinary_shares_issued': 25930380000,
+  'ads_ratio': 5,
+  'annual_average_usd_twd': 27.937,
+  'eps_source_url': 'https://investor.tsmc.com/english/encrypt/files/encrypt_file/reports/2022-02/b59a98158c3db59117bf162d05d7778874715e4b/FS.pdf',
+  'shares_source_url': 'https://investor.tsmc.com/sites/ir/financial-report/2022/TSMC%202022Q4%20Consolidated%20Financial%20Statements_E_1.pdf'},
+ {'fiscal_year': 2022,
+  'price_date': '2022-12-30',
+  'close': 74.49,
+  'diluted_eps': 6.57,
+  'eps_unit': 'USD je ADS',
+  'revenue_usd': 75881000000,
+  'ordinary_shares_issued': 25930380000,
+  'ads_ratio': 5,
+  'annual_average_usd_twd': 29.835,
+  'eps_source_url': 'https://investor.tsmc.com/english/encrypt/files/encrypt_file/reports/2023-02/8dd8b6bbd00c6c6fc6b6880790247c714597212c/FS.pdf',
+  'shares_source_url': 'https://investor.tsmc.com/sites/ir/financial-report/2022/TSMC%202022Q4%20Consolidated%20Financial%20Statements_E_1.pdf'},
+ {'fiscal_year': 2023,
+  'price_date': '2023-12-29',
+  'close': 104.0,
+  'diluted_eps': 5.18,
+  'eps_unit': 'USD je ADS',
+  'revenue_usd': 69298000000,
+  'ordinary_shares_issued': 25932071000,
+  'ads_ratio': 5,
+  'annual_average_usd_twd': 31.195,
+  'eps_source_url': 'https://investor.tsmc.com/english/encrypt/files/encrypt_file/reports/2024-02/eb3eca87abc2668d3c8d5ca2eaa005b8f3f582b4/FS_audited.pdf',
+  'shares_source_url': 'https://investor.tsmc.com/sites/ir/financial-report/2023/TSMC%202023Q4%20Consolidated%20Financial%20Statements_E.pdf'},
+ {'fiscal_year': 2024,
+  'price_date': '2024-12-31',
+  'close': 197.49,
+  'diluted_eps': 7.04,
+  'eps_unit': 'USD je ADS',
+  'revenue_usd': 90083000000,
+  'ordinary_shares_issued': 25932733000,
+  'ads_ratio': 5,
+  'annual_average_usd_twd': 32.129,
+  'eps_source_url': 'https://investor.tsmc.com/english/encrypt/files/encrypt_file/reports/2025-02/5619e02969294761af7084c9aa9b702f04ed9bee/FS_audited.pdf',
+  'shares_source_url': 'https://investor.tsmc.com/sites/ir/financial-report/2025/TSMC%202025Q4%20Consolidated%20Financial%20Statements_E_1.pdf'},
+ {'fiscal_year': 2025,
+  'price_date': '2025-12-31',
+  'close': 303.89,
+  'diluted_eps': 10.65,
+  'eps_unit': 'USD je ADS',
+  'revenue_usd': 122424000000,
+  'ordinary_shares_issued': 25932524000,
+  'ads_ratio': 5,
+  'annual_average_usd_twd': 31.114,
+  'eps_source_url': 'https://investor.tsmc.com/english/encrypt/files/encrypt_file/reports/2026-02/cb73d5f4e019a8f6d7a494a0f8f6c6da2dfc4ee2/FS.pdf',
+  'shares_source_url': 'https://investor.tsmc.com/sites/ir/financial-report/2025/TSMC%202025Q4%20Consolidated%20Financial%20Statements_E_1.pdf'})
+
+
+def tsm_historical_metadata(field: str) -> dict[str, Any]:
+    observations = [dict(item, pe=round(item["close"] / item["diluted_eps"], 9),
+                         ps=round(item["close"] * (item["ordinary_shares_issued"] / item["ads_ratio"]) / item["revenue_usd"], 9))
+                    for item in TSM_HISTORICAL_INPUTS]
+    pe = field == "hist_pe"
+    return dict(provider="TSMC IR + Yahoo Finance", validation_version=1,
+                fact_type="historical_year_end_pe_median" if pe else "historical_year_end_ps_median",
+                label="5J-Median · JE" if pe else "Hist. P/S 5J",
+                source_label="TIFRS · IR / Kurse", accounting_basis="Taiwan-IFRS",
+                period="FY2021–FY2025", verified_at="2026-11-17", sample_count=5,
+                source_url=TSM_HISTORICAL_INPUTS[-1]["eps_source_url"],
+                price_source_url="https://finance.yahoo.com/quote/TSM/history/",
+                observations=observations,
+                method=("Median der fünf Jahresend-KGVs 2021–2025: letzter splitbereinigter NYSE-Schlusskurs je ADS in USD ÷ veröffentlichtes verwässertes Taiwan-IFRS-Jahres-EPS je ADS in USD. "
+                        if pe else "Median der fünf Jahresend-KUVs 2021–2025: letzter splitbereinigter NYSE-Schlusskurs je ADS in USD × ausgegebene Stammaktien zum Jahresende ÷ 5 ÷ veröffentlichter Taiwan-IFRS-Jahresumsatz in USD. Aktienzahlen auf berichtete Tausend gerundet. ")
+                       + "USD-Jahreszahlen des Emittenten zum gewichteten Jahresdurchschnittskurs; keine erneute Währungs- oder ADS-Umrechnung. Schlusskurse ohne Dividendenbereinigung. Nachträglich rekonstruierte Jahresend-Stichprobe; kein Durchschnitt täglicher TTM-Multiples und kein historisch handelbarer Backtest.",
+                comparable_to_current=True,
+                comparison_note=("Jahresend-Referenz auf USD-ADS-Basis; aktuelles Yahoo-KGV verwendet rollierende TTM-Gewinne, Forward-KGV Analystenschätzungen. Wechselkursübersetzung und Berichtszeitraum können leicht abweichen. Der Bewertungsabstand ist kein Kurspotenzial." if pe else "Historische USD-Jahresumsätze verwenden den gewichteten Jahresdurchschnittskurs; das aktuelle KUV verwendet TTM-Umsatz zum zuletzt abgerufenen USD/TWD-Kurs. Zeitraum und FX-Basis unterscheiden sich. Keine punktgenau vergleichbare Bewertungsprämie und kein Kursziel."))
+
+
+def apply_tsm_historical_reference(stock: dict[str, Any]) -> None:
+    if stock.get("ticker") != TSM_TICKER:
+        return
+    for field, ratio in (("hist_pe", "pe"), ("hist_ps", "ps")):
+        meta = tsm_historical_metadata(field)
+        stock[field] = round(median(item[ratio] for item in meta["observations"]), 6)
+        stock.setdefault("field_metadata", {})[field] = meta
+
+
 def add_buy_indicator(stock: dict[str, Any], now: datetime | None = None) -> None:
     """Evaluate an explicit, conservative screen; never turn old data green."""
     is_tsm = stock.get("ticker") == TSM_TICKER
@@ -205,7 +294,7 @@ def add_buy_indicator(stock: dict[str, Any], now: datetime | None = None) -> Non
         summary=summary, rule=(
             "Vorgeschlagene TSMC-Regel: " + stock.get("buy_trigger", "") +
             " Bewertung und Rücksetzer müssen gleichzeitig passen. Die KGV-Grenzen sind bewusst gewählte absolute Obergrenzen für den profitablen, aber zyklischen Chiphersteller; RSI ≤ 45 und Kurs ≤ SMA 200 verlangen einen Rücksetzer. "
-            "Eigener Vorschlag, nicht rückgetestet; keine historische KGV-Referenz. Forward-KGV beruht auf veränderlichen Analystenschätzungen. "
+            "Eigener Vorschlag, nicht rückgetestet; die Schwellen sind eigenständig gewählt und nicht aus der historischen Referenz abgeleitet. Forward-KGV beruht auf veränderlichen Analystenschätzungen. "
             "TTM-Prüfschwelle = aktueller USD-ADS-Kurs ÷ TTM-KGV × 25 bei unverändertem TTM-EPS; kein Kursziel. "
             "Alle vier Bedingungen müssen mit frischen USD-Daten erfüllt sein. Vor einem Nachkauf Gewinnprognosen, Investitionsbedarf und Taiwan-Risiko prüfen."
             if is_tsm else stock.get("buy_trigger", "") + " Eigene Screening-Regel mit gewähltem 15%-Puffer, nicht rückgetestet. Forward-KGV ist eine Konsensschätzung und kann auf bereinigten Gewinnen beruhen. TTM-Prüfkurs = aktueller Kurs ÷ TTM-KGV × Prüfschwelle bei unverändertem TTM-EPS; kein Kursziel. Bilanz, Kapitalausstattung und Gewinnqualität vor einem Kauf separat prüfen. " + US_PE_REFERENCES[stock["ticker"]]["note"]),
@@ -362,6 +451,7 @@ def build_seed_data(now: datetime | None = None) -> dict[str, Any]:
             stock["field_sources"]["currency"] = "unavailable"
             stock["field_updated_at"]["currency"] = None
             apply_us_historical_reference(stock)
+            apply_tsm_historical_reference(stock)
             if stock["ticker"] == TOKIO_TICKER:
                 # Verified year-end references retain their own explicit period
                 # and basis; the J-GAAP KGV series is not comparable to IFRS.
