@@ -1269,7 +1269,7 @@
           "hist_pe": null,
           "hist_ps": null,
           "hist_div": null,
-          "buy_trigger": "Noch kein individueller Nachkauf-Indikator hinterlegt.",
+          "buy_trigger": "Forward-KGV ≤ 20, TTM-KGV ≤ 25, Kurs ≤ SMA 200 und RSI (14) ≤ 45; alle vier Bedingungen gemeinsam.",
           "current_pe": 24.202852,
           "forward_pe": 15.969441,
           "ps_ratio": 12.888128,
@@ -1407,6 +1407,62 @@
             },
             "last_distribution_date": "2026-09-16",
             "cash_events_count": 45
+          },
+          "technicals_as_of": "2026-11-16T00:00:00-05:00",
+          "buy_indicator": {
+            "version": 1,
+            "status": "eligible",
+            "label": "Nachkauf prüfen",
+            "summary": "4/4 Bedingungen erfüllt. TTM ≤ 25,00×; Forward ≤ 20,00×; Kurs ≤ SMA 200; RSI ≤ 45.",
+            "rule": "Vorgeschlagene TSMC-Regel: Forward-KGV ≤ 20, TTM-KGV ≤ 25, Kurs ≤ SMA 200 und RSI (14) ≤ 45; alle vier Bedingungen gemeinsam. Bewertung und Rücksetzer müssen gleichzeitig passen. Die KGV-Grenzen sind bewusst gewählte absolute Obergrenzen für den profitablen, aber zyklischen Chiphersteller; RSI ≤ 45 und Kurs ≤ SMA 200 verlangen einen Rücksetzer. Eigener Vorschlag, nicht rückgetestet; keine historische KGV-Referenz. Forward-KGV beruht auf veränderlichen Analystenschätzungen. TTM-Prüfschwelle = aktueller USD-ADS-Kurs ÷ TTM-KGV × 25 bei unverändertem TTM-EPS; kein Kursziel. Alle vier Bedingungen müssen mit frischen USD-Daten erfüllt sein. Vor einem Nachkauf Gewinnprognosen, Investitionsbedarf und Taiwan-Risiko prüfen.",
+            "target_pe": 25.0,
+            "target_price": 385.75,
+            "currency": "USD",
+            "discount_pct": null,
+            "conditions": [
+              {
+                "key": "current_pe",
+                "label": "TTM-KGV ≤ 25",
+                "actual": 24.202852,
+                "threshold": 25.0,
+                "passed": true
+              },
+              {
+                "key": "forward_pe",
+                "label": "Forward-KGV ≤ 20",
+                "actual": 15.969441,
+                "threshold": 20.0,
+                "passed": true
+              },
+              {
+                "key": "sma200",
+                "label": "Kurs ≤ SMA 200",
+                "actual": 373.45,
+                "threshold": 403.266501,
+                "passed": true
+              },
+              {
+                "key": "rsi14",
+                "label": "RSI (14) ≤ 45",
+                "actual": 38.689142,
+                "threshold": 45,
+                "passed": true
+              }
+            ],
+            "as_of": "2026-11-16T21:00:02+00:00",
+            "evaluated_at": "2026-11-17T12:22:47+01:00",
+            "reference_period": null,
+            "basis": "proposed_absolute_thresholds",
+            "sources": [
+              {
+                "label": "TSMC Q3 2026",
+                "url": "https://investor.tsmc.com/english/quarterly-results/2026/q3"
+              },
+              {
+                "label": "TSMC Geschäftsrisiken",
+                "url": "https://www.sec.gov/Archives/edgar/data/1046179/000162828026025362/tsm-20251231.htm"
+              }
+            ]
           }
         },
         {
