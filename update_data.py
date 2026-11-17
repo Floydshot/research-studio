@@ -53,6 +53,13 @@ TSM_TICKER = "TSM"
 TSM_FX_SOURCE = "https://finance.yahoo.com/quote/TWD%3DX/"
 TSM_PS_SOURCE = "https://finance.yahoo.com/quote/TSM/"
 TSM_PS_VERSION = 1
+FEAR_GREED_SOURCE = "https://edition.cnn.com/markets/fear-and-greed"
+FEAR_GREED_ENDPOINT = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
+FEAR_GREED_VERSION = 1
+FEAR_GREED_MAX_AGE = 4 * 86400
+FEAR_GREED_COMPARISONS = {"previous_close": "previous_close", "previous_week": "previous_1_week",
+                         "previous_month": "previous_1_month", "previous_year": "previous_1_year"}
+FEAR_GREED_RATINGS = {"extreme fear", "fear", "neutral", "greed", "extreme greed"}
 TOKIO_TICKER = "8766.T"
 TOKIO_DIVIDEND_SOURCE = "https://www.tokiomarinehd.com/ir/stock/return.html"
 TOKIO_REPORT_INDEX = "https://www.tokiomarinehd.com/en/ir/download/{year}.html"
@@ -392,6 +399,148 @@ def iso_now(now: datetime | None = None) -> str:
     return (now or datetime.now(timezone.utc)).astimezone(BERLIN).isoformat(timespec="seconds")
 
 
+def fear_greed_score(value: Any) -> float | None:
+    """CNN uses a 0–100 score, not a fraction, percentage string or Boolean."""
+    score = finite_number(value) if isinstance(value, (int, float)) and not isinstance(value, bool) else None
+    return score if score is not None and 0 <= score <= 100 else None
+
+
+def fear_greed_rating(score: float) -> str:
+    """Display bands for comparison scores, whose endpoint has no own label."""
+    # Matches CNN's own page classifier, including its boundary values.
+    return "extreme fear" if score <= 25 else "fear" if score < 45 else "neutral" if score <= 55 else "greed" if score < 75 else "extreme greed"
+
+
+def _fear_greed_time(value: Any) -> datetime:
+    if not isinstance(value, str):
+        raise ValueError("CNN-Zeitstempel fehlt oder ist kein ISO-Datum")
+    instant = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if instant.tzinfo is None or instant.utcoffset() is None:
+        raise ValueError("CNN-Zeitstempel hat keine Zeitzone")
+    return instant.astimezone(timezone.utc)
+
+
+def unavailable_fear_and_greed(stamp: str | None = None, note: str | None = None) -> dict[str, Any]:
+    value = dict(version=FEAR_GREED_VERSION, provider="CNN", source_url=FEAR_GREED_SOURCE,
+                 source_status="unavailable", score=None, rating=None, as_of=None, retrieved_at=None,
+                 last_attempted_at=stamp,
+                 comparisons={key: dict(score=None, rating=None) for key in FEAR_GREED_COMPARISONS})
+    if note:
+        value["note"] = note
+    return value
+
+
+def normalize_fear_and_greed(payload: Any, retrieved_at: str | None = None) -> dict[str, Any]:
+    """Accept the official headline block only; never substitute a subindex."""
+    stamp = retrieved_at or iso_now()
+    checked = _fear_greed_time(stamp)
+    headline = payload.get("fear_and_greed") if isinstance(payload, dict) else None
+    if not isinstance(headline, dict):
+        raise ValueError("CNN-Antwort enthält keinen Fear-&-Greed-Gesamtindex")
+    score = fear_greed_score(headline.get("score"))
+    rating = " ".join(headline.get("rating", "").lower().split()) if isinstance(headline.get("rating"), str) else None
+    if score is None or rating not in FEAR_GREED_RATINGS or rating != fear_greed_rating(score):
+        raise ValueError("CNN-Gesamtindex oder Einstufung ist ungültig")
+    as_of = _fear_greed_time(headline.get("timestamp"))
+    if not -300 <= (checked - as_of).total_seconds() <= FEAR_GREED_MAX_AGE:
+        raise ValueError("CNN-Gesamtindex ist älter als vier Tage oder liegt in der Zukunft")
+    comparisons = {}
+    missing = False
+    for key, raw_key in FEAR_GREED_COMPARISONS.items():
+        comparison = fear_greed_score(headline.get(raw_key))
+        comparisons[key] = dict(score=comparison, rating=fear_greed_rating(comparison) if comparison is not None else None)
+        missing = missing or comparison is None
+    result = dict(version=FEAR_GREED_VERSION, provider="CNN", source_url=FEAR_GREED_SOURCE,
+                  source_status="live", score=score, rating=rating, as_of=as_of.isoformat(timespec="seconds"),
+                  retrieved_at=checked.isoformat(timespec="seconds"), last_attempted_at=checked.isoformat(timespec="seconds"),
+                  comparisons=comparisons)
+    if missing:
+        result["note"] = "Einzelne CNN-Vergleichswerte sind nicht verfügbar."
+    return result
+
+
+def valid_fear_and_greed(value: Any, stamp: str | None = None) -> dict[str, Any] | None:
+    """Validate persisted observations independently of today's availability."""
+    if not isinstance(value, dict) or value.get("version") != FEAR_GREED_VERSION or value.get("provider") != "CNN" or value.get("source_url") != FEAR_GREED_SOURCE or value.get("source_status") not in {"live", "previous"}:
+        return None
+    score = fear_greed_score(value.get("score"))
+    if score is None or value.get("rating") not in FEAR_GREED_RATINGS or value.get("rating") != fear_greed_rating(score):
+        return None
+    try:
+        checked = _fear_greed_time(stamp or iso_now())
+        as_of = _fear_greed_time(value.get("as_of"))
+        retrieved = _fear_greed_time(value.get("retrieved_at"))
+        # A valid old observation may be displayed as previous for any age;
+        # its original market and retrieval times must remain unchanged.
+        if (as_of - retrieved).total_seconds() > 300 or (retrieved - checked).total_seconds() > 300 or (as_of - checked).total_seconds() > 300:
+            return None
+    except (ValueError, TypeError, OverflowError):
+        return None
+    comparisons = value.get("comparisons")
+    if not isinstance(comparisons, dict):
+        return None
+    for key in FEAR_GREED_COMPARISONS:
+        item = comparisons.get(key)
+        if not isinstance(item, dict):
+            return None
+        score = fear_greed_score(item.get("score"))
+        if item.get("score") is None:
+            if item.get("rating") is not None:
+                return None
+        elif score is None or item.get("rating") != fear_greed_rating(score):
+            return None
+    return deepcopy(value)
+
+
+def merge_fear_and_greed(previous: Any, payload: Any = None, stamp: str | None = None,
+                        error: str | None = None) -> dict[str, Any]:
+    stamp = stamp or iso_now()
+    prior = valid_fear_and_greed(previous, stamp)
+    try:
+        if error:
+            raise ValueError(error)
+        fresh = normalize_fear_and_greed(payload, stamp)
+        if prior and _fear_greed_time(fresh["as_of"]) < _fear_greed_time(prior["as_of"]):
+            raise ValueError("CNN lieferte einen älteren Indexstand als den zuletzt bestätigten")
+        return fresh
+    except (ValueError, TypeError, OverflowError) as exc:
+        note = "CNN-Abruf nicht bestätigt: " + str(exc)[:180]
+        if prior:
+            prior.update(source_status="previous", last_attempted_at=stamp, note=note)
+            return prior
+        return unavailable_fear_and_greed(stamp, note)
+
+
+def fetch_fear_and_greed(timeout: float = 10.0) -> dict[str, Any]:
+    """One bounded, dependency-free request to CNN's public data endpoint."""
+    if not 0 < timeout <= 12:
+        raise ValueError("CNN-Zeitlimit muss größer 0 und höchstens 12 Sekunden sein")
+    request = Request(FEAR_GREED_ENDPOINT, headers={
+        "User-Agent": "ResearchStudio/1.0 (+https://floydshot.github.io/research-studio/)",
+        "Accept": "application/json",
+    })
+    maximum = 2_000_000
+    with urlopen(request, timeout=timeout) as response:
+        if response.status != 200:
+            raise ValueError(f"CNN antwortete mit HTTP {response.status}")
+        raw = response.read(maximum + 1)
+    if len(raw) > maximum:
+        raise ValueError("CNN-Antwort überschreitet das Größenlimit")
+    result = json.loads(raw.decode("utf-8"), parse_constant=lambda value: (_ for _ in ()).throw(ValueError("Ungültige CNN-JSON-Zahl: " + value)))
+    if not isinstance(result, dict):
+        raise ValueError("CNN-Antwort ist kein JSON-Objekt")
+    return result
+
+
+def refresh_fear_and_greed(previous: Any = None,
+                          fetcher: Callable[[], dict[str, Any]] | None = None) -> dict[str, Any]:
+    """Fetch once, isolating CNN failures from every stock's update status."""
+    try:
+        return merge_fear_and_greed(previous, (fetcher or fetch_fear_and_greed)())
+    except Exception as exc:
+        return merge_fear_and_greed(previous, error=f"{type(exc).__name__}: {str(exc)[:160]}")
+
+
 def tranche_for(portfolio_id: str, forward_pe: Any) -> tuple[str, str, str]:
     pe = finite_number(forward_pe)
     if pe is None or pe <= 0:
@@ -439,7 +588,8 @@ def build_seed_data(now: datetime | None = None) -> dict[str, Any]:
                   last_updated=now.astimezone(BERLIN).strftime("%d.%m.%Y, %H:%M %Z"),
                   updated_at=stamp, last_attempted_at=None, data_mode="initial",
                   expected_stock_count=EXPECTED_STOCK_COUNT,
-                  warnings=[INITIAL_WARNING, REFERENCE_WARNING], portfolios=[])
+                  warnings=[INITIAL_WARNING, REFERENCE_WARNING], portfolios=[],
+                  fear_and_greed=unavailable_fear_and_greed())
     for portfolio in PORTFOLIOS:
         group = dict(id=portfolio["id"], name=portfolio["name"], cluster_order=list(portfolio["cluster_order"]), stocks=[])
         for ref in portfolio["stocks"]:
@@ -1644,7 +1794,8 @@ def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[st
 
 def build_live_data(previous: dict[str, Any] | None = None,
                     fetcher: Callable[[str], dict[str, Any]] = fetch_ticker,
-                    now: datetime | None = None) -> dict[str, Any]:
+                    now: datetime | None = None,
+                    fear_greed_fetcher: Callable[[], dict[str, Any]] | None = None) -> dict[str, Any]:
     now = now or datetime.now(timezone.utc)
     result = build_seed_data(now)
     result["warnings"] = [REFERENCE_WARNING]
@@ -1677,6 +1828,7 @@ def build_live_data(previous: dict[str, Any] | None = None,
         result["warnings"].append("Keine neuen Yahoo-Finance-Daten; bisherige Werte bzw. Startwerte bleiben mit ursprünglicher Herkunft erhalten.")
         result["last_updated"] = previous.get("last_updated", result["last_updated"])
         result["updated_at"] = previous.get("updated_at", result["updated_at"])
+    result["fear_and_greed"] = refresh_fear_and_greed(previous.get("fear_and_greed"), fear_greed_fetcher)
     return result
 
 
@@ -1708,7 +1860,9 @@ def atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--seed", action="store_true", help="Nur die vorgegebenen Startwerte schreiben; kein Netzwerk")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--seed", action="store_true", help="Nur die vorgegebenen Startwerte schreiben; kein Netzwerk")
+    mode.add_argument("--sentiment-only", action="store_true", help="Nur CNN Fear & Greed in vorhandener data.json aktualisieren; Aktien unverändert lassen")
     parser.add_argument("--output", type=Path, default=Path(__file__).resolve().with_name("data.json"), help="Ziel-JSON; standardmäßig neben diesem Skript")
     parser.add_argument("--ticker-timeout", type=float, default=45.0, help="Gesamtzeitlimit pro Ticker in Sekunden (max. 45)")
     parser.add_argument("--attempts", type=int, default=2, choices=(1, 2, 3), help="Abrufversuche je Endpoint")
@@ -1718,6 +1872,11 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.seed:
             result = build_seed_data()
+        elif args.sentiment_only:
+            result = load_previous(args.output)
+            if not result:
+                raise ValueError("--sentiment-only benötigt eine vorhandene Dashboard-data.json")
+            result["fear_and_greed"] = refresh_fear_and_greed(result.get("fear_and_greed"))
         else:
             # Fail early on missing dependencies, rather than failing per holding.
             import pandas  # noqa: F401
@@ -1730,6 +1889,9 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, ValueError, ImportError) as exc:
         print(f"Update fehlgeschlagen: {exc}", file=sys.stderr)
         return 1
+    if args.sentiment_only:
+        print(f"CNN Fear & Greed → {args.output} | Status: {result['fear_and_greed']['source_status']}")
+        return 0 if result["fear_and_greed"]["source_status"] == "live" else 1
     print(f"{EXPECTED_STOCK_COUNT} Werte → {args.output} | Modus: {result['data_mode']} | {result.get('status_counts', {'initial': EXPECTED_STOCK_COUNT})}")
     return 1 if result["data_mode"] == "stale" else 0
 
