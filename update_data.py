@@ -49,6 +49,10 @@ NUMERIC_FIELDS = (
 )
 ETF_NUMERIC_FIELDS = ("distribution_yield_ttm", "distributions_per_share_ttm")
 ETF_SOURCE = "https://am.jpmorgan.com/content/dam/jpm-am-aem/americas/us/en/literature/fact-sheet/etfs/FS-JEPQ.PDF"
+TSM_TICKER = "TSM"
+TSM_FX_SOURCE = "https://finance.yahoo.com/quote/TWD%3DX/"
+TSM_PS_SOURCE = "https://finance.yahoo.com/quote/TSM/"
+TSM_PS_VERSION = 1
 TOKIO_TICKER = "8766.T"
 TOKIO_DIVIDEND_SOURCE = "https://www.tokiomarinehd.com/ir/stock/return.html"
 TOKIO_REPORT_INDEX = "https://www.tokiomarinehd.com/en/ir/download/{year}.html"
@@ -231,6 +235,7 @@ PORTFOLIOS = [
         reference("Apple", "AAPL", BIG_TECH, 33.0, "Abwarten auf Forward P/E < 28x", 39.3, 35.2, hist_ps=7.4, ps_ratio=9.8),
         reference("AMD", "AMD", SEMICONDUCTOR, 134.5, "Forward P/E 28x–32x oder Wochen-SMA 50", 137.1, 39.5, hist_ps=8.5, ps_ratio=11.5),
         reference("Arista Networks", "ANET", SEMICONDUCTOR, 46.5, "Rücksetzer auf Forward P/E < 38x–40x", 67.9, 48.5, hist_ps=14.5, ps_ratio=22.0),
+        reference("TSMC", "TSM", SEMICONDUCTOR, None, "Noch kein individueller Nachkauf-Indikator hinterlegt.", None, None),
         reference("Palo Alto Networks", "PANW", CYBERSECURITY, 173.8, "EV/FCF < 30x–32x (Earnings-Dip nutzen)", 271.9, 93.5, hist_ps=11.5, ps_ratio=18.2),
         reference("CrowdStrike", "CRWD", CYBERSECURITY, 200.0, "Strikte Disziplin: P/S < 25x oder P/FCF < 35x", 250.0, 208.3, hist_ps=27.1, ps_ratio=43.2),
         reference("Cloudflare", "NET", CYBERSECURITY, 210.0, "Kompression auf P/S 20x–25x abwarten", 260.0, 226.9, hist_ps=31.1, ps_ratio=41.7),
@@ -1207,6 +1212,98 @@ def apply_period_returns(stock: dict[str, Any], previous: dict[str, Any], payloa
         stock["returns"] = unavailable_period_returns(stock["ticker"], payload.get("returns_error") or "Gesamtrenditehistorie noch nicht verfügbar")
 
 
+def valid_tsm_fx(value: Any, stamp: str) -> dict[str, Any] | None:
+    """The Yahoo TWD=X pair is TWD per USD, never the inverse rate."""
+    if not isinstance(value, dict) or value.get("base_currency") != "USD" or value.get("quote_currency") != "TWD" or value.get("source_url") != TSM_FX_SOURCE:
+        return None
+    rate = finite_number(value.get("rate"))
+    if rate is None or rate <= 0:
+        return None
+    try:
+        checked = datetime.fromisoformat(stamp)
+        retrieved = datetime.fromisoformat(value.get("retrieved_at", ""))
+        as_of = datetime.fromisoformat(value.get("as_of", ""))
+        if any(item.tzinfo is None for item in (checked, retrieved, as_of)) or not as_of <= retrieved <= checked:
+            return None
+        if not 0 <= (checked.astimezone(timezone.utc).date() - as_of.astimezone(timezone.utc).date()).days <= 5:
+            return None
+    except (ValueError, TypeError):
+        return None
+    return {**value, "rate": rate}
+
+
+def valid_tsm_ps_metadata(value: Any, ratio: Any, stamp: str) -> dict[str, Any] | None:
+    """Only a reproducible, currency-correct prior P/S may be reused."""
+    if not isinstance(value, dict) or value.get("provider") != "Yahoo Finance" or value.get("validation_version") != TSM_PS_VERSION or value.get("source_url") != TSM_PS_SOURCE:
+        return None
+    if value.get("quote_currency") != "USD" or value.get("financial_currency") != "TWD" or not value.get("method"):
+        return None
+    inputs = value.get("calculation_inputs")
+    if not isinstance(inputs, dict):
+        return None
+    market_cap, revenue, rate = (finite_number(inputs.get(key)) for key in ("market_cap_usd", "total_revenue_twd", "usd_twd_rate"))
+    ratio = finite_number(ratio)
+    if any(item is None or item <= 0 for item in (market_cap, revenue, rate, ratio)):
+        return None
+    try:
+        checked = datetime.fromisoformat(stamp)
+        retrieved = datetime.fromisoformat(value.get("retrieved_at", ""))
+        info_retrieved = datetime.fromisoformat(value.get("info_retrieved_at", ""))
+        quote_as_of = datetime.fromisoformat(value.get("quote_as_of", ""))
+        if any(item.tzinfo is None for item in (checked, retrieved, info_retrieved, quote_as_of)) or not quote_as_of <= info_retrieved <= retrieved <= checked:
+            return None
+    except (ValueError, TypeError):
+        return None
+    fx = dict(rate=rate, as_of=value.get("fx_as_of"), retrieved_at=value.get("fx_retrieved_at"),
+              base_currency="USD", quote_currency="TWD", source_url=value.get("fx_source_url"))
+    # A cached corrected observation remains usable as a labelled previous
+    # value; its FX had to be current when that observation was verified.
+    if not valid_tsm_fx(fx, value["retrieved_at"]) or not math.isclose(ratio, market_cap * rate / revenue, rel_tol=0, abs_tol=0.000001):
+        return None
+    return deepcopy(value)
+
+
+def apply_tsm_ps_ratio(stock: dict[str, Any], previous: dict[str, Any], payload: dict[str, Any], stamp: str) -> None:
+    """Yahoo's TSM P/S mixes USD market cap with TWD revenue; ignore it."""
+    stock["ps_ratio"] = None
+    stock["field_sources"]["ps_ratio"] = "unavailable"
+    stock["field_updated_at"]["ps_ratio"] = None
+    metadata = stock.setdefault("field_metadata", {})
+    metadata["ps_ratio"] = {"unavailable_reason": "TSMC-KUV benötigt USD/TWD-Umrechnung; unbereinigtes Yahoo-KUV verworfen."}
+    info = payload.get("info") or {}
+    fx = valid_tsm_fx(payload.get("tsm_fx"), stamp)
+    market_cap, revenue = finite_number(info.get("marketCap")), finite_number(info.get("totalRevenue"))
+    fresh = None
+    result = None
+    if fx and info.get("currency") == "USD" and info.get("financialCurrency") == "TWD" and market_cap is not None and market_cap > 0 and revenue is not None and revenue > 0:
+        try:
+            quote_epoch = finite_number(info.get("regularMarketTime"))
+            quote_as_of = datetime.fromtimestamp(quote_epoch, timezone.utc).isoformat(timespec="seconds") if quote_epoch else None
+            result = market_cap * fx["rate"] / revenue
+            fresh = dict(provider="Yahoo Finance", validation_version=TSM_PS_VERSION,
+                         source_url=TSM_PS_SOURCE, quote_currency="USD", financial_currency="TWD",
+                         method="Marktkapitalisierung (USD) × USD/TWD (TWD je USD) ÷ TTM-Umsatz (TWD); keine zusätzliche ADS-Umrechnung.",
+                         calculation_inputs=dict(market_cap_usd=market_cap, total_revenue_twd=revenue, usd_twd_rate=fx["rate"]),
+                         fx_source_url=fx["source_url"], fx_as_of=fx["as_of"], fx_retrieved_at=fx["retrieved_at"],
+                         quote_as_of=quote_as_of, info_retrieved_at=payload.get("info_retrieved_at"),
+                         retrieved_at=max(datetime.fromisoformat(fx["retrieved_at"]), datetime.fromisoformat(payload.get("info_retrieved_at", ""))).isoformat(timespec="seconds"))
+            fresh = valid_tsm_ps_metadata(fresh, result, stamp)
+        except (OverflowError, OSError, ValueError, TypeError):
+            fresh = None
+    if fresh:
+        stock["ps_ratio"] = round(result, 6)
+        stock["field_sources"]["ps_ratio"] = "live"
+        stock["field_updated_at"]["ps_ratio"] = fresh["retrieved_at"]
+        metadata["ps_ratio"] = fresh
+        return
+    prior = valid_tsm_ps_metadata(previous.get("field_metadata", {}).get("ps_ratio"), previous.get("ps_ratio"), stamp)
+    if prior and previous.get("field_sources", {}).get("ps_ratio") in {"live", "previous"}:
+        stock["ps_ratio"] = previous["ps_ratio"]
+        stock["field_sources"]["ps_ratio"] = "previous"
+        stock["field_updated_at"]["ps_ratio"] = prior["retrieved_at"]
+        metadata["ps_ratio"] = prior
+
+
 def _fetch_worker(ticker: str, pipe: Any, attempts: int) -> None:
     """Separate process gives even Ticker.info a hard overall time limit."""
     try:
@@ -1263,6 +1360,20 @@ def _fetch_worker(ticker: str, pipe: Any, attempts: int) -> None:
             pipe.send(dict(returns=calculate_period_returns(long_history, ticker, return_info, iso_now(), issuer_cash)))
         except Exception as exc:
             pipe.send(dict(returns_error=f"Gesamtrendite-Historie: {type(exc).__name__}: {str(exc)[:180]}"))
+        if ticker == TSM_TICKER:
+            # Keep quote, technicals and total returns even if this optional
+            # currency endpoint reaches its own or the overall time limit.
+            try:
+                fx_security = yf.Ticker("TWD=X")
+                fx_history = fx_security.history(period="5d", interval="1d", auto_adjust=False, actions=False, timeout=12)
+                fx_close = fx_history["Close"].dropna()
+                fx_metadata = fx_security.get_history_metadata()
+                if fx_close.empty or (isinstance(fx_metadata, dict) and fx_metadata.get("currency", "TWD") != "TWD"):
+                    raise ValueError("Kein USD/TWD-Kurs in der erwarteten Währung")
+                pipe.send(dict(tsm_fx=dict(rate=finite_number(fx_close.iloc[-1]), as_of=fx_close.index[-1].isoformat(),
+                                           retrieved_at=iso_now(), base_currency="USD", quote_currency="TWD", source_url=TSM_FX_SOURCE)))
+            except Exception as exc:
+                pipe.send(dict(warnings=[f"TSMC USD/TWD: {type(exc).__name__}: {str(exc)[:180]}"]))
         pipe.send(dict(done=True))
     except Exception as exc:
         pipe.send(dict(warnings=[f"Abruf: {type(exc).__name__}: {str(exc)[:180]}"]))
@@ -1329,7 +1440,8 @@ def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[st
     price = quote_price or history_price
     is_etf = seed.get("asset_type") == "etf"
     is_tokio = seed.get("ticker") == TOKIO_TICKER
-    if is_tokio:
+    is_tsm = seed.get("ticker") == TSM_TICKER
+    if is_tokio or is_tsm:
         stock["field_metadata"] = {field: dict(value) for field, value in seed.get("field_metadata", {}).items()}
     dividend, dividend_warnings = (None, []) if is_etf or is_tokio else normalize_dividend_yield(info, price)
     stock["warnings"].extend(dividend_warnings)
@@ -1359,6 +1471,8 @@ def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[st
             continue
         if is_tokio and field in {"current_pe", "forward_pe", "ps_ratio", "roe", "div_yield"}:
             continue
+        if is_tsm and field == "ps_ratio":
+            continue
         value = values[field]
         if field in {"price", "sma200"} and value is not None and value <= 0:
             value = None
@@ -1376,6 +1490,8 @@ def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[st
     if is_tokio:
         apply_tokio_issuer_metrics(stock, previous, payload, price, values["currency"], stamp)
         apply_tokio_dividend(stock, previous, payload, price, values["currency"], stamp)
+    if is_tsm:
+        apply_tsm_ps_ratio(stock, previous, payload, iso_now())
     if is_etf:
         if stock.get("current_pe") is not None and stock["current_pe"] <= 0:
             stock["current_pe"] = None
