@@ -534,13 +534,17 @@
       if (state.selected) { const stock = state.visible.find(item => item.ticker === state.selected); if (stock) { root.append(el('span', '', stock.name + ' ausgewählt')); const clear = el('button', 'clear-selection', 'Aufheben'); clear.type = 'button'; clear.addEventListener('click', () => select(state.selected)); root.append(clear); } }
     }
     function renderBuyIndicator(stock, trigger) {
+      if (stock.ticker === 'TSM') {
+        const copy = (stock.buy_trigger || 'Kein individueller Indikator hinterlegt').replace(/(Forward|TTM)-KGV ≤ (\d+(?:[,.]\d+)?)/g, '$1 P/E ≤ $2x').replace('; alle vier Bedingungen gemeinsam.', '');
+        trigger.append(el('span', 'trigger-text', copy));
+        return true;
+      }
       const indicator = stock.buy_indicator;
-      if (!['GS', 'JPM', 'MS', 'AFL', 'TSM'].includes(stock.ticker) || !indicator || typeof indicator !== 'object') return false;
+      if (!['GS', 'JPM', 'MS', 'AFL'].includes(stock.ticker) || !indicator || typeof indicator !== 'object') return false;
       const valid = indicator.version === 1 && ['eligible', 'watch', 'unavailable'].includes(indicator.status) && typeof indicator.summary === 'string' && typeof indicator.rule === 'string' && Array.isArray(indicator.conditions);
       const asOf = valid && typeof indicator.as_of === 'string' ? new Date(indicator.as_of).getTime() : NaN;
       const freshStamp = value => { const stamp = typeof value === 'string' ? new Date(value).getTime() : NaN; return Number.isFinite(stamp) && stamp <= Date.now() + 5 * 60 * 1000 && Date.now() - stamp <= 4 * 24 * 3600 * 1000; };
-      const validTSM = stock.ticker !== 'TSM' || stock.currency === 'USD' && indicator.currency === 'USD' && ['price', 'current_pe', 'forward_pe', 'sma200'].every(field => positive(stock[field]) !== null) && number(stock.rsi14) !== null && Number(stock.rsi14) >= 0 && Number(stock.rsi14) <= 100 && freshStamp(stock.technicals_as_of);
-      const fresh = valid && validTSM && ['live', 'partial'].includes(mode()) && freshStamp(indicator.as_of) && ['price', 'current_pe', 'forward_pe', 'sma200', 'rsi14', 'currency'].every(field => stock.field_sources && stock.field_sources[field] === 'live' && stock.field_updated_at && freshStamp(stock.field_updated_at[field]));
+      const fresh = valid && ['live', 'partial'].includes(mode()) && freshStamp(indicator.as_of) && ['price', 'current_pe', 'forward_pe', 'sma200', 'rsi14', 'currency'].every(field => stock.field_sources && stock.field_sources[field] === 'live' && stock.field_updated_at && freshStamp(stock.field_updated_at[field]));
       const checked = valid && indicator.conditions.length > 0 && indicator.conditions.every(item => item && typeof item.label === 'string' && [true, false, null].includes(item.passed));
       const status = !fresh || !checked || indicator.status === 'eligible' && !indicator.conditions.every(item => item.passed === true) ? 'unavailable' : indicator.status;
       const label = { eligible: 'Nachkauf prüfen', watch: 'Abwarten', unavailable: 'Daten prüfen' }[status];
