@@ -149,12 +149,13 @@ def apply_us_historical_reference(stock: dict[str, Any]) -> None:
 
 def add_buy_indicator(stock: dict[str, Any], now: datetime | None = None) -> None:
     """Evaluate an explicit, conservative screen; never turn old data green."""
-    if stock.get("ticker") not in US_PE_REFERENCES:
+    is_tsm = stock.get("ticker") == TSM_TICKER
+    if stock.get("ticker") not in US_PE_REFERENCES and not is_tsm:
         return
     now = now or datetime.now(timezone.utc)
     stamp = iso_now(now)
     reference_pe = finite_number(stock.get("hist_pe"))
-    target = reference_pe * 0.85 if reference_pe and reference_pe > 0 else None
+    target = 25.0 if is_tsm else reference_pe * 0.85 if reference_pe and reference_pe > 0 else None
     fields = ("current_pe", "forward_pe", "price", "sma200", "rsi14", "currency")
 
     def fresh(field: str) -> bool:
@@ -177,10 +178,16 @@ def add_buy_indicator(stock: dict[str, Any], now: datetime | None = None) -> Non
         valid = valid and quote_time.tzinfo is not None and -300 <= (now - quote_time).total_seconds() <= 4 * 86400
     except (TypeError, ValueError):
         valid = False
-    checks = [("current_pe", "TTM-KGV ≤ 85% der eigenen Referenz", target),
-              ("forward_pe", "Forward-KGV ≤ eigene Referenz", reference_pe),
+    if is_tsm:
+        try:
+            technical_time = datetime.fromisoformat(stock.get("technicals_as_of") or "")
+            valid = valid and technical_time.tzinfo is not None and -300 <= (now - technical_time).total_seconds() <= 4 * 86400
+        except (TypeError, ValueError):
+            valid = False
+    checks = [("current_pe", "TTM-KGV ≤ 25" if is_tsm else "TTM-KGV ≤ 85% der eigenen Referenz", target),
+              ("forward_pe", "Forward-KGV ≤ 20" if is_tsm else "Forward-KGV ≤ eigene Referenz", 20.0 if is_tsm else reference_pe),
               ("sma200", "Kurs ≤ SMA 200", values["sma200"]),
-              ("rsi14", "RSI (14) ≤ 50", 50)]
+              ("rsi14", "RSI (14) ≤ 45" if is_tsm else "RSI (14) ≤ 50", 45 if is_tsm else 50)]
     conditions = []
     for key, label, threshold in checks:
         actual = values["price"] if key == "sma200" else values[key]
@@ -190,16 +197,27 @@ def add_buy_indicator(stock: dict[str, Any], now: datetime | None = None) -> Non
     state = "unavailable" if not valid else "eligible" if passed == len(conditions) else "watch"
     target_price = values["price"] / values["current_pe"] * target if valid else None
     target_text = format(target, ".2f").replace(".", ",") if valid else ""
-    reference_text = format(reference_pe, ".2f").replace(".", ",") if valid else ""
-    summary = (f"{passed}/4 Bedingungen erfüllt. TTM ≤ {target_text}×; Forward ≤ {reference_text}×; Kurs ≤ SMA 200; RSI ≤ 50." if valid
+    reference_text = format(20.0 if is_tsm else reference_pe, ".2f").replace(".", ",") if valid else ""
+    summary = (f"{passed}/4 Bedingungen erfüllt. TTM ≤ {target_text}×; Forward ≤ {reference_text}×; Kurs ≤ SMA 200; RSI ≤ {45 if is_tsm else 50}." if valid
                else "Keine Auswertung: positive aktuelle KGVs, Kurs, SMA 200, RSI und USD-Kursbasis müssen frisch bestätigt sein.")
     stock["buy_indicator"] = dict(version=1, status=state,
         label={"eligible": "Nachkauf prüfen", "watch": "Abwarten", "unavailable": "Daten prüfen"}[state],
-        summary=summary, rule=stock.get("buy_trigger", "") + " Eigene Screening-Regel mit gewähltem 15%-Puffer, nicht rückgetestet. Forward-KGV ist eine Konsensschätzung und kann auf bereinigten Gewinnen beruhen. TTM-Prüfkurs = aktueller Kurs ÷ TTM-KGV × Prüfschwelle bei unverändertem TTM-EPS; kein Kursziel. Bilanz, Kapitalausstattung und Gewinnqualität vor einem Kauf separat prüfen. " + US_PE_REFERENCES[stock["ticker"]]["note"],
+        summary=summary, rule=(
+            "Vorgeschlagene TSMC-Regel: " + stock.get("buy_trigger", "") +
+            " Bewertung und Rücksetzer müssen gleichzeitig passen. Die KGV-Grenzen sind bewusst gewählte absolute Obergrenzen für den profitablen, aber zyklischen Chiphersteller; RSI ≤ 45 und Kurs ≤ SMA 200 verlangen einen Rücksetzer. "
+            "Eigener Vorschlag, nicht rückgetestet; keine historische KGV-Referenz. Forward-KGV beruht auf veränderlichen Analystenschätzungen. "
+            "TTM-Prüfschwelle = aktueller USD-ADS-Kurs ÷ TTM-KGV × 25 bei unverändertem TTM-EPS; kein Kursziel. "
+            "Alle vier Bedingungen müssen mit frischen USD-Daten erfüllt sein. Vor einem Nachkauf Gewinnprognosen, Investitionsbedarf und Taiwan-Risiko prüfen."
+            if is_tsm else stock.get("buy_trigger", "") + " Eigene Screening-Regel mit gewähltem 15%-Puffer, nicht rückgetestet. Forward-KGV ist eine Konsensschätzung und kann auf bereinigten Gewinnen beruhen. TTM-Prüfkurs = aktueller Kurs ÷ TTM-KGV × Prüfschwelle bei unverändertem TTM-EPS; kein Kursziel. Bilanz, Kapitalausstattung und Gewinnqualität vor einem Kauf separat prüfen. " + US_PE_REFERENCES[stock["ticker"]]["note"]),
         target_pe=round(target, 6) if target is not None else None,
         target_price=round(target_price, 2) if target_price is not None else None,
-        currency=stock.get("currency"), discount_pct=15, conditions=conditions,
-        as_of=stock.get("as_of"), evaluated_at=stamp, reference_period="FY2021–FY2025")
+        currency=stock.get("currency"), discount_pct=None if is_tsm else 15, conditions=conditions,
+        as_of=stock.get("as_of"), evaluated_at=stamp, reference_period=None if is_tsm else "FY2021–FY2025")
+    if is_tsm:
+        stock["buy_indicator"].update(
+            basis="proposed_absolute_thresholds",
+            sources=[dict(label="TSMC Q3 2026", url="https://investor.tsmc.com/english/quarterly-results/2026/q3"),
+                     dict(label="TSMC Geschäftsrisiken", url="https://www.sec.gov/Archives/edgar/data/1046179/000162828026025362/tsm-20251231.htm")])
 
 
 def reference(name: str, ticker: str, cluster: str, hist_pe: float | None,
@@ -235,7 +253,7 @@ PORTFOLIOS = [
         reference("Apple", "AAPL", BIG_TECH, 33.0, "Abwarten auf Forward P/E < 28x", 39.3, 35.2, hist_ps=7.4, ps_ratio=9.8),
         reference("AMD", "AMD", SEMICONDUCTOR, 134.5, "Forward P/E 28x–32x oder Wochen-SMA 50", 137.1, 39.5, hist_ps=8.5, ps_ratio=11.5),
         reference("Arista Networks", "ANET", SEMICONDUCTOR, 46.5, "Rücksetzer auf Forward P/E < 38x–40x", 67.9, 48.5, hist_ps=14.5, ps_ratio=22.0),
-        reference("TSMC", "TSM", SEMICONDUCTOR, None, "Noch kein individueller Nachkauf-Indikator hinterlegt.", None, None),
+        reference("TSMC", "TSM", SEMICONDUCTOR, None, "Forward-KGV ≤ 20, TTM-KGV ≤ 25, Kurs ≤ SMA 200 und RSI (14) ≤ 45; alle vier Bedingungen gemeinsam.", None, None),
         reference("Palo Alto Networks", "PANW", CYBERSECURITY, 173.8, "EV/FCF < 30x–32x (Earnings-Dip nutzen)", 271.9, 93.5, hist_ps=11.5, ps_ratio=18.2),
         reference("CrowdStrike", "CRWD", CYBERSECURITY, 200.0, "Strikte Disziplin: P/S < 25x oder P/FCF < 35x", 250.0, 208.3, hist_ps=27.1, ps_ratio=43.2),
         reference("Cloudflare", "NET", CYBERSECURITY, 210.0, "Kompression auf P/S 20x–25x abwarten", 260.0, 226.9, hist_ps=31.1, ps_ratio=41.7),
@@ -1441,6 +1459,8 @@ def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[st
     is_etf = seed.get("asset_type") == "etf"
     is_tokio = seed.get("ticker") == TOKIO_TICKER
     is_tsm = seed.get("ticker") == TSM_TICKER
+    if is_tsm:
+        stock["technicals_as_of"] = technicals.get("history_as_of")
     if is_tokio or is_tsm:
         stock["field_metadata"] = {field: dict(value) for field, value in seed.get("field_metadata", {}).items()}
     dividend, dividend_warnings = (None, []) if is_etf or is_tokio else normalize_dividend_yield(info, price)
