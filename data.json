@@ -4694,5 +4694,34 @@
   "status_counts": {
     "live": 28,
     "partial": 2
+  },
+  "fear_and_greed": {
+    "version": 1,
+    "provider": "CNN",
+    "source_url": "https://edition.cnn.com/markets/fear-and-greed",
+    "source_status": "live",
+    "score": 25.6176125244618,
+    "rating": "fear",
+    "as_of": "2026-11-17T16:00:38+00:00",
+    "retrieved_at": "2026-11-17T16:02:09+00:00",
+    "last_attempted_at": "2026-11-17T16:02:09+00:00",
+    "comparisons": {
+      "previous_close": {
+        "score": 31.0190476190476,
+        "rating": "fear"
+      },
+      "previous_week": {
+        "score": 37.3714285714286,
+        "rating": "fear"
+      },
+      "previous_month": {
+        "score": 18.214285714285715,
+        "rating": "extreme fear"
+      },
+      "previous_year": {
+        "score": 11.642857142857142,
+        "rating": "extreme fear"
+      }
+    }
   }
 }
