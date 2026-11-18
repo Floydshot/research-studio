@@ -1365,8 +1365,7 @@ const FutureModel = (() => {
     }
     function futureYearTable(result, settings) {
       const body=$('future-year-body');body.replaceChildren(); if(!result||result.error)return;
-      const years=[0,5,10,15,20,30].filter(year=>year<=settings.years);if(!years.includes(settings.years))years.push(settings.years);
-      for(const year of years){const row=result.series.find(item=>item.month===year*12);if(!row)continue;const tr=el('tr');for(const value of [year+' J',futureMoney(row.contributions),futureMoney(row.portfolio),futureMoney(row.dividendsCumulative),futureMoney(row.cash),futureMoney(row.wealth)])tr.append(el('td','',value));body.append(tr);}
+      for(let year=0;year<=settings.years;year++){const row=result.series.find(item=>item.month===year*12);if(!row)continue;const tr=el('tr');for(const value of [year===0?'Start':'Jahr '+year,futureMoney(row.contributions),futureMoney(row.portfolio),futureMoney(row.dividendsCumulative),futureMoney(row.cash),futureMoney(row.wealth)])tr.append(el('td','',value));body.append(tr);}
     }
     function futureMethod(rows, settings) {
       const root=$('future-method-copy');root.replaceChildren();
