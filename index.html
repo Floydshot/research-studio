@@ -7,6 +7,7 @@
   <meta name="theme-color" content="#0b1119">
   <meta name="description" content="floyd projects — research studio. Tech Stonks und Value Stonks mit Aktien und JEPQ.">
   <title>floyd projects · research studio</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext x='32' y='51' text-anchor='middle' font-size='52'%3E%F0%9F%8F%9B%EF%B8%8F%3C/text%3E%3C/svg%3E">
   <script>
     (() => {
       let theme = 'dark';
@@ -192,12 +193,31 @@
     }
     @media(max-width:370px) { .fg-history-rating { display: none; } .fg-content { grid-template-columns: minmax(0,1.3fr) minmax(0,1fr); gap: 10px; } .fg-history dt { font-size: 9px; } }
 
+
+    .studio-toggle { display: inline-grid; place-items: center; flex: none; width: 31px; height: 31px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 6px; }
+    .studio-toggle:hover { border-color: var(--faint); color: var(--text); background: var(--surface-2); }
+    .studio-toggle svg { width: 17px; height: 17px; transition: transform .15s; }
+    .studio-toggle[aria-pressed=true] svg { transform: rotate(180deg); }
+
+    .future-panel{margin-top:0}.future-settings{border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:17px 19px;margin-bottom:17px}.future-settings-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:15px}.future-settings-heading h2,.future-positions-heading h2{margin:0;font-size:13px;font-weight:600;letter-spacing:-.1px}.future-settings-heading p,.future-positions-heading p{margin:3px 0 0;font-size:10px;color:var(--faint)}.future-scenario-tag{font-size:9px;color:var(--teal);border:1px solid var(--line);padding:2px 7px;border-radius:4px;white-space:nowrap}.future-input-grid{display:grid;grid-template-columns:1fr 1fr 1.4fr 1fr;gap:14px}.future-field{display:flex;min-width:0;flex-direction:column;gap:6px;font-size:10px;color:var(--muted)}.future-field select,.future-input-unit{width:100%;min-width:0;height:36px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text)}.future-field select{padding:0 9px;font-size:11px}.future-input-unit{display:flex;align-items:center;overflow:hidden}.future-input-unit input{width:100%;min-width:0;height:100%;border:0;background:transparent;color:var(--text);padding:0 10px;font-size:12px;font-variant-numeric:tabular-nums;outline-offset:-3px}.future-input-unit>span{padding-right:10px;color:var(--faint);font-size:11px}.future-options-row{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:17px;padding-top:14px;border-top:1px solid var(--line-soft)}.future-horizon{display:flex;align-items:center;flex-wrap:wrap;gap:10px 13px;border:0;padding:0;margin:0;min-width:0}.future-horizon legend{float:left;font-size:10px;color:var(--muted);padding:6px 0;margin-right:3px}.future-year-buttons{display:flex;gap:4px}.future-year-buttons button{padding:5px 10px;font-size:10px;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:5px}.future-year-buttons button[aria-pressed=true]{background:var(--surface-2);border-color:var(--teal);color:var(--text)}.future-check{display:inline-flex;align-items:center;gap:7px;font-size:10px;color:var(--muted);cursor:pointer}.future-check input{accent-color:var(--teal);width:14px;height:14px;margin:0;flex:none}.future-dividend-mode{flex:none}.future-reinvest-label{color:var(--text);font-weight:500}.future-dividend-mode p{margin:4px 0 0;font-size:9px;color:var(--faint)}.future-assumption-note{margin:13px 0 0;font-size:10px;color:var(--muted);line-height:1.6}.future-chart-panel{margin-bottom:20px}.future-rate-pill{font-size:10px;color:var(--teal);white-space:nowrap;padding-top:1px;font-variant-numeric:tabular-nums}.future-chart-wrap{position:relative;height:330px;margin:17px 19px 9px}.future-chart-caption{display:flex;justify-content:space-between;gap:16px;padding:10px 19px 12px;border-top:1px solid var(--line-soft);font-size:9px;line-height:1.6;color:var(--faint)}.future-chart-caption>span:last-child{white-space:nowrap}.future-error{margin:15px 19px;padding:12px 14px;border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:5px;background:var(--surface-2);color:var(--text);font-size:11px;line-height:1.7}.future-error strong{display:block;font-weight:600;margin-bottom:3px}.future-error p{margin:3px 0;color:var(--muted)}.future-error ul{margin:5px 0 0;padding-left:17px;color:var(--muted)}.future-year-details{border-top:1px solid var(--line-soft);padding:10px 19px 13px;font-size:10px;color:var(--muted)}.future-year-details>summary,.future-method>summary{cursor:pointer;width:max-content;max-width:100%;color:var(--muted)}.future-year-scroll{overflow:auto;max-width:100%;margin-top:10px}.future-year-table{width:100%;min-width:650px;border-collapse:collapse;text-align:right;font-variant-numeric:tabular-nums;font-size:10px}.future-year-table th,.future-year-table td{padding:9px 10px;border-bottom:1px solid var(--line-soft);white-space:nowrap}.future-year-table th{font-weight:500;color:var(--faint)}.future-year-table th:first-child,.future-year-table td:first-child{text-align:left}.future-year-table tbody tr:last-child td{color:var(--text);font-weight:550;border-bottom:0}.future-positions-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:0 0 12px}.future-selection-actions{display:flex;gap:7px;flex-shrink:0}.future-selection-actions button{border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:10px;padding:5px 8px}.future-selection-actions button:hover{color:var(--text);border-color:var(--faint)}.future-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.future-card{position:relative;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:12px;transition:border-color .15s,background .15s}.future-card:hover{border-color:var(--faint)}.future-card.excluded{background:var(--surface-2);border-style:dashed;filter:grayscale(1);opacity:.58}.future-card.problem{border-color:var(--amber)}.future-card-toggle{display:flex;align-items:center;gap:8px;width:100%;min-width:0;padding:0;border:0;border-radius:3px;background:transparent;color:var(--text);text-align:left}.future-card-names{flex:1;min-width:0}.future-card-name{display:block;font-size:11px;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.future-card-category{display:block;font-size:9px;color:var(--faint);margin-top:1px}.future-inclusion{width:17px;height:17px;flex:none;border:1px solid var(--line);border-radius:4px;display:grid;place-items:center;color:var(--teal);background:var(--surface-2);font-size:11px}.future-card.excluded .future-inclusion{color:var(--faint);background:transparent}.future-card .company-logo{width:25px;height:25px;flex:none;border-radius:5px;font-size:8px}.future-card .company-logo-image{padding:2px}.future-card-rate{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:9px 0 8px;color:var(--text);font-size:13px;font-weight:550;font-variant-numeric:tabular-nums}.future-card-rate small{font-size:9px;font-weight:400;color:var(--faint);text-align:right}.future-card-fields{display:grid;grid-template-columns:1fr 1.25fr;gap:9px;border-top:1px solid var(--line-soft);padding-top:8px}.future-card-fields label{font-size:8px;color:var(--faint);display:block;min-width:0}.future-small-input{display:flex;align-items:center;gap:3px;margin-top:4px}.future-small-input input{width:100%;min-width:0;height:25px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:4px;padding:0 5px;font-size:10px;font-variant-numeric:tabular-nums}.future-small-input>span{font-size:8px;color:var(--muted);white-space:nowrap}.future-card-input-note{font-size:8px;color:var(--faint);margin:5px 0 0;line-height:1.4;min-height:12px}.future-card-warning{margin:6px 0 0;font-size:9px;line-height:1.5;color:var(--amber)}.future-card.excluded input{opacity:.7}.future-no-cards{font-size:11px;color:var(--muted);padding:20px 0}.future-method{font-size:10px;color:var(--muted);padding-top:17px;margin-top:17px;border-top:1px solid var(--line);line-height:1.8}.future-method p{margin:8px 0}.future-method ul{padding-left:17px;margin:7px 0}.future-method a{color:var(--muted);text-underline-offset:3px}.future-chart-fallback{padding:15px 19px;color:var(--muted);font-size:10px}.future-chart-fallback svg{display:block;width:100%;height:auto;max-height:330px}.future-chart-fallback p{margin:5px 0}.future-chart-fallback .future-svg-text{fill:var(--muted);font-size:11px}.future-chart-fallback .future-svg-axis{stroke:var(--line);stroke-width:1}.future-panel input:disabled{opacity:.45}.future-input-unit:has(input:disabled){opacity:.55}
+@media(min-width:1600px){.future-cards{grid-template-columns:repeat(5,minmax(0,1fr))}}@media(max-width:1100px){.future-cards{grid-template-columns:repeat(3,minmax(0,1fr))}.future-input-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.future-options-row{align-items:flex-start;flex-direction:column;gap:13px}.future-rate-pill{white-space:normal;text-align:right}}@media(max-width:700px){.future-settings{padding:14px 13px}.future-input-grid{gap:12px}.future-field{font-size:9px}.future-field select{font-size:10px}.future-horizon{gap:9px}.future-horizon legend{float:none;width:100%;padding:0}.future-year-buttons button{padding:5px 9px}.future-check{font-size:9px}.future-settings-heading p{font-size:9px;max-width:205px}.future-scenario-tag{font-size:8px}.future-chart-wrap{height:280px;margin:14px 12px 6px}.future-chart-caption{padding:9px 13px;flex-direction:column;gap:3px}.future-chart-caption>span:last-child{white-space:normal}.future-year-details{padding:10px 13px}.future-positions-heading{align-items:flex-start;flex-direction:column;gap:9px}.future-positions-heading p{font-size:9px}.future-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.future-card{padding:10px}.future-card .company-logo{width:23px;height:23px}.future-card-name{font-size:10px}.future-card-category{font-size:8px}.future-card-toggle{gap:6px}.future-inclusion{width:15px;height:15px;font-size:10px}.future-card-fields{gap:6px;grid-template-columns:1fr}.future-card-rate{font-size:12px;align-items:flex-start;flex-direction:column;gap:1px}.future-card-rate small{text-align:left}.future-card-input-note{min-height:0}.future-chart-panel .panel-top{flex-wrap:wrap}.future-rate-pill{text-align:left;font-size:9px}.future-method{font-size:9px}.future-error{margin:12px 13px;font-size:10px}}@media(max-width:360px){.future-input-grid{grid-template-columns:minmax(0,1fr)}.future-card .company-logo{display:none}.future-card-category{font-size:7.5px}.future-selection-actions{gap:5px}.future-selection-actions button{font-size:9px;padding:5px 6px}}@media(prefers-reduced-motion:reduce){.future-card{transition:none}}
+
+
+    /* Borderless gray surfaces; focus rings and colored state cues stay visible. */
+    .brand-mark,[data-theme=light] .brand-mark { border: 0; background: transparent; font-family: "Apple Color Emoji","Segoe UI Emoji",sans-serif; font-size: 25px; line-height: 1; }
+    .status-dot,.status-dot.stale,[data-theme=light] .status-dot.stale { background: var(--amber); }
+    .status-dot.live { background: var(--teal); }
+    .summary,.summary-item,.chart-panel,.stock-card:not(.selected),.returns-panel,
+    .search,.sort,.reload,.theme-toggle,.studio-toggle,.metric-switch,.cluster,
+    .future-settings,.future-card:not(.problem),.future-field select,.future-input-unit,
+    .future-small-input input,.future-year-buttons button:not([aria-pressed=true]),
+    .future-selection-actions button,.future-inclusion,.future-scenario-tag { border-color: transparent !important; }
   </style>
 </head>
 <body>
   <div class="shell">
     <header class="topbar">
-      <div class="brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 18V12M9 18V7M14 18V10M19 18V4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></span><span>floyd projects</span></div>
+      <div class="brand"><span class="brand-mark" aria-hidden="true">🏛️</span><span>floyd projects</span></div>
       <div class="header-actions">
         <div class="update-area"><div class="update-copy"><div class="status-line" role="status"><span id="status-dot" class="status-dot" aria-hidden="true"></span><span id="status-text">Daten werden geladen</span></div><div id="timestamp" class="timestamp">Datenquellen: Yahoo Finance · Emittenten-IR</div></div><button type="button" id="reload" class="reload" aria-label="Daten erneut laden" aria-busy="false" title="Lädt den neuesten veröffentlichten Datenstand erneut."><svg class="reload-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M16.2 7A6.5 6.5 0 1 0 16 13M16.2 3.5V7H12.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><svg class="reload-progress" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="2" opacity=".25"/><path d="M17 10a7 7 0 0 0-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span id="reload-label">Aktualisieren</span></button></div>
       <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Zu Light Mode wechseln" title="Zu Light Mode wechseln"><svg class="theme-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><svg class="theme-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.4 14.2A8.6 8.6 0 0 1 9.8 3.6a8.6 8.6 0 1 0 10.6 10.6Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="theme-label">Light Mode</span></button>
@@ -205,7 +225,7 @@
     </header>
     <main>
       <div class="page-heading">
-        <div class="page-title"><div class="heading-line"><h1>research studio</h1></div><p class="subtitle">buy the right shit at the right time</p></div>
+        <div class="page-title"><div class="heading-line"><h1 id="studio-title">research studio</h1><button type="button" id="studio-toggle" class="studio-toggle" aria-label="Zu future studio wechseln" aria-pressed="false" title="Zu future studio wechseln"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m5 7 5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><p id="studio-subtitle" class="subtitle">buy the right shit at the right time</p></div>
         <section id="fear-greed" class="fear-greed" aria-labelledby="fg-heading" data-status="unavailable">
           <div class="fg-top"><h2 id="fg-heading" class="fg-heading">Fear &amp; Greed</h2><a class="fg-source" href="https://www.cnn.com/markets/fear-and-greed" target="_blank" rel="noopener noreferrer">CNN ↗</a></div>
           <div class="fg-content">
@@ -225,7 +245,7 @@
               <div><dt>1 year ago</dt><dd><span id="fg-previous_year-rating" class="fg-history-rating">—</span><span id="fg-previous_year-score" class="fg-history-score">—</span></dd></div>
             </dl>
           </div>
-          <p id="fg-meta" class="fg-meta">CNN · Index wird geladen …</p><p id="fg-announcement" class="sr-only" aria-live="polite"></p>
+          <p id="fg-meta" class="fg-meta" hidden></p><p id="fg-announcement" class="sr-only" aria-live="polite"></p>
         </section>
       </div>
       <div id="loading" class="loading-panel" aria-live="polite"><span class="loading-text">Bewertungsdaten werden geladen …</span><div class="skeleton" aria-hidden="true"></div><div class="skeleton tall" aria-hidden="true"></div></div>
@@ -236,7 +256,34 @@
         <section id="portfolio-panel" role="tabpanel" aria-labelledby="tab-tech">
           <div id="summary" class="summary" aria-label="Portfolio-Kennzahlen"></div>
           <div class="toolbar"><div id="clusters" class="clusters" role="group" aria-label="Nach Cluster filtern"></div><div class="table-controls"><div class="search-wrap"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="m13 13 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><label for="search" class="sr-only">Werte nach Name oder Ticker suchen</label><input id="search" class="search" type="search" autocomplete="off" placeholder="Name oder Ticker suchen"></div><div class="sort-wrap"><label for="sort">Sortieren</label><select id="sort" class="sort"><option value="forward">Forward P/E aufsteigend</option><option id="secondary-sort" value="secondary">P/S aufsteigend</option><option value="name">Name A–Z</option></select></div></div></div>
-          <section class="chart-panel" aria-labelledby="chart-title"><div class="panel-top"><div><h2 id="chart-title" class="section-title">Bewertung im Vergleich</h2><p id="chart-subtitle" class="section-desc">Kurs-Gewinn-Verhältnis · niedriger = günstiger im Gewinnvergleich</p></div><div class="metric-switch" role="group" aria-label="Chart-Metrik"><button type="button" id="metric-pe" class="metric-btn" aria-pressed="true" data-metric="pe">KGV · P/E</button><button type="button" id="metric-secondary" class="metric-btn" aria-pressed="false" data-metric="secondary">Umsatz · P/S</button></div></div><div class="chart-meta"><ul id="legend" class="legend" aria-label="Diagramm-Legende"></ul><div id="selection-label" class="selection-label"></div></div><div id="chart-scroll" class="chart-scroll"><div id="chart-inner" class="chart-inner"><canvas id="valuation-chart" role="img" aria-label="Bewertungsvergleich der gefilterten Aktien. Alle Werte stehen auch in den Detailkacheln."></canvas></div></div><div id="chart-fallback" class="chart-fallback" hidden></div><div class="chart-note"><span>Historische Referenzen: feste Nutzervorgaben (5J/10J), Zeitraum nicht unabhängig verifiziert.</span><span id="chart-interaction">Aktie im Chart oder auf der Kachel auswählen ↗</span></div></section>
+          <section id="future-panel" class="future-panel" aria-labelledby="future-title" hidden>
+  <div class="future-settings" aria-label="Annahmen für die Depotprojektion">
+    <div class="future-settings-heading"><div><h2>Szenario einstellen</h2><p>Veränderbare Beispielwerte · keine persönlichen Depotdaten</p></div><span class="future-scenario-tag">Modellrechnung</span></div>
+    <div class="future-input-grid">
+      <label class="future-field" for="future-initial">Startkapital <span class="future-input-unit"><input id="future-initial" type="number" min="0" max="1000000000" step="100" inputmode="decimal" value="10000"><span>€</span></span></label>
+      <label class="future-field" for="future-monthly">Monatliche Einzahlung <span class="future-input-unit"><input id="future-monthly" type="number" min="0" max="10000000" step="50" inputmode="decimal" value="0"><span>€</span></span></label>
+      <label class="future-field" for="future-source">Rendite als Szenario <select id="future-source"><option value="manual">Manuell festlegen</option><option value="5y">Historische Rendite · 5 Jahre</option><option value="10y">Historische Rendite · 10 Jahre</option><option value="all">Historische Rendite · All Time</option></select></label>
+      <label id="future-rate-field" class="future-field" for="future-rate">Gesamtrendite pro Jahr <span class="future-input-unit"><input id="future-rate" type="number" min="-99" max="1000" step="0.5" inputmode="decimal" value="7"><span>%</span></span></label>
+    </div>
+    <div class="future-options-row"><fieldset class="future-horizon"><legend>Zeitraum</legend><div id="future-years" class="future-year-buttons"><button type="button" data-years="5">5 J</button><button type="button" data-years="10">10 J</button><button type="button" data-years="15">15 J</button><button type="button" data-years="20" aria-pressed="true">20 J</button><button type="button" id="future-years-30" data-years="30" hidden>30 J</button></div><label class="future-check"><input id="future-extend" type="checkbox"> Auf 30 Jahre erweitern</label></fieldset><div class="future-dividend-mode"><label class="future-check future-reinvest-label"><input id="future-reinvest" type="checkbox" checked> Dividenden reinvestieren</label><p id="future-dividend-mode-copy">Ausschüttungen bleiben im Depot und wachsen mit.</p></div></div>
+    <p id="future-assumption-note" class="future-assumption-note"></p>
+  </div>
+  <section class="future-chart-panel chart-panel" aria-labelledby="future-title">
+    <div class="panel-top"><div><h2 id="future-title" class="section-title">Entwicklung des Depots</h2><p id="future-chart-subtitle" class="section-desc"></p></div><span id="future-initial-rates" class="future-rate-pill"></span></div>
+    <div id="future-error" class="future-error" role="status" hidden></div>
+    <div id="future-chart-wrap" class="future-chart-wrap"><canvas id="future-chart" role="img" aria-label="Modellierte Depotentwicklung. Alle Jahreswerte stehen in der Tabelle darunter."></canvas></div>
+    <div id="future-chart-fallback" class="future-chart-fallback" hidden></div>
+    <div class="future-chart-caption"><span id="future-chart-caption"></span><span>Nominal · vor Steuern und Gebühren</span></div>
+    <details class="future-year-details"><summary>Jahreswerte ansehen</summary><div class="future-year-scroll"><table class="future-year-table"><caption class="sr-only">Modellierte Entwicklung nach Jahren</caption><thead><tr><th>Jahr</th><th>Einzahlungen</th><th>Depotwert</th><th>Dividenden gesamt</th><th>Ausgezahlt</th><th>Gesamtvermögen</th></tr></thead><tbody id="future-year-body"></tbody></table></div></details>
+  </section>
+  <div class="future-positions-heading"><div><h2>Positionen im Szenario</h2><p id="future-selection-copy">Kachel anklicken, um eine Position aus- oder einzuschließen.</p></div><div class="future-selection-actions"><button type="button" id="future-include-all">Alle einschließen</button><button type="button" id="future-equal-weights">Gleich gewichten</button></div></div>
+  <div id="future-cards" class="future-cards" aria-label="Positionen für die Depotprojektion"></div>
+  <p id="future-no-cards" class="future-no-cards" hidden>Für die gewählten Filter gibt es keine Positionen.</p>
+  <details class="future-method"><summary>Annahmen, Daten und Berechnung</summary><div id="future-method-copy"></div></details>
+</section>
+
+          <div id="research-content">
+          <section id="research-chart" class="chart-panel" aria-labelledby="chart-title"><div class="panel-top"><div><h2 id="chart-title" class="section-title">Bewertung im Vergleich</h2><p id="chart-subtitle" class="section-desc">Kurs-Gewinn-Verhältnis · niedriger = günstiger im Gewinnvergleich</p></div><div class="metric-switch" role="group" aria-label="Chart-Metrik"><button type="button" id="metric-pe" class="metric-btn" aria-pressed="true" data-metric="pe">KGV · P/E</button><button type="button" id="metric-secondary" class="metric-btn" aria-pressed="false" data-metric="secondary">Umsatz · P/S</button></div></div><div class="chart-meta"><ul id="legend" class="legend" aria-label="Diagramm-Legende"></ul><div id="selection-label" class="selection-label"></div></div><div id="chart-scroll" class="chart-scroll"><div id="chart-inner" class="chart-inner"><canvas id="valuation-chart" role="img" aria-label="Bewertungsvergleich der gefilterten Aktien. Alle Werte stehen auch in den Detailkacheln."></canvas></div></div><div id="chart-fallback" class="chart-fallback" hidden></div><div class="chart-note"><span>Historische Referenzen: feste Nutzervorgaben (5J/10J), Zeitraum nicht unabhängig verifiziert.</span><span id="chart-interaction">Aktie im Chart oder auf der Kachel auswählen ↗</span></div></section>
           <div class="details-heading"><h2>Werte im Detail</h2><span class="details-help">Auswahl verknüpft Kacheln und Diagramm</span></div>
           <div id="cards" class="cards" aria-live="polite" aria-label="Aktien, ETFs und Nachkauf-Indikatoren"></div>
           <div id="empty" class="empty" hidden><strong>Keine passenden Werte</strong><p>Für diese Kombination aus Cluster und Suche gibt es keine Treffer.</p><button type="button" id="reset-filters">Filter zurücksetzen</button></div>
@@ -246,8 +293,9 @@
             <p id="returns-empty" class="returns-empty" hidden>Für die gewählten Filter sind keine Positionen vorhanden.</p>
             <p class="returns-note">In jeweiliger Handelswährung, ohne Steuern und Gebühren. * 3Y, 5Y und 10Y: Rendite pro Jahr (p. a.). All Time: seit dem ersten verfügbaren Kurs, ab einem Jahr Historie ebenfalls p. a. Fehlende oder nicht bestätigte Historie: —. Die Tabelle folgt den Filtern oben; jede Position wird einzeln betrachtet.</p>
           </section>
+          </div>
         </section>
-        <footer class="footer"><p>Aktien-Tranchen folgen der festen Forward-P/E-Regel; individuelle Nachkauf-Indikatoren werden separat angezeigt. JEPQ wird als ETF separat betrachtet: Fonds-KGV und Ausschüttungen sind keine Unternehmenskennzahlen. Quellenstatus steht an jeder Kennzahl.</p><span class="data-links"><a href="https://finance.yahoo.com/" target="_blank" rel="noopener noreferrer">Yahoo Finance ↗</a> · <a href="https://www.tokiomarinehd.com/ir/stock/return.html" target="_blank" rel="noopener noreferrer">Tokio Marine IR ↗</a></span></footer>
+        <footer id="research-footer" class="footer"><p>Aktien-Tranchen folgen der festen Forward-P/E-Regel; individuelle Nachkauf-Indikatoren werden separat angezeigt. JEPQ wird als ETF separat betrachtet: Fonds-KGV und Ausschüttungen sind keine Unternehmenskennzahlen. Quellenstatus steht an jeder Kennzahl.</p><span class="data-links"><a href="https://finance.yahoo.com/" target="_blank" rel="noopener noreferrer">Yahoo Finance ↗</a> · <a href="https://www.tokiomarinehd.com/ir/stock/return.html" target="_blank" rel="noopener noreferrer">Tokio Marine IR ↗</a></span></footer>
       </div>
       <p id="announcer" class="sr-only" aria-live="polite"></p>
     </main>
@@ -410,7 +458,7 @@
     "source_url": "https://thumb.wikimedia.org/wikipedia/en/thumb/6/63/Tsmc.svg/250px-Tsmc.svg.png"
   }
 };
-    const state = { data: null, portfolio: 'tech', cluster: 'Alle', metric: 'pe', sort: 'forward', search: '', selected: null, visible: [], chart: null, request: null };
+    const state = { data: null, view: 'research', portfolio: 'tech', cluster: 'Alle', metric: 'pe', sort: 'forward', search: '', selected: null, visible: [], chart: null, request: null, refreshFailed: false };
     let toastTimer = null, refreshSequence = 0;
     const returnColumns = [['1d', '1D'], ['1w', '1W'], ['1m', '1M'], ['6m', '6M'], ['ytd', 'YTD'], ['1y', '1Y'], ['3y', '3Y*'], ['5y', '5Y*'], ['10y', '10Y*'], ['all', 'ALL TIME*']];
     const returnsSort = { tech: { key: 'category', direction: 1 }, value: { key: 'category', direction: 1 } };
@@ -428,7 +476,7 @@
       document.querySelector('meta[name="theme-color"]').content = theme === 'light' ? '#ffffff' : '#0b1119';
       try { localStorage.setItem('floyd-projects-theme', theme); } catch (_) {}
       syncThemeButton();
-      if (state.data) renderChart();
+      if (state.data) { if (state.view === 'future') renderFutureStudio(); else renderChart(); }
     }
     function chartPalette() {
       const styles = getComputedStyle(document.documentElement), color = name => styles.getPropertyValue(name).trim();
@@ -453,6 +501,7 @@
       const stamp = state.data.last_updated || 'Zeitpunkt unbekannt', current = mode();
       if (current === 'initial') return ['Initialwerte geladen', 'Es sind noch keine aktuellen Marktdaten veröffentlicht.', 'info'];
       if (current === 'stale') return ['Letzten Datenstand geladen', 'Stand: ' + stamp + '. Die Daten sind als veraltet gekennzeichnet.', 'warning'];
+      if (!$('status-dot').classList.contains('live')) return ['Letzten Datenstand geladen', 'Veröffentlichter Marktdatenstand: ' + stamp + '. ' + $('status-text').title, 'warning'];
       const title = changed ? 'Daten aktualisiert' : 'Bereits auf aktuellem Stand';
       const message = 'Veröffentlichter Datenstand: ' + stamp + '. ' + (changed ? 'Die Ansicht wurde aktualisiert.' : 'Es liegen keine neueren veröffentlichten Daten vor.') + (current === 'partial' ? ' Einzelne Kennzahlen nutzen gekennzeichnete Fallbacks.' : '');
       return [title, message, changed ? 'success' : 'info'];
@@ -595,9 +644,19 @@
     }
     function status() {
       const current = mode();
-      $('status-text').textContent = { live: 'Aktuell · Marktdaten + IR', partial: 'Teilweise aktualisiert', stale: 'Veraltet · letzte verfügbare Daten', initial: 'Initialwerte · noch kein Live-Abruf' }[current];
-      $('status-dot').className = 'status-dot' + (current === 'live' ? ' live' : current === 'stale' ? ' stale' : '');
-      $('timestamp').textContent = (current === 'initial' ? 'Initialisiert: ' : 'Last updated: ') + (state.data.last_updated || 'Zeitpunkt unbekannt');
+      // Matches the weekday 06:30 UTC publication schedule, including weekends.
+      const now = Date.now(), due = new Date(now); due.setUTCHours(6,30,0,0);
+      while (due.getTime() > now || due.getUTCDay() === 0 || due.getUTCDay() === 6) due.setUTCDate(due.getUTCDate() - 1);
+      const updated = cnnTime(state.data.updated_at), sentiment = state.data.fear_and_greed;
+      const marketFresh = ['live','partial'].includes(current) && Number.isFinite(updated) && updated >= due.getTime() && updated <= now + 300000;
+      const cnnFresh = validCnnSnapshot(sentiment) && sentiment.source_status === 'live' && cnnTime(sentiment.retrieved_at) >= due.getTime() && now - cnnTime(sentiment.as_of) <= 4 * 86400000;
+      const fresh = marketFresh && cnnFresh && !state.refreshFailed;
+      $('status-text').textContent = state.refreshFailed ? 'Aktualisierung fehlgeschlagen' : fresh ? 'Aktualisiert' : !marketFresh ? current === 'initial' ? 'Noch keine aktuellen Daten' : 'Update ausstehend' : 'CNN-Update ausstehend';
+      $('status-dot').className = 'status-dot' + (fresh ? ' live' : '');
+      const details = [marketFresh ? 'Der planmäßige Marktdatenstand liegt vor.' : 'Der erwartete Marktdatenstand seit ' + dateText(due.toISOString()) + ' (Berlin) liegt noch nicht vor.', cnnFresh ? 'CNN-Abruf bestätigt.' : 'CNN-Abruf nicht aktuell bestätigt.', current === 'partial' ? 'Einzelne Kennzahlen verwenden weiterhin die am Wert gekennzeichneten Vorwerte.' : '', state.refreshFailed ? 'Der letzte Abruf ist fehlgeschlagen; vorhandene Daten bleiben sichtbar.' : ''].filter(Boolean).join(' ');
+      $('status-text').title = details;
+      $('timestamp').textContent = 'Letztes Update: ' + (Number.isFinite(updated) && dateText(state.data.updated_at) ? dateText(state.data.updated_at) + ' (Berlin)' : state.data.last_updated || 'Zeitpunkt unbekannt');
+      $('timestamp').title = ['Marktdaten: ' + (dateText(state.data.updated_at) || 'unbekannt'), validCnnSnapshot(sentiment) ? 'CNN-Stand: ' + dateText(sentiment.as_of) + ' · Abruf: ' + dateText(sentiment.retrieved_at) : 'CNN derzeit nicht bestätigt'].join(' · ');
       const notice = $('data-notice'); notice.replaceChildren();
       if (current === 'live' || current === 'partial') { notice.hidden = true; return; }
       const warnings = Array.isArray(state.data.warnings) ? state.data.warnings.filter(item => typeof item === 'string') : [];
@@ -857,7 +916,7 @@
       if (state.visible.some(stock => ['GS', 'JPM', 'MS', 'AFL'].includes(stock.ticker) && issuerMetric(stock, 'hist_pe'))) notes.push('GS, JPM, MS und AFL: 5J-Referenz aus Jahresendkursen und berichteten verwässerten GAAP-Jahresgewinnen; Methode, Zeitraum und Quellen stehen an der Kennzahl.');
       if (state.visible.some(stock => stock.ticker === '8766.T')) notes.push('Tokio Marine: 5J-Referenz = Mittel der Jahresend-KGVs FY2021–FY2025 (J-GAAP); aktuelle KGVs nach IFRS, daher nur eingeschränkt vergleichbar.');
       if (state.visible.some(isETF)) notes.push('JEPQ: Fonds-KGV und Ausschüttungen (12M), ohne historische Referenz.');
-      document.querySelector('.chart-note span').textContent = notes.join(' ');
+      $('research-content').querySelector('.chart-note span').textContent = notes.join(' ');
       series.forEach(s => { const item = el('li'), swatch = el('span', 'legend-swatch'); swatch.style.backgroundColor = s.color; item.append(swatch, document.createTextNode(s.label)); legend.append(item); });
       $('metric-pe').setAttribute('aria-pressed', String(state.metric === 'pe')); $('metric-secondary').setAttribute('aria-pressed', String(state.metric === 'secondary'));
       $('chart-subtitle').textContent = state.metric === 'pe' ? 'KGV · gemeldete Gewinne, historische Referenz und Gewinnprognose' : state.portfolio === 'tech' ? 'Kurs-Umsatz-Verhältnis · aktueller Wert und feste historische Referenz' : 'Dividenden und ETF-Ausschüttungsrendite in Prozent · JEPQ: letzte 12 Monate';
@@ -869,8 +928,22 @@
       if (state.chart) { state.chart.data = config.data; state.chart.options = config.options; state.chart.update('none'); }
       else { try { state.chart = new Chart($('valuation-chart'), config); } catch (error) { renderFallback(series); } }
     }
+    function syncStudioView() {
+      const future = state.view === 'future';
+      $('studio-title').textContent = future ? 'future studio' : 'research studio';
+      $('studio-subtitle').textContent = future ? 'watch the paint dry' : 'buy the right shit at the right time';
+      $('studio-toggle').setAttribute('aria-pressed', String(future));
+      const action = future ? 'Zu research studio wechseln' : 'Zu future studio wechseln';
+      $('studio-toggle').setAttribute('aria-label', action); $('studio-toggle').title = action;
+      $('research-content').hidden = future; $('future-panel').hidden = !future; $('research-footer').hidden = future;
+      document.querySelector('.toolbar .sort-wrap').hidden = future;
+      document.body.dataset.studio = state.view;
+    }
     function render() {
-      state.visible = stocks(); if (state.selected && !state.visible.some(stock => stock.ticker === state.selected)) state.selected = null;
+      if (!state.data) return;
+      state.visible = stocks();
+      if (state.view === 'future') { renderFutureStudio(); return; }
+      if (state.selected && !state.visible.some(stock => stock.ticker === state.selected)) state.selected = null;
       renderSummary(); renderCards(); renderSelection(); renderChart(); renderReturns();
       $('announcer').textContent = state.visible.length + ' Werte angezeigt.';
     }
@@ -947,7 +1020,9 @@
       if (state.request) return;
       const controller = new AbortController(); state.request = controller; const started = performance.now();
       const previous = state.data ? JSON.stringify({ ...state.data, fear_and_greed: undefined }) : null, previousSentiment = state.data && state.data.fear_and_greed; let notice = null;
-      const sentimentAttempt = fetchCnnFearGreed(controller.signal);
+      // Automatic updates are published by the morning workflow. A direct CNN
+      // request is made only once for an explicit refresh, never on page open.
+      const sentimentAttempt = notify ? fetchCnnFearGreed(controller.signal) : Promise.resolve(null);
       dismissToast(); setRefreshBusy(true); $('error').hidden = true; if (!state.data) $('loading').hidden = false;
       if (notify) { $('status-text').textContent = 'Daten werden geladen …'; $('status-dot').className = 'status-dot'; }
       const timeout = setTimeout(() => controller.abort(), 18000);
@@ -962,12 +1037,14 @@
         if (state.cluster !== 'Alle' && !portfolio().stocks.some(stock => stock.cluster === state.cluster)) state.cluster = 'Alle';
         $('loading').hidden = true; $('app').hidden = false; status(); renderFilters(); render(); renderFearGreed();
         const sentiment = await sentimentAttempt; if (controller.signal.aborted) throw new DOMException('Zeitüberschreitung', 'AbortError');
-        state.data.fear_and_greed = selectCnnFearGreed(publishedSentiment, previousSentiment, sentiment); renderFearGreed();
-        notice = cnnRefreshNotice(refreshNotice(changed), sentiment, state.data.fear_and_greed, previousSentiment);
+        if (notify) state.data.fear_and_greed = selectCnnFearGreed(publishedSentiment, previousSentiment, sentiment);
+        state.refreshFailed = false; renderFearGreed(); status();
+        notice = notify ? cnnRefreshNotice(refreshNotice(changed), sentiment, state.data.fear_and_greed, previousSentiment) : null;
       } catch (error) {
         if (state.request !== controller) return;
         const sentiment = await sentimentAttempt;
-        if (state.data) { state.data.fear_and_greed = selectCnnFearGreed(state.data.fear_and_greed, previousSentiment, sentiment); renderFearGreed(); }
+        state.refreshFailed = true;
+        if (state.data && notify) { state.data.fear_and_greed = selectCnnFearGreed(state.data.fear_and_greed, previousSentiment, sentiment); renderFearGreed(); }
         const failure = error.name === 'AbortError' ? new Error('Zeitüberschreitung beim Laden. Bitte erneut versuchen.') : error;
         showError(failure); notice = ['Aktualisierung fehlgeschlagen', (state.data ? 'Der bisherige Datenstand bleibt sichtbar. ' : '') + failure.message, 'error'];
       } finally {
@@ -976,7 +1053,9 @@
         if (state.request === controller) { state.request = null; $('loading').hidden = true; setRefreshBusy(false); if (notify && notice) showToast(...notice); }
       }
     }
+    $('studio-toggle').addEventListener('click', () => { state.view = state.view === 'research' ? 'future' : 'research'; syncStudioView(); render(); });
     $('reload').addEventListener('click', () => load({ notify: true }));
+    window.addEventListener('focus', () => { if (state.data && !state.request) status(); });
     $('toast-close').addEventListener('click', dismissToast);
     $('refresh-toast').addEventListener('mouseenter', () => clearTimeout(toastTimer));
     $('refresh-toast').addEventListener('mouseleave', scheduleToastDismiss);
@@ -988,7 +1067,286 @@
     $('sort').addEventListener('change', event => { state.sort = event.target.value; render(); });
     $('search').addEventListener('input', event => { state.search = event.target.value; render(); });
     $('reset-filters').addEventListener('click', () => { state.cluster = 'Alle'; state.search = ''; $('search').value = ''; renderFilters(); render(); $('search').focus(); });
-    window.addEventListener('load', () => { if (state.data && window.Chart && !state.chart) renderChart(); });
+    window.addEventListener('load', () => { if (!state.data) return; if (state.view === 'future') renderFutureStudio(); else if (window.Chart && !state.chart) renderChart(); });
+    /* Future Studio model and controls */
+/* Future Studio: nominal scenario model, not a forecast or historical backtest. */
+const FutureModel = (() => {
+  'use strict';
+  const DAYS_PER_YEAR = 365.2425;
+  const MAX_YEARS = 30;
+  const MAX_VALUE = 1e30;
+  const MAX_MONEY_INPUT = 1e12;
+  const finite = value => typeof value === 'number' && Number.isFinite(value);
+  const fail = (code, message) => { const error = new Error(message); error.code = code; throw error; };
+  const checked = value => {
+    if (!finite(value) || Math.abs(value) > MAX_VALUE) fail('overflow', 'Diese Annahmen erzeugen zu große Werte. Bitte Rendite, Laufzeit oder Einzahlungen reduzieren.');
+    return value;
+  };
+  function dateDay(value) {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+    const [year, month, day] = value.split('-').map(Number);
+    if (year < 100 || month < 1 || month > 12 || day < 1 || day > 31) return null;
+    const stamp = Date.UTC(year, month - 1, day), parsed = new Date(stamp);
+    return parsed.getUTCFullYear() === year && parsed.getUTCMonth() === month - 1 && parsed.getUTCDate() === day ? stamp / 86400000 : null;
+  }
+  function periodRateDetails(period) {
+    if (!period || typeof period !== 'object' || !finite(period.value) || period.value <= -100 || typeof period.annualized !== 'boolean') return null;
+    const start = dateDay(period.start), end = dateDay(period.end);
+    if (start === null || end === null || end <= start) return null;
+    const years = (end - start) / DAYS_PER_YEAR;
+    const ratePct = period.annualized ? period.value : Math.expm1(Math.log1p(period.value / 100) / years) * 100;
+    if (!finite(ratePct) || ratePct <= -100) return null;
+    return { ratePct, sampleYears: years, annualizedFromTotal: !period.annualized,
+      warning: years < 1 ? 'Die All-Time-Historie umfasst weniger als ein Jahr; die Jahresrate ist entsprechend unsicher.' : null };
+  }
+  function annualRateFromPeriod(period) {
+    const result = periodRateDetails(period);
+    return result ? result.ratePct : null;
+  }
+  function project(input) {
+    try {
+      if (!input || typeof input !== 'object') fail('input', 'Projektionsannahmen fehlen.');
+      const { positions, initial, monthly, years, reinvest } = input;
+      if (!Array.isArray(positions) || !positions.length) fail('positions', 'Bitte mindestens eine Position einbeziehen.');
+      if (positions.length > 1000) fail('positions', 'Zu viele Positionen für dieses Szenario.');
+      for (const [name, value] of [['Startkapital', initial], ['Monatliche Einzahlung', monthly]]) {
+        if (!finite(value) || value < 0 || value > MAX_MONEY_INPUT) fail('money', name + ' muss zwischen 0 und 1 Billion liegen.');
+      }
+      if (!Number.isInteger(years) || years < 0 || years > MAX_YEARS) fail('years', 'Die Laufzeit muss zwischen 0 und 30 ganzen Jahren liegen.');
+      if (typeof reinvest !== 'boolean') fail('reinvest', 'Bitte reinvestierte oder ausgezahlte Dividenden wählen.');
+      const ids = new Set();
+      const rows = positions.map(position => {
+        if (!position || typeof position.id !== 'string' || !position.id.trim() || ids.has(position.id)) fail('id', 'Positionen benötigen eindeutige Kennungen.');
+        ids.add(position.id);
+        if (!finite(position.weight) || position.weight < 0) fail('weight', 'Gewichte müssen endliche, nicht negative Zahlen sein.');
+        return position;
+      }).filter(position => position.weight > 0);
+      if (!rows.length) fail('weight', 'Mindestens eine Position benötigt ein positives Gewicht.');
+      const maxWeight = Math.max(...rows.map(position => position.weight));
+      const denominator = rows.reduce((sum, position) => sum + position.weight / maxWeight, 0);
+      const assets = rows.map(position => {
+        const { id, totalReturnPct, dividendYieldPct } = position;
+        if (!finite(totalReturnPct) || totalReturnPct <= -100) fail('return', 'Die jährliche Gesamtrendite für ' + id + ' muss größer als −100 % sein.');
+        if (!finite(dividendYieldPct) || dividendYieldPct < 0) fail('yield', 'Eine gültige, nicht negative Ausschüttungsrendite für ' + id + ' fehlt.');
+        const weight = position.weight / maxWeight / denominator;
+        const monthlyFactor = Math.exp(Math.log1p(totalReturnPct / 100) / 12);
+        const monthlyYield = dividendYieldPct / 1200;
+        const priceFactor = monthlyFactor - monthlyYield;
+        if (!finite(monthlyFactor) || !finite(monthlyYield) || !finite(priceFactor) || priceFactor <= 0) fail('decomposition', 'Gesamtrendite und Ausschüttungsrendite für ' + id + ' lassen sich nicht sinnvoll aufteilen.');
+        return { id, weight, totalReturnPct, dividendYieldPct, monthlyFactor, monthlyYield, priceFactor,
+          value: initial * weight, dividendsCumulative: 0, cash: 0 };
+      });
+      const weightedReturnPct = assets.reduce((sum, asset) => sum + asset.weight * asset.totalReturnPct, 0);
+      const weightedYieldPct = assets.reduce((sum, asset) => sum + asset.weight * asset.dividendYieldPct, 0);
+      if (!finite(weightedReturnPct) || !finite(weightedYieldPct)) fail('overflow', 'Die gewichteten Annahmen liegen außerhalb des Zahlenbereichs.');
+      const series = [];
+      const sample = month => {
+        const portfolio = checked(assets.reduce((sum, asset) => sum + asset.value, 0));
+        const dividendsCumulative = checked(assets.reduce((sum, asset) => sum + asset.dividendsCumulative, 0));
+        const cash = checked(assets.reduce((sum, asset) => sum + asset.cash, 0));
+        const dividendsAnnualRunRate = checked(assets.reduce((sum, asset) => sum + asset.value * asset.dividendYieldPct / 100, 0));
+        const priorDividends = month > 12 ? series[month - 12].dividendsCumulative : 0;
+        return { month, year: month / 12, portfolio, contributions: initial + monthly * month,
+          dividendsCumulative, cash, wealth: checked(portfolio + cash), dividendsAnnualRunRate,
+          last12MonthsDividends: Math.max(0, dividendsCumulative - priorDividends) };
+      };
+      series.push(sample(0));
+      for (let month = 1; month <= years * 12; month++) {
+        for (const asset of assets) {
+          const dividend = checked(asset.value * asset.monthlyYield);
+          asset.dividendsCumulative = checked(asset.dividendsCumulative + dividend);
+          if (!reinvest) asset.cash = checked(asset.cash + dividend);
+          asset.value = checked(asset.value * (reinvest ? asset.monthlyFactor : asset.priceFactor) + monthly * asset.weight);
+        }
+        series.push(sample(month));
+      }
+      const last = series[series.length - 1];
+      const final = { ...last, gain: last.wealth - last.contributions,
+        positions: assets.map(asset => ({ id: asset.id, weight: asset.weight, value: asset.value,
+          dividendsCumulative: asset.dividendsCumulative, cash: asset.cash,
+          annualDividendRunRate: asset.value * asset.dividendYieldPct / 100 })) };
+      const scenarioCAGR = initial > 0 && monthly === 0 && years > 0 ? (Math.pow(last.wealth / initial, 1 / years) - 1) * 100 : null;
+      return { series, final, weightedReturnPct, weightedYieldPct, scenarioCAGR,
+        positionCount: assets.length, years, reinvest, initial, monthly,
+        allocation: 'normalized_initial_and_monthly_contributions_no_rebalancing',
+        dividendMethod: 'monthly_opening_value_times_annual_yield_divided_by_12',
+        returnBasis: 'effective_annual_total_return_including_distributions',
+        contributionTiming: 'end_of_month', cashInterestPct: 0 };
+    } catch (error) {
+      return { error: error && error.message ? error.message : 'Das Szenario konnte nicht berechnet werden.', code: error && error.code ? error.code : 'calculation' };
+    }
+  }
+  return Object.freeze({ project, annualRateFromPeriod, periodRateDetails, MAX_YEARS, MAX_VALUE });
+})();
+
+    const futureStudio = { settings: {}, chart: null, initialized: false };
+    const FUTURE_STORAGE = 'floyd-projects-future-studio-v1';
+    const futureNumber = value => typeof value === 'number' && Number.isFinite(value) ? value : null;
+    const futureMoney = (value, compact = true) => futureNumber(value) === null ? '—' : new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: compact ? 0 : 2, ...(compact && Math.abs(value) >= 1e9 ? { notation: 'compact', maximumFractionDigits: 2 } : {}) }).format(value);
+    const futurePercent = value => futureNumber(value) === null ? '—' : fmt(value, 2) + '%';
+    function futureDefaults() { return { initial: 10000, monthly: 0, source: 'manual', manual: 7, years: 20, extend: false, reinvest: true, excluded: {}, weights: {}, yields: {} }; }
+    function futureSettings() {
+      if (!futureStudio.settings[state.portfolio]) futureStudio.settings[state.portfolio] = futureDefaults();
+      return futureStudio.settings[state.portfolio];
+    }
+    function saveFutureSettings() { try { localStorage.setItem(FUTURE_STORAGE, JSON.stringify(futureStudio.settings)); } catch (_) {} }
+    function loadFutureSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(FUTURE_STORAGE) || '{}');
+        for (const id of ['tech', 'value']) {
+          const value = saved && saved[id]; if (!value || typeof value !== 'object') continue;
+          const settings = futureDefaults();
+          for (const [key,min,max] of [['initial',0,1e9],['monthly',0,1e7],['manual',-99,1000]]) if (futureNumber(value[key]) !== null && value[key] >= min && value[key] <= max) settings[key] = value[key];
+          if (['manual','5y','10y','all'].includes(value.source)) settings.source = value.source;
+          if ([5,10,15,20,30].includes(value.years)) settings.years = value.years;
+          settings.extend = value.extend === true || settings.years === 30; settings.reinvest = value.reinvest !== false;
+          for (const key of ['excluded','weights','yields']) if (value[key] && typeof value[key] === 'object' && !Array.isArray(value[key])) for (const [ticker,item] of Object.entries(value[key]).slice(0,100)) {
+            if (!/^[A-Za-z0-9.^=-]{1,24}$/.test(ticker)) continue;
+            if (key === 'excluded' && item === true) settings.excluded[ticker] = true;
+            if (key !== 'excluded' && futureNumber(item) !== null && item >= 0 && item <= (key === 'weights' ? 100000 : 100)) settings[key][ticker] = item;
+          }
+          futureStudio.settings[id] = settings;
+        }
+      } catch (_) {}
+    }
+    function futureFilteredStocks() {
+      const query = String(state.search || '').trim().toLocaleLowerCase('de-DE');
+      const group = portfolio(), order = group.cluster_order || [];
+      return group.stocks.map((stock,index) => ({ stock,index })).filter(({stock}) => (state.cluster === 'Alle' || stock.cluster === state.cluster) && (!query || (stock.name + ' ' + stock.ticker).toLocaleLowerCase('de-DE').includes(query))).sort((a,b) => {
+        const ai = order.indexOf(a.stock.cluster), bi = order.indexOf(b.stock.cluster);
+        return (ai < 0 ? 999 : ai) - (bi < 0 ? 999 : bi) || a.index - b.index;
+      }).map(item => item.stock);
+    }
+    function futureStockAssumptions(stock, settings) {
+      const ownYield = Object.prototype.hasOwnProperty.call(settings.yields, stock.ticker);
+      const yieldField = stock.asset_type === 'etf' ? 'distribution_yield_ttm' : 'div_yield';
+      const yieldSource = stock.field_sources && stock.field_sources[yieldField];
+      const providedYield = number(stock[yieldField]);
+      const dividendYieldPct = ownYield ? settings.yields[stock.ticker] : ['live','previous'].includes(yieldSource) && providedYield !== null && providedYield >= 0 ? providedYield : null;
+      const period = settings.source === 'manual' ? null : returnPeriod(stock, settings.source);
+      const history = returnData(stock), validHistory = history && ['live','previous'].includes(history.source_status) && history.currency === stock.currency;
+      const details = settings.source === 'manual' ? null : validHistory ? FutureModel.periodRateDetails(period) : null;
+      const totalReturnPct = settings.source === 'manual' ? settings.manual : details ? details.ratePct : null;
+      const weight = Object.prototype.hasOwnProperty.call(settings.weights, stock.ticker) ? settings.weights[stock.ticker] : 1;
+      let problem = null;
+      if (futureNumber(totalReturnPct) === null) problem = 'Keine bestätigte ' + ({'5y':'5-Jahres-','10y':'10-Jahres-',all:'All-Time-'}[settings.source] || '') + 'Rendite verfügbar.';
+      else if (totalReturnPct <= -100) problem = 'Gesamtrendite muss über −100% liegen.';
+      else if (futureNumber(dividendYieldPct) === null || dividendYieldPct < 0 || dividendYieldPct > 100) problem = 'Dividendenrendite prüfen oder als eigene Annahme eintragen.';
+      else if (futureNumber(weight) === null || weight <= 0 || weight > 100000) problem = 'Gewichtung muss größer als 0 sein.';
+      return { stock, id: stock.ticker, weight, totalReturnPct, dividendYieldPct, ownYield, yieldField, yieldSource, period, details, problem, included: settings.excluded[stock.ticker] !== true };
+    }
+    function initFutureStudio() {
+      if (futureStudio.initialized) return; futureStudio.initialized = true; loadFutureSettings();
+      for (const [id,key] of [['future-initial','initial'],['future-monthly','monthly'],['future-rate','manual']]) $(id).addEventListener('input', event => { const value = event.target.value.trim(); futureSettings()[key] = value === '' ? null : Number(value); saveFutureSettings(); renderFutureStudio(); });
+      $('future-source').addEventListener('change', event => { futureSettings().source = event.target.value; saveFutureSettings(); renderFutureStudio(); });
+      $('future-reinvest').addEventListener('change', event => { futureSettings().reinvest = event.target.checked; saveFutureSettings(); renderFutureStudio(); });
+      $('future-extend').addEventListener('change', event => { const settings = futureSettings(); settings.extend = event.target.checked; if (!settings.extend && settings.years === 30) settings.years = 20; saveFutureSettings(); renderFutureStudio(); });
+      $('future-years').querySelectorAll('button[data-years]').forEach(button => button.addEventListener('click', () => { futureSettings().years = Number(button.dataset.years); saveFutureSettings(); renderFutureStudio(); }));
+      $('future-include-all').addEventListener('click', () => { const settings = futureSettings(); for (const stock of futureFilteredStocks()) delete settings.excluded[stock.ticker]; saveFutureSettings(); renderFutureStudio(); });
+      $('future-equal-weights').addEventListener('click', () => { const settings = futureSettings(); for (const stock of futureFilteredStocks()) delete settings.weights[stock.ticker]; saveFutureSettings(); renderFutureStudio(); });
+    }
+    function syncFutureControls(settings, result) {
+      for (const [id,key] of [['future-initial','initial'],['future-monthly','monthly']]) if (document.activeElement !== $(id)) $(id).value = settings[key] === null ? '' : String(settings[key]);
+      $('future-source').value = settings.source; const manual = settings.source === 'manual';
+      $('future-rate').disabled = !manual;
+      if (document.activeElement !== $('future-rate')) $('future-rate').value = manual ? settings.manual === null ? '' : String(settings.manual) : result && !result.error ? String(Math.round(result.weightedReturnPct * 100) / 100) : '';
+      $('future-rate-field').firstChild.textContent = manual ? 'Gesamtrendite pro Jahr ' : 'Startgewichtete Rendite p. a. ';
+      $('future-reinvest').checked = settings.reinvest; $('future-extend').checked = settings.extend; $('future-years-30').hidden = !settings.extend;
+      $('future-years').querySelectorAll('button[data-years]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.years) === settings.years)));
+      $('future-dividend-mode-copy').textContent = settings.reinvest ? 'Ausschüttungen bleiben im Depot und wachsen mit.' : 'Ausschüttungen fließen auf ein unverzinstes Cash-Konto.';
+      $('future-assumption-note').textContent = manual ? 'Manuell gilt dieselbe Gesamtrendite inklusive Dividenden für jede Position. Für unterschiedliche Wachstumsraten der Aktien wähle eine historische Datenbasis. Die Auswahl wirkt in beiden Fällen auf die Dividenden und die Verteilung.' : 'Verwendet die jährlichen Gesamtrenditen der einzelnen Aktien aus der Rendite-Tabelle, inklusive reinvestierter Ausschüttungen. Fehlende Historie wird nicht ersetzt. All Time beginnt je Aktie an einem anderen Datum.';
+      $('future-assumption-note').textContent += ' EUR-Szenario mit konstanten Wechselkursen.';
+    }
+    function futureSummary(rows, settings, result) {
+      const included = rows.filter(row => row.included), good = result && !result.error;
+      const notes = settings.reinvest ? 'Im Zieljahr modelliert · reinvestiert' : 'Im Zieljahr modelliert · ausgezahlt';
+      const values = [
+        ['Werte im Vergleich', String(included.length), '/ ' + portfolio().stocks.length, state.cluster === 'Alle' ? 'Im Szenario · gesamtes Portfolio' : 'Im Szenario · ' + state.cluster],
+        ['Depotwert nach ' + settings.years + ' Jahren', good ? futureMoney(result.final.portfolio) : '—', '', good && !settings.reinvest ? 'Mit Cash: ' + futureMoney(result.final.wealth) : 'Modellwert · inklusive Reinvestitionen'],
+        ['Dividenden im Zieljahr', good ? futureMoney(result.final.last12MonthsDividends) : '—', '', notes],
+        ['Einzahlungen gesamt', good ? futureMoney(result.final.contributions) : '—', '', 'Startkapital + monatliche Einzahlungen']
+      ];
+      const root = $('summary'); root.replaceChildren();
+      values.forEach((item,index) => { const card = el('div','summary-item'), value = el('div','summary-value' + (index === 1 ? ' teal' : ''),item[1]); if (item[2]) value.append(el('small','',item[2])); card.append(el('p','summary-label',item[0]),value,el('div','summary-note',item[3])); root.append(card); });
+    }
+    function futureCard(row, settings, weightTotal) {
+      const stock = row.stock, card = el('article','future-card' + (row.included ? '' : ' excluded') + (row.included && row.problem ? ' problem' : '')); card.dataset.futureTicker = stock.ticker;
+      const toggle = el('button','future-card-toggle'); toggle.type = 'button'; toggle.setAttribute('aria-pressed',String(row.included)); toggle.setAttribute('aria-label',stock.name + (row.included ? ' aus Projektion ausschließen' : ' in Projektion einschließen'));
+      const names = el('span','future-card-names'); names.append(el('span','future-card-name',stock.name),el('span','future-card-category',stock.cluster)); toggle.append(companyLogo(stock.ticker,'future-logo'),names,el('span','future-inclusion',row.included ? '✓' : '+')); card.append(toggle);
+      const flip = () => { if (row.included) settings.excluded[stock.ticker] = true; else delete settings.excluded[stock.ticker]; saveFutureSettings(); renderFutureStudio(); };
+      toggle.addEventListener('click',flip); card.addEventListener('click',event => { if (!event.target.closest('button,input,label,a')) flip(); });
+      const rate = el('div','future-card-rate',futurePercent(row.totalReturnPct) + ' p. a.');
+      const sourceLabel = settings.source === 'manual' ? 'Eigene Annahme' : {'5y':'5 Jahre · Gesamtrendite','10y':'10 Jahre · Gesamtrendite',all:'All Time · Gesamtrendite'}[settings.source]; rate.append(el('small','',sourceLabel));
+      if (row.period && row.period.start && row.period.end) rate.title = 'Historische Gesamtrendite: ' + row.period.start + ' bis ' + row.period.end + (stock.returns && stock.returns.as_of ? ' · Kursstand: ' + stock.returns.as_of : '') + (row.details && row.details.warning ? ' · ' + row.details.warning : '');
+      else rate.title = 'Eigene Gesamtrendite-Annahme, inklusive Dividenden und Ausschüttungen.';
+      card.append(rate);
+      const fields = el('div','future-card-fields');
+      const weightLabel = el('label','', 'Gewicht (Teile)'), weightWrap = el('span','future-small-input'), weight = el('input'); weight.type = 'number'; weight.min = '0.01'; weight.max = '100000'; weight.step = '0.1'; weight.value = futureNumber(row.weight) === null ? '' : String(row.weight); weight.setAttribute('aria-label',stock.name + ' Gewichtung'); weightWrap.append(weight,el('span','',row.included && weightTotal > 0 && row.weight > 0 ? fmt(row.weight / weightTotal * 100,1) + '%' : 'Anteile')); weightLabel.append(weightWrap);
+      weight.addEventListener('change',event => { settings.weights[stock.ticker] = event.target.value.trim() === '' ? null : Number(event.target.value); saveFutureSettings(); renderFutureStudio(); });
+      const yieldLabel = el('label','',stock.asset_type === 'etf' ? 'Ausschüttung p. a.' : 'Dividenden p. a.'), yieldWrap = el('span','future-small-input'), yieldInput = el('input'); yieldInput.type = 'number'; yieldInput.min = '0'; yieldInput.max = '100'; yieldInput.step = '0.1'; yieldInput.value = row.dividendYieldPct === null ? '' : String(row.dividendYieldPct); yieldInput.placeholder = 'Annahme'; yieldInput.setAttribute('aria-label',stock.name + ' Dividendenrendite in Prozent'); yieldInput.title = row.ownYield ? 'Eigene angenommene jährliche Ausschüttungsrendite.' : provenance(stock,row.yieldField); yieldWrap.append(yieldInput,el('span','','%')); yieldLabel.append(yieldWrap);
+      yieldInput.addEventListener('change',event => { if (event.target.value.trim() === '') delete settings.yields[stock.ticker]; else settings.yields[stock.ticker] = Number(event.target.value); saveFutureSettings(); renderFutureStudio(); });
+      fields.append(weightLabel,yieldLabel); card.append(fields);
+      const yieldNote = row.ownYield ? 'Dividende: eigene Annahme · leeren für Quelldaten' : 'Dividende: ' + (stock.asset_type === 'etf' ? 'Ausschüttungen der letzten 12 Monate' : row.yieldSource === 'previous' ? 'bestätigter Vorwert als Annahme' : 'Quelldaten als konstante Annahme'); card.append(el('p','future-card-input-note',yieldNote));
+      if (row.problem) card.append(el('p','future-card-warning',row.problem));
+      return card;
+    }
+    function futureChart(result, settings) {
+      const wrap = $('future-chart-wrap'), fallback = $('future-chart-fallback');
+      if (futureStudio.chart) { futureStudio.chart.destroy(); futureStudio.chart = null; }
+      if (!result || result.error) { wrap.hidden = true; fallback.hidden = true; return; }
+      const style = getComputedStyle(document.documentElement), color = key => style.getPropertyValue(key).trim();
+      const sets = [{label:'Depotwert',key:'portfolio',color:color('--teal'),width:2.5},{label:'Einzahlungen',key:'contributions',color:color('--muted'),width:1.5,dash:[5,4]},{label:settings.reinvest ? 'Reinvestierte Dividenden · Summe' : 'Ausgezahlte Dividenden · Summe',key:settings.reinvest ? 'dividendsCumulative' : 'cash',color:color('--sky'),width:1.5}];
+      if (!settings.reinvest) sets.push({label:'Gesamtvermögen · Depot + Cash',key:'wealth',color:color('--amber'),width:2,dash:[3,3]});
+      if (window.Chart) {
+        try {
+          wrap.hidden = false; fallback.hidden = true;
+          futureStudio.chart = new Chart($('future-chart'),{type:'line',data:{datasets:sets.map(set=>({label:set.label,data:result.series.map(row=>({x:row.year,y:row[set.key]})),borderColor:set.color,backgroundColor:set.color,borderWidth:set.width,borderDash:set.dash||[],pointRadius:0,pointHitRadius:8,tension:.15,fill:false}))},options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},layout:{padding:{top:5,right:9}},plugins:{legend:{position:'bottom',align:'start',labels:{color:color('--muted'),boxWidth:13,boxHeight:2,padding:17,font:{size:10},usePointStyle:false}},tooltip:{backgroundColor:color('--surface'),titleColor:color('--text'),bodyColor:color('--text'),borderColor:color('--line'),borderWidth:1,padding:11,titleFont:{size:11},bodyFont:{size:10},callbacks:{title:items=>items.length?'Nach '+fmt(items[0].parsed.x,1)+' Jahren':'',label:context=>context.dataset.label+': '+futureMoney(context.parsed.y,false)}}},scales:{x:{type:'linear',min:0,max:settings.years,title:{display:true,text:'Jahre',color:color('--faint'),font:{size:10}},grid:{display:false},border:{color:color('--line')},ticks:{color:color('--muted'),stepSize:5,font:{size:10},callback:value=>value+' J'}},y:{beginAtZero:true,border:{display:false},grid:{color:color('--line-soft')},ticks:{color:color('--muted'),font:{size:10},maxTicksLimit:6,callback:value=>new Intl.NumberFormat('de-DE',{notation:'compact',maximumFractionDigits:1}).format(value)+' €'}}}}});
+          requestAnimationFrame(()=>{if(futureStudio.chart&&state.view==='future')futureStudio.chart.resize();}); return;
+        } catch (_) { if (futureStudio.chart) futureStudio.chart.destroy(); futureStudio.chart = null; }
+      }
+      wrap.hidden = true; fallback.hidden = false; fallback.replaceChildren();
+      const ns='http://www.w3.org/2000/svg', svg=document.createElementNS(ns,'svg'); svg.setAttribute('viewBox','0 0 760 320'); svg.setAttribute('role','img'); svg.setAttribute('aria-label','Modellierte Depotentwicklung. Genaue Werte stehen in der Jahrestabelle.');
+      const max=Math.max(1,...result.series.map(row=>Math.max(...sets.map(set=>row[set.key]))));
+      const axis=document.createElementNS(ns,'path');axis.setAttribute('d','M 75 15 V 280 H 745');axis.setAttribute('fill','none');axis.setAttribute('class','future-svg-axis');svg.append(axis);
+      for(let i=0;i<=4;i++){const text=document.createElementNS(ns,'text');text.setAttribute('x','67');text.setAttribute('y',String(280-i*65+4));text.setAttribute('text-anchor','end');text.setAttribute('class','future-svg-text');text.textContent=new Intl.NumberFormat('de-DE',{notation:'compact',maximumFractionDigits:1}).format(max*i/4)+' €';svg.append(text);}
+      for(const year of [0,5,10,15,20,30].filter(v=>v<=settings.years)){const text=document.createElementNS(ns,'text');text.setAttribute('x',String(75+year/settings.years*670));text.setAttribute('y','305');text.setAttribute('text-anchor','middle');text.setAttribute('class','future-svg-text');text.textContent=year+' J';svg.append(text);}
+      for(const set of sets){const line=document.createElementNS(ns,'polyline');line.setAttribute('points',result.series.map(row=>(75+row.year/settings.years*670).toFixed(2)+','+(280-row[set.key]/max*260).toFixed(2)).join(' '));line.setAttribute('fill','none');line.setAttribute('stroke',set.color);line.setAttribute('stroke-width',String(set.width));if(set.dash)line.setAttribute('stroke-dasharray',set.dash.join(' '));svg.append(line);}fallback.append(svg,el('p','',sets.map(set=>set.label).join(' · ')));
+    }
+    function futureYearTable(result, settings) {
+      const body=$('future-year-body');body.replaceChildren(); if(!result||result.error)return;
+      const years=[0,5,10,15,20,30].filter(year=>year<=settings.years);if(!years.includes(settings.years))years.push(settings.years);
+      for(const year of years){const row=result.series.find(item=>item.month===year*12);if(!row)continue;const tr=el('tr');for(const value of [year+' J',futureMoney(row.contributions),futureMoney(row.portfolio),futureMoney(row.dividendsCumulative),futureMoney(row.cash),futureMoney(row.wealth)])tr.append(el('td','',value));body.append(tr);}
+    }
+    function futureMethod(rows, settings) {
+      const root=$('future-method-copy');root.replaceChildren();
+      root.append(el('p','','Die Grafik ist ein konstantes Renditeszenario, keine Vorhersage. Historische Renditen wiederholen sich nicht verlässlich. Die Startwerte sind Beispiele; tatsächliche Depotbestände werden nicht eingelesen.'));
+      const list=el('ul');for(const text of ['Alle Beträge sind ein nominales EUR-Szenario. Historische Prozentwerte stammen aus der jeweiligen Handelswährung; Wechselkurse werden für die Zukunft konstant angenommen. Keine Aussage über historische EUR-Renditen.','Startkapital und Einzahlungen werden nach den eingegebenen Anteilen verteilt. Nach Ausschlüssen oder Sektorfiltern werden die sichtbaren, eingeschlossenen Gewichte auf 100% normiert. Monatliche Einzahlungen erfolgen am Monatsende; kein automatisches Rebalancing.','Die eingegebene oder historische Jahresrate ist eine Gesamtrendite inklusive reinvestierter Dividenden. Ausschüttungen werden daraus abgetrennt und nicht zusätzlich aufgeschlagen. Die aktuelle Ausschüttungsrendite wird als konstante jährliche Annahme auf den jeweiligen Depotwert angewendet und monatlich modelliert.','Reinvestierend bleiben Ausschüttungen im Depot. Ausschüttend werden sie separat und unverzinst als Cash gesammelt. Gesamtvermögen = Depotwert + ausgezahltes Cash. Die Summe reinvestierter Dividenden steckt bereits im Depotwert und darf nicht hinzuaddiert werden.','Steuern, Gebühren und Inflation sind nicht berücksichtigt. Die angezeigte startgewichtete Rendite ist die Annahme zu Beginn; durch unterschiedliche Wachstumsraten verändern sich die Gewichte im Zeitverlauf.'])list.append(el('li','',text));root.append(list);
+      if(settings.source!=='manual'){
+        const sources=el('ul');for(const row of rows.filter(item=>item.included)){const li=el('li'),period=row.period;li.append(document.createTextNode(row.stock.name+': '+futurePercent(row.totalReturnPct)+' p. a.'+(period&&period.start&&period.end?' · '+period.start+' bis '+period.end:' · keine bestätigte Historie')+(row.details&&row.details.warning?' · '+row.details.warning:'')));const source=returnSourceUrl(row.stock);if(source){const link=el('a','',' · Quelle ↗');link.href=source;link.target='_blank';link.rel='noopener noreferrer';li.append(link);}sources.append(li);}root.append(el('p','','Historische Annahmen aus der Rendite-Tabelle:'),sources);
+      }
+      root.append(el('p','','Szenarioeinstellungen werden nur lokal in diesem Browser und getrennt nach Depot gespeichert.'));
+    }
+    function renderFutureStudio() {
+      if(!futureStudio.initialized||!state.data||state.view!=='future')return;
+      const settings=futureSettings(),rows=futureFilteredStocks().map(stock=>futureStockAssumptions(stock,settings)),included=rows.filter(row=>row.included),problems=included.filter(row=>row.problem);
+      let result=null;
+      if(!included.length)result={error:'Schließe mindestens eine Position über ihre Kachel ein.'};
+      else if(problems.length)result={error:'Für dieses Szenario fehlen passende Eingangsdaten.'};
+      else if(futureNumber(settings.initial)===null||settings.initial<0||settings.initial>1e9||futureNumber(settings.monthly)===null||settings.monthly<0||settings.monthly>1e7)result={error:'Bitte gültige Werte für Startkapital und monatliche Einzahlung eingeben.'};
+      else result=FutureModel.project({positions:included.map(row=>({id:row.id,weight:row.weight,totalReturnPct:row.totalReturnPct,dividendYieldPct:row.dividendYieldPct})),initial:settings.initial,monthly:settings.monthly,years:settings.years,reinvest:settings.reinvest});
+      syncFutureControls(settings,result);futureSummary(rows,settings,result);
+      $('future-chart-subtitle').textContent=portfolio().name+' · '+(state.cluster==='Alle'?'alle Kategorien':state.cluster)+' · '+settings.years+' Jahre · '+(settings.reinvest?'Dividenden reinvestiert':'Dividenden ausgeschüttet');
+      $('future-initial-rates').textContent=result&&!result.error?'Startgewichtung: '+futurePercent(result.weightedReturnPct)+' Gesamtrendite p. a. · '+futurePercent(result.weightedYieldPct)+' Ausschüttung':'';
+      const error=$('future-error');error.hidden=!result.error;error.replaceChildren();if(result.error){error.append(el('strong','',result.error));if(problems.length){error.append(el('p','','Wähle eine andere Renditebasis, trage eine fehlende Dividendenannahme ein oder schließe die betroffenen Kacheln aus.'));const list=el('ul');problems.forEach(row=>list.append(el('li','',row.stock.name+': '+row.problem)));error.append(list);}}
+      $('future-chart-caption').textContent=result.error?'Das Szenario wird erst mit vollständigen Annahmen berechnet.':settings.reinvest?'Reinvestierte Dividenden sind im Depotwert enthalten. Summe der Reinvestitionen: '+futureMoney(result.final.dividendsCumulative)+'.':'Depotwert + unverzinstes Cash = '+futureMoney(result.final.wealth)+' Gesamtvermögen. Ausgezahlte Dividenden: '+futureMoney(result.final.cash)+'.';
+      futureChart(result,settings);futureYearTable(result,settings);
+      const cards=$('future-cards');cards.replaceChildren();const total=included.reduce((sum,row)=>sum+(futureNumber(row.weight)!==null&&row.weight>0?row.weight:0),0);for(const row of rows)cards.append(futureCard(row,settings,total));$('future-no-cards').hidden=!!rows.length;
+      $('future-selection-copy').textContent='Kachel anklicken: grau = ausgeschlossen. '+included.length+' von '+rows.length+' sichtbaren Positionen enthalten. Gewichte gelten nur für diese Auswahl.';
+      futureMethod(rows,settings);
+    }
+
+    initFutureStudio();
+    syncStudioView();
     renderFearGreed();
     load();
   })();
