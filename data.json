@@ -3215,7 +3215,7 @@
             "basis": "total_return",
             "source_status": "live",
             "as_of": "2026-11-18",
-            "retrieved_at": "2026-11-18T14:00:54+01:00",
+            "retrieved_at": "2026-11-18T14:19:15+01:00",
             "since": "2000-01-04",
             "source_url": "https://finance.yahoo.com/quote/8766.T/history/",
             "method": "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen; Ausschüttungen werden am Ex-Tag zum Schlusskurs wiederangelegt. Keine Gebühren oder Steuern. Kalenderzeiträume verwenden den letzten Handelsschluss am oder vor dem Stichtag; 1D verwendet die vorherige Handelssitzung. 3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum.",
@@ -3298,7 +3298,22 @@
                 "date": "2005-09-29",
                 "reason": "Ungeklärter extremer Kurssprung in älterer Tokio-Historie"
               }
-            ]
+            ],
+            "available_history": {
+              "version": 1,
+              "basis": "total_return",
+              "currency": "JPY",
+              "source_url": "https://finance.yahoo.com/quote/8766.T/history/",
+              "retrieved_at": "2026-11-18T14:19:15+01:00",
+              "value": 12.590813,
+              "start": "2005-09-29",
+              "end": "2026-11-18",
+              "annualized": true,
+              "observations": 5207,
+              "excluded_through": "2005-09-29",
+              "method": "Längster zusammenhängender Zeitraum ohne erkannte Datenbrüche; Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen Barausschüttungen mit Wiederanlage am Ex-Tag. Ab einem Jahr mit tatsächlichen Tagen / 365,2425 annualisiert. Keine rückwirkend ergänzte 5J-/10J- oder All-Time-Historie.",
+              "reason": "Frühere Zeiträume mit erkannten Datenbrüchen bleiben ausgeschlossen; die Rendite über den letzten Bruch wird nicht verwendet; Ausgangsbasis ist der erste gültige Schlusskurs am oder nach diesem Bruch."
+            }
           }
         },
         {
