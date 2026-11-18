@@ -212,6 +212,11 @@
     .future-settings,.future-card:not(.problem),.future-field select,.future-input-unit,
     .future-small-input input,.future-year-buttons button:not([aria-pressed=true]),
     .future-selection-actions button,.future-inclusion,.future-scenario-tag { border-color: transparent !important; }
+
+    .future-estimate-note { margin: 8px 0 0; font-size: 10px; line-height: 1.6; color: var(--muted); }
+    .future-card-rate .future-estimate-label { color: var(--muted); font-weight: 550; }
+    .future-card-estimate { margin: -3px 0 8px; color: var(--faint); font-size: 8px; line-height: 1.6; }
+    .future-card-estimate a { color: inherit; white-space: nowrap; text-underline-offset: 2px; }
   </style>
 </head>
 <body>
@@ -262,11 +267,12 @@
     <div class="future-input-grid">
       <label class="future-field" for="future-initial">Startkapital <span class="future-input-unit"><input id="future-initial" type="number" min="0" max="1000000000" step="100" inputmode="decimal" value="10000"><span>€</span></span></label>
       <label class="future-field" for="future-monthly">Monatliche Einzahlung <span class="future-input-unit"><input id="future-monthly" type="number" min="0" max="10000000" step="50" inputmode="decimal" value="0"><span>€</span></span></label>
-      <label class="future-field" for="future-source">Rendite als Szenario <select id="future-source"><option value="manual">Manuell festlegen</option><option value="5y">Historische Rendite · 5 Jahre</option><option value="10y">Historische Rendite · 10 Jahre</option><option value="all">Historische Rendite · All Time</option></select></label>
+      <label class="future-field" for="future-source">Rendite als Szenario <select id="future-source"><option value="manual">Manuell festlegen</option><option value="5y">Historische Basis · 5 Jahre</option><option value="10y">Historische Basis · 10 Jahre</option><option value="all">Historische Basis · All Time</option></select></label>
       <label id="future-rate-field" class="future-field" for="future-rate">Gesamtrendite pro Jahr <span class="future-input-unit"><input id="future-rate" type="number" min="-99" max="1000" step="0.5" inputmode="decimal" value="7"><span>%</span></span></label>
     </div>
     <div class="future-options-row"><fieldset class="future-horizon"><legend>Zeitraum</legend><div id="future-years" class="future-year-buttons"><button type="button" data-years="5">5 J</button><button type="button" data-years="10">10 J</button><button type="button" data-years="15">15 J</button><button type="button" data-years="20" aria-pressed="true">20 J</button><button type="button" id="future-years-30" data-years="30" hidden>30 J</button></div><label class="future-check"><input id="future-extend" type="checkbox"> Auf 30 Jahre erweitern</label></fieldset><div class="future-dividend-mode"><label class="future-check future-reinvest-label"><input id="future-reinvest" type="checkbox" checked> Dividenden reinvestieren</label><p id="future-dividend-mode-copy">Ausschüttungen bleiben im Depot und wachsen mit.</p></div></div>
     <p id="future-assumption-note" class="future-assumption-note"></p>
+    <p id="future-estimate-note" class="future-estimate-note" role="status" hidden></p>
   </div>
   <section class="future-chart-panel chart-panel" aria-labelledby="future-title">
     <div class="panel-top"><div><h2 id="future-title" class="section-title">Entwicklung des Depots</h2><p id="future-chart-subtitle" class="section-desc"></p></div><span id="future-initial-rates" class="future-rate-pill"></span></div>
@@ -1109,6 +1115,45 @@ const FutureModel = (() => {
     const result = periodRateDetails(period);
     return result ? result.ratePct : null;
   }
+  function resolveHistoricalRate(stock, requestedKey) {
+    const history = stock && stock.returns;
+    if (!['5y','10y','all'].includes(requestedKey) || !history || history.version !== 1 || history.basis !== 'total_return' || !['live','previous'].includes(history.source_status) || !stock.currency || history.currency !== stock.currency) return null;
+    const end = dateDay(history.as_of), since = dateDay(history.since), retrieved = Date.parse(history.retrieved_at);
+    if (end === null || since === null || end <= since || typeof history.retrieved_at !== 'string' || !/(?:Z|[+-]\d{2}:\d{2})$/.test(history.retrieved_at) || !Number.isFinite(retrieved) || retrieved > Date.now() + 300000 || end * 86400000 > Date.now() + 300000 || end * 86400000 > retrieved + 86400000) return null;
+    try { const url = new URL(history.source_url); if (url.protocol !== 'https:' || url.hostname !== 'finance.yahoo.com' || url.pathname !== '/quote/' + encodeURIComponent(stock.ticker) + '/history/') return null; } catch (_) { return null; }
+    if (history.quality_notes !== undefined && !Array.isArray(history.quality_notes)) return null;
+    const quality = history.quality_notes || [];
+    if (quality.some(note => !note || dateDay(note.date) === null || typeof note.reason !== 'string')) return null;
+    const usable = period => {
+      const details = periodRateDetails(period), start = period && dateDay(period.start);
+      if (!details || start < since || dateDay(period.end) !== end) return null;
+      if (quality.some(note => { const bad = dateDay(note && note.date); return bad !== null && bad > start && bad <= end; })) return null;
+      return details;
+    };
+    const matchesWindow = (period, details, key) => {
+      if (!details) return false;
+      if (key === 'all') return dateDay(period.start) === since;
+      const years = {'1y':1,'3y':3,'5y':5,'10y':10}[key];
+      return !!years && (years === 1 || period.annualized === true) && details.sampleYears >= years - 2 / DAYS_PER_YEAR && details.sampleYears <= years + 10 / DAYS_PER_YEAR;
+    };
+    const requested = history.periods && history.periods[requestedKey], requestedDetails = usable(requested), direct = matchesWindow(requested,requestedDetails,requestedKey) ? requestedDetails : null;
+    if (direct) return { ...direct, period: requested, requestedKey, basisKey: requestedKey, estimated: false, sourceStatus: history.source_status };
+    const candidates = [];
+    for (const key of ['all','10y','5y','3y','1y']) {
+      const period = history.periods && history.periods[key], details = usable(period);
+      if (matchesWindow(period,details,key)) candidates.push({ ...details, period, basisKey: key });
+    }
+    const available = history.available_history;
+    if (available && available.version === 1 && available.basis === history.basis && available.currency === history.currency && available.source_url === history.source_url && available.retrieved_at === history.retrieved_at && typeof available.method === 'string' && available.method && typeof available.reason === 'string' && available.reason) {
+      const details = usable(available), excluded = available.excluded_through === null ? null : dateDay(available.excluded_through);
+      const lastBreak = quality.reduce((last,note) => { const day = dateDay(note && note.date); return day === null ? last : Math.max(last,day); }, -Infinity);
+      const observedDays = details ? (dateDay(available.end) - dateDay(available.start)) : 0;
+      if (details && Number.isInteger(available.observations) && available.observations >= 2 && available.observations <= observedDays + 1 && available.annualized === (observedDays >= DAYS_PER_YEAR) && (lastBreak === -Infinity ? available.excluded_through === null && dateDay(available.start) === since : excluded === lastBreak && dateDay(available.start) >= lastBreak && dateDay(available.start) <= lastBreak + 10)) candidates.push({ ...details, period: available, basisKey: 'available' });
+    }
+    const targetYears = requestedKey === 'all' ? Infinity : requestedKey === '5y' ? 5 : 10;
+    const selected = candidates.filter(item => item.sampleYears >= 1 && item.sampleYears <= targetYears + 10 / DAYS_PER_YEAR).sort((a,b) => b.sampleYears - a.sampleYears)[0];
+    return selected ? { ...selected, requestedKey, estimated: true, sourceStatus: history.source_status, reason: requested && requested.reason || 'Der vollständige gewählte Zeitraum ist nicht bestätigt.' } : null;
+  }
   function project(input) {
     try {
       if (!input || typeof input !== 'object') fail('input', 'Projektionsannahmen fehlen.');
@@ -1182,7 +1227,7 @@ const FutureModel = (() => {
       return { error: error && error.message ? error.message : 'Das Szenario konnte nicht berechnet werden.', code: error && error.code ? error.code : 'calculation' };
     }
   }
-  return Object.freeze({ project, annualRateFromPeriod, periodRateDetails, MAX_YEARS, MAX_VALUE });
+  return Object.freeze({ project, annualRateFromPeriod, periodRateDetails, resolveHistoricalRate, MAX_YEARS, MAX_VALUE });
 })();
 
     const futureStudio = { settings: {}, chart: null, initialized: false };
@@ -1229,9 +1274,8 @@ const FutureModel = (() => {
       const yieldSource = stock.field_sources && stock.field_sources[yieldField];
       const providedYield = number(stock[yieldField]);
       const dividendYieldPct = ownYield ? settings.yields[stock.ticker] : ['live','previous'].includes(yieldSource) && providedYield !== null && providedYield >= 0 ? providedYield : null;
-      const period = settings.source === 'manual' ? null : returnPeriod(stock, settings.source);
-      const history = returnData(stock), validHistory = history && ['live','previous'].includes(history.source_status) && history.currency === stock.currency;
-      const details = settings.source === 'manual' ? null : validHistory ? FutureModel.periodRateDetails(period) : null;
+      const details = settings.source === 'manual' ? null : FutureModel.resolveHistoricalRate(stock, settings.source);
+      const period = details ? details.period : settings.source === 'manual' ? null : returnPeriod(stock, settings.source);
       const totalReturnPct = settings.source === 'manual' ? settings.manual : details ? details.ratePct : null;
       const weight = Object.prototype.hasOwnProperty.call(settings.weights, stock.ticker) ? settings.weights[stock.ticker] : 1;
       let problem = null;
@@ -1239,7 +1283,7 @@ const FutureModel = (() => {
       else if (totalReturnPct <= -100) problem = 'Gesamtrendite muss über −100% liegen.';
       else if (futureNumber(dividendYieldPct) === null || dividendYieldPct < 0 || dividendYieldPct > 100) problem = 'Dividendenrendite prüfen oder als eigene Annahme eintragen.';
       else if (futureNumber(weight) === null || weight <= 0 || weight > 100000) problem = 'Gewichtung muss größer als 0 sein.';
-      return { stock, id: stock.ticker, weight, totalReturnPct, dividendYieldPct, ownYield, yieldField, yieldSource, period, details, problem, included: settings.excluded[stock.ticker] !== true };
+      return { stock, id: stock.ticker, weight, totalReturnPct, dividendYieldPct, ownYield, yieldField, yieldSource, period, details, estimated: !!(details && details.estimated), problem, included: settings.excluded[stock.ticker] !== true };
     }
     function initFutureStudio() {
       if (futureStudio.initialized) return; futureStudio.initialized = true; loadFutureSettings();
@@ -1260,7 +1304,7 @@ const FutureModel = (() => {
       $('future-reinvest').checked = settings.reinvest; $('future-extend').checked = settings.extend; $('future-years-30').hidden = !settings.extend;
       $('future-years').querySelectorAll('button[data-years]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.years) === settings.years)));
       $('future-dividend-mode-copy').textContent = settings.reinvest ? 'Ausschüttungen bleiben im Depot und wachsen mit.' : 'Ausschüttungen fließen auf ein unverzinstes Cash-Konto.';
-      $('future-assumption-note').textContent = manual ? 'Manuell gilt dieselbe Gesamtrendite inklusive Dividenden für jede Position. Für unterschiedliche Wachstumsraten der Aktien wähle eine historische Datenbasis. Die Auswahl wirkt in beiden Fällen auf die Dividenden und die Verteilung.' : 'Verwendet die jährlichen Gesamtrenditen der einzelnen Aktien aus der Rendite-Tabelle, inklusive reinvestierter Ausschüttungen. Fehlende Historie wird nicht ersetzt. All Time beginnt je Aktie an einem anderen Datum.';
+      $('future-assumption-note').textContent = manual ? 'Manuell gilt dieselbe Gesamtrendite inklusive Dividenden für jede Position. Für unterschiedliche Wachstumsraten der Aktien wähle eine historische Datenbasis. Die Auswahl wirkt in beiden Fällen auf die Dividenden und die Verteilung.' : 'Verwendet annualisierte Gesamtrenditen inklusive Ausschüttungen. Fehlt der gewählte Zeitraum, dient die längste geeignete eigene Historie als gekennzeichnete Ersatzannahme. All Time beginnt je Aktie an einem anderen Datum.';
       $('future-assumption-note').textContent += ' EUR-Szenario mit konstanten Wechselkursen.';
     }
     function futureSummary(rows, settings, result) {
@@ -1281,11 +1325,12 @@ const FutureModel = (() => {
       const names = el('span','future-card-names'); names.append(el('span','future-card-name',stock.name),el('span','future-card-category',stock.cluster)); toggle.append(companyLogo(stock.ticker,'future-logo'),names,el('span','future-inclusion',row.included ? '✓' : '+')); card.append(toggle);
       const flip = () => { if (row.included) settings.excluded[stock.ticker] = true; else delete settings.excluded[stock.ticker]; saveFutureSettings(); renderFutureStudio(); };
       toggle.addEventListener('click',flip); card.addEventListener('click',event => { if (!event.target.closest('button,input,label,a')) flip(); });
-      const rate = el('div','future-card-rate',futurePercent(row.totalReturnPct) + ' p. a.');
-      const sourceLabel = settings.source === 'manual' ? 'Eigene Annahme' : {'5y':'5 Jahre · Gesamtrendite','10y':'10 Jahre · Gesamtrendite',all:'All Time · Gesamtrendite'}[settings.source]; rate.append(el('small','',sourceLabel));
-      if (row.period && row.period.start && row.period.end) rate.title = 'Historische Gesamtrendite: ' + row.period.start + ' bis ' + row.period.end + (stock.returns && stock.returns.as_of ? ' · Kursstand: ' + stock.returns.as_of : '') + (row.details && row.details.warning ? ' · ' + row.details.warning : '');
+      const rate = el('div','future-card-rate', (row.estimated ? '≈ ' : '') + futurePercent(row.totalReturnPct) + ' p. a.');
+      const sourceLabel = settings.source === 'manual' ? 'Eigene Annahme' : row.estimated ? 'Ersatzannahme · ' + fmt(row.details.sampleYears,2) + ' J Historie' : {'5y':'5 Jahre · Gesamtrendite','10y':'10 Jahre · Gesamtrendite',all:'All Time · Gesamtrendite'}[settings.source]; rate.append(el('small',row.estimated ? 'future-estimate-label' : '',sourceLabel));
+      if (row.period && row.period.start && row.period.end) rate.title = (row.estimated ? 'Ersatzannahme für ' + ({'5y':'5 Jahre','10y':'10 Jahre',all:'All Time'}[settings.source]) + ': ' + row.details.reason + ' Verwendete eigene Gesamtrendite: ' : 'Historische Gesamtrendite: ') + row.period.start + ' bis ' + row.period.end + (stock.returns && stock.returns.as_of ? ' · Kursstand: ' + stock.returns.as_of : '') + (row.details && row.details.warning ? ' · ' + row.details.warning : '');
       else rate.title = 'Eigene Gesamtrendite-Annahme, inklusive Dividenden und Ausschüttungen.';
       card.append(rate);
+      if (row.estimated) { const note = el('p','future-card-estimate',returnDate(row.period.start) + ' – ' + returnDate(row.period.end) + ' · ' + stock.currency + ' · inkl. Ausschüttungen'); const url = returnSourceUrl(stock); if (url) { const link = el('a','',' Quelle ↗'); link.href = url; link.target = '_blank'; link.rel = 'noopener noreferrer'; note.append(link); } card.append(note); }
       const fields = el('div','future-card-fields');
       const weightLabel = el('label','', 'Gewicht (Teile)'), weightWrap = el('span','future-small-input'), weight = el('input'); weight.type = 'number'; weight.min = '0.01'; weight.max = '100000'; weight.step = '0.1'; weight.value = futureNumber(row.weight) === null ? '' : String(row.weight); weight.setAttribute('aria-label',stock.name + ' Gewichtung'); weightWrap.append(weight,el('span','',row.included && weightTotal > 0 && row.weight > 0 ? fmt(row.weight / weightTotal * 100,1) + '%' : 'Anteile')); weightLabel.append(weightWrap);
       weight.addEventListener('change',event => { settings.weights[stock.ticker] = event.target.value.trim() === '' ? null : Number(event.target.value); saveFutureSettings(); renderFutureStudio(); });
@@ -1328,7 +1373,9 @@ const FutureModel = (() => {
       root.append(el('p','','Die Grafik ist ein konstantes Renditeszenario, keine Vorhersage. Historische Renditen wiederholen sich nicht verlässlich. Die Startwerte sind Beispiele; tatsächliche Depotbestände werden nicht eingelesen.'));
       const list=el('ul');for(const text of ['Alle Beträge sind ein nominales EUR-Szenario. Historische Prozentwerte stammen aus der jeweiligen Handelswährung; Wechselkurse werden für die Zukunft konstant angenommen. Keine Aussage über historische EUR-Renditen.','Startkapital und Einzahlungen werden nach den eingegebenen Anteilen verteilt. Nach Ausschlüssen oder Sektorfiltern werden die sichtbaren, eingeschlossenen Gewichte auf 100% normiert. Monatliche Einzahlungen erfolgen am Monatsende; kein automatisches Rebalancing.','Die eingegebene oder historische Jahresrate ist eine Gesamtrendite inklusive reinvestierter Dividenden. Ausschüttungen werden daraus abgetrennt und nicht zusätzlich aufgeschlagen. Die aktuelle Ausschüttungsrendite wird als konstante jährliche Annahme auf den jeweiligen Depotwert angewendet und monatlich modelliert.','Reinvestierend bleiben Ausschüttungen im Depot. Ausschüttend werden sie separat und unverzinst als Cash gesammelt. Gesamtvermögen = Depotwert + ausgezahltes Cash. Die Summe reinvestierter Dividenden steckt bereits im Depotwert und darf nicht hinzuaddiert werden.','Steuern, Gebühren und Inflation sind nicht berücksichtigt. Die angezeigte startgewichtete Rendite ist die Annahme zu Beginn; durch unterschiedliche Wachstumsraten verändern sich die Gewichte im Zeitverlauf.'])list.append(el('li','',text));root.append(list);
       if(settings.source!=='manual'){
-        const sources=el('ul');for(const row of rows.filter(item=>item.included)){const li=el('li'),period=row.period;li.append(document.createTextNode(row.stock.name+': '+futurePercent(row.totalReturnPct)+' p. a.'+(period&&period.start&&period.end?' · '+period.start+' bis '+period.end:' · keine bestätigte Historie')+(row.details&&row.details.warning?' · '+row.details.warning:'')));const source=returnSourceUrl(row.stock);if(source){const link=el('a','',' · Quelle ↗');link.href=source;link.target='_blank';link.rel='noopener noreferrer';li.append(link);}sources.append(li);}root.append(el('p','','Historische Annahmen aus der Rendite-Tabelle:'),sources);
+        root.append(el('p','','Fehlt ein vollständiger 5-/10-Jahres- oder All-Time-Zeitraum, wird die längste geeignete eigene Gesamtrenditehistorie als Ersatzannahme verwendet. Bei 5/10 Jahren ist sie höchstens so lang wie der gewählte Zeitraum. Bekannte Datenbrüche werden ausgeschlossen. Geometrisches Mittel (CAGR): (Endvermögen / Anfangsvermögen)^(365,2425 / tatsächliche Tage) − 1; bereits annualisierte Raten werden unverändert übernommen. Es wird keine frühere Börsenhistorie erfunden und kein Branchenmittel zugemischt. Die historischen Messwerte in der Rendite-Tabelle bleiben unverändert.'));
+        const listingSources = { CRWD: ['CrowdStrike · Börsenstart 12.06.2019','https://ir.crowdstrike.com/resources/investor-faqs/'], NET: ['Cloudflare · Börsenstart 13.09.2019','https://www.cloudflare.com/en-au/press/press-releases/2019/cloudflare-announces-pricing-of-initial-public-offering/'], JEPQ: ['JEPQ · Handelsbeginn 04.05.2022','https://www.nasdaqtrader.com/TraderNews.aspx?id=ETA2022-43'] };
+        const sources=el('ul');for(const row of rows.filter(item=>item.included)){const li=el('li'),period=row.period;li.append(document.createTextNode(row.stock.name+': '+(row.estimated?'Ersatzannahme · ':'')+futurePercent(row.totalReturnPct)+' p. a.'+(period&&period.start&&period.end?' · '+period.start+' bis '+period.end:' · keine bestätigte Historie')+' · '+row.stock.currency+(row.details?' · '+fmt(row.details.sampleYears,2)+' Jahre eigene Historie':'')+(row.estimated?' statt '+({'5y':'5 Jahren','10y':'10 Jahren',all:'der unvollständigen All-Time-Historie'}[settings.source])+' · '+row.details.reason:'')+(row.details&&row.details.warning?' · '+row.details.warning:'')+(row.details&&row.details.sourceStatus==='previous'?' · bestätigter Vorwert':'')+(row.estimated&&period&&period.method?' · '+period.method:'')));const source=returnSourceUrl(row.stock);if(source){const link=el('a','',' · Renditequelle ↗');link.href=source;link.target='_blank';link.rel='noopener noreferrer';li.append(link);}if(row.estimated&&listingSources[row.stock.ticker]){const [title,url]=listingSources[row.stock.ticker],link=el('a','',' · '+title+' ↗');link.href=url;link.target='_blank';link.rel='noopener noreferrer';li.append(link);}const cash=returnCashSourceUrl(row.stock);if(cash){const link=el('a','',' · Ausschüttungen: JPMorgan AM ↗');link.href=cash;link.target='_blank';link.rel='noopener noreferrer';li.append(link);}sources.append(li);}root.append(el('p','','Verwendete historische Basis und Ersatzannahmen:'),sources);
       }
       root.append(el('p','','Szenarioeinstellungen werden nur lokal in diesem Browser und getrennt nach Depot gespeichert.'));
     }
@@ -1341,6 +1388,7 @@ const FutureModel = (() => {
       else if(futureNumber(settings.initial)===null||settings.initial<0||settings.initial>1e9||futureNumber(settings.monthly)===null||settings.monthly<0||settings.monthly>1e7)result={error:'Bitte gültige Werte für Startkapital und monatliche Einzahlung eingeben.'};
       else result=FutureModel.project({positions:included.map(row=>({id:row.id,weight:row.weight,totalReturnPct:row.totalReturnPct,dividendYieldPct:row.dividendYieldPct})),initial:settings.initial,monthly:settings.monthly,years:settings.years,reinvest:settings.reinvest});
       syncFutureControls(settings,result);futureSummary(rows,settings,result);
+      const estimates=included.filter(row=>row.estimated),estimateNote=$('future-estimate-note');estimateNote.hidden=!estimates.length;estimateNote.textContent=estimates.length?'≈ '+estimates.length+' Ersatzannahme'+(estimates.length===1?'':'n')+' im Szenario: '+estimates.map(row=>row.stock.name).join(', ')+'. Tatsächlich verwendete Zeiträume und Quellen stehen auf den Kacheln.':'';
       $('future-chart-subtitle').textContent=portfolio().name+' · '+(state.cluster==='Alle'?'alle Kategorien':state.cluster)+' · '+settings.years+' Jahre · '+(settings.reinvest?'Dividenden reinvestiert':'Dividenden ausgeschüttet');
       $('future-initial-rates').textContent=result&&!result.error?'Startgewichtung: '+futurePercent(result.weightedReturnPct)+' Gesamtrendite p. a. · '+futurePercent(result.weightedYieldPct)+' Ausschüttung':'';
       const error=$('future-error');error.hidden=!result.error;error.replaceChildren();if(result.error){error.append(el('strong','',result.error));if(problems.length){error.append(el('p','','Wähle eine andere Renditebasis, trage eine fehlende Dividendenannahme ein oder schließe die betroffenen Kacheln aus.'));const list=el('ul');problems.forEach(row=>list.append(el('li','',row.stock.name+': '+row.problem)));error.append(list);}}
