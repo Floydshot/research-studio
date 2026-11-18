@@ -82,6 +82,12 @@ RETURN_METHOD = (
     "3J, 5J, 10J und All Time ab einem Jahr sind mit tatsächlichen Tagen / 365,2425 annualisiert. "
     "All Time beginnt beim ersten verfügbaren Kurs, nicht bei einem persönlichen Kaufdatum."
 )
+AVAILABLE_HISTORY_METHOD = (
+    "Längster zusammenhängender Zeitraum ohne erkannte Datenbrüche; "
+    "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen "
+    "Barausschüttungen mit Wiederanlage am Ex-Tag. Ab einem Jahr mit tatsächlichen Tagen "
+    "/ 365,2425 annualisiert. Keine rückwirkend ergänzte 5J-/10J- oder All-Time-Historie."
+)
 
 
 def tokio_historical_pe_metadata() -> dict[str, Any]:
@@ -1404,7 +1410,86 @@ def calculate_period_returns(history: Any, ticker: str, info: dict[str, Any] | N
                 else:
                     entry["value"] = round(value, 6)
         result["periods"][key] = entry
+    # Keep every requested observed period unchanged. This separate observation
+    # lets a projection disclose a shorter actual window instead of pretending
+    # that missing pre-IPO years or a discontinuous early history were observed.
+    excluded_through = max(bad_dates) if bad_dates else None
+    clean_indices = [index for index, date in enumerate(dates)
+                     if excluded_through is None or date.date() >= excluded_through]
+    clean_start = clean_indices[0] if clean_indices else None
+    clean_date = dates[clean_start] if clean_start is not None else None
+    clean_days = (end - clean_date).days if clean_date is not None else 0
+    available = dict(
+        version=1, basis="total_return", currency=result["currency"],
+        source_url=result["source_url"], retrieved_at=result["retrieved_at"],
+        value=None, start=clean_date.date().isoformat() if clean_date is not None else None,
+        end=result["as_of"], annualized=clean_days >= 365.2425,
+        observations=len(close) - clean_start if clean_start is not None else 0,
+        excluded_through=excluded_through.isoformat() if excluded_through is not None else None,
+        method=AVAILABLE_HISTORY_METHOD,
+        reason=("Frühere Zeiträume mit erkannten Datenbrüchen bleiben ausgeschlossen; "
+                "die Rendite über den letzten Bruch wird nicht verwendet; Ausgangsbasis ist der erste gültige Schlusskurs am oder nach diesem Bruch."
+                if excluded_through is not None else
+                "Nutzt die vollständige verfügbare Kurshistorie; fehlende Jahre vor deren Beginn werden nicht ergänzt."))
+    if clean_start is None or clean_days <= 0 or len(close) - clean_start < 2:
+        available["reason"] = "Nach dem letzten erkannten Datenbruch liegen noch keine zwei gültigen Schlusskurse vor."
+    else:
+        growth = finite_number(factors.iloc[clean_start + 1:].prod(skipna=False))
+        try:
+            rate = ((growth ** (365.2425 / clean_days) - 1) * 100 if available["annualized"]
+                    else (growth - 1) * 100) if growth is not None and growth > 0 else None
+        except (OverflowError, ValueError):
+            rate = None
+        rate = finite_number(rate)
+        if rate is None or rate <= -100:
+            available["reason"] = "Gesamtrendite im zusammenhängenden Zeitraum nicht gültig berechenbar."
+        else:
+            available["value"] = round(rate, 6)
+    result["available_history"] = available
     return result
+
+
+def valid_available_history(available: Any, parent: dict[str, Any]) -> bool:
+    """Validate optional projection provenance without accepting invented years."""
+    if (not isinstance(available, dict) or available.get("version") != 1 or
+            available.get("basis") != "total_return" or
+            not isinstance(parent.get("currency"), str) or not parent["currency"] or
+            available.get("currency") != parent["currency"] or
+            available.get("source_url") != parent.get("source_url") or
+            available.get("retrieved_at") != parent.get("retrieved_at") or
+            available.get("end") != parent.get("as_of") or
+            available.get("method") != AVAILABLE_HISTORY_METHOD or
+            not isinstance(available.get("reason"), str) or not available["reason"].strip() or
+            type(available.get("annualized")) is not bool or
+            type(available.get("observations")) is not int or available["observations"] < 0):
+        return False
+    try:
+        first = datetime.strptime(parent["since"], "%Y-%m-%d").date()
+        end = datetime.strptime(parent["as_of"], "%Y-%m-%d").date()
+        start = datetime.strptime(available.get("start", ""), "%Y-%m-%d").date()
+        notes = parent.get("quality_notes", [])
+        if not isinstance(notes, list) or any(not isinstance(note, dict) or
+                                             not isinstance(note.get("reason"), str) for note in notes):
+            return False
+        bad_dates = [datetime.strptime(note.get("date", ""), "%Y-%m-%d").date() for note in notes]
+        last_bad = max(bad_dates) if bad_dates else None
+        if available.get("excluded_through") != (last_bad.isoformat() if last_bad is not None else None):
+            return False
+        if (not first <= start <= end or any(date > end for date in bad_dates) or
+                (last_bad is None and start != first) or
+                (last_bad is not None and (start < max(first, last_bad) or (start - max(first, last_bad)).days > 10))):
+            return False
+        days = (end - start).days
+        if (available["annualized"] != (days >= 365.2425) or
+                available["observations"] > days + 1):
+            return False
+    except (TypeError, ValueError, KeyError):
+        return False
+    raw = available.get("value")
+    if raw is None:
+        return True
+    rate = finite_number(raw)
+    return rate is not None and rate > -100 and days > 0 and available["observations"] >= 2
 
 
 def valid_period_returns(value: Any, ticker: str, stamp: str) -> dict[str, Any] | None:
@@ -1453,6 +1538,8 @@ def valid_period_returns(value: Any, ticker: str, stamp: str) -> dict[str, Any] 
         if key == "all" and period["annualized"] != ((end - first).days >= 365.2425):
             return None
         has_value = True
+    if "available_history" in value and not valid_available_history(value["available_history"], value):
+        return None
     return deepcopy(value) if has_value else None
 
 
