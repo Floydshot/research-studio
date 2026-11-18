@@ -280,7 +280,7 @@
     <div id="future-chart-wrap" class="future-chart-wrap"><canvas id="future-chart" role="img" aria-label="Modellierte Depotentwicklung. Alle Jahreswerte stehen in der Tabelle darunter."></canvas></div>
     <div id="future-chart-fallback" class="future-chart-fallback" hidden></div>
     <div class="future-chart-caption"><span id="future-chart-caption"></span><span>Nominal · vor Steuern und Gebühren</span></div>
-    <details class="future-year-details"><summary>Jahreswerte ansehen</summary><div class="future-year-scroll"><table class="future-year-table"><caption class="sr-only">Modellierte Entwicklung nach Jahren</caption><thead><tr><th>Jahr</th><th>Einzahlungen</th><th>Depotwert</th><th>Dividenden gesamt</th><th>Ausgezahlt</th><th>Gesamtvermögen</th></tr></thead><tbody id="future-year-body"></tbody></table></div></details>
+    <details class="future-year-details"><summary>Jahreswerte ansehen</summary><p id="future-year-note"></p><div class="future-year-scroll"><table class="future-year-table" aria-describedby="future-year-note"><caption class="sr-only">Modellierte Entwicklung nach Jahren mit Dividenden je einzelnem Jahr</caption><thead><tr><th>Jahr</th><th>Einzahlungen gesamt</th><th>Depotwert</th><th>Dividenden im Jahr</th><th>Cashbestand gesamt</th><th>Gesamtvermögen</th></tr></thead><tbody id="future-year-body"></tbody></table></div></details>
   </section>
   <div class="future-positions-heading"><div><h2>Positionen im Szenario</h2><p id="future-selection-copy">Kachel anklicken, um eine Position aus- oder einzuschließen.</p></div><div class="future-selection-actions"><button type="button" id="future-include-all">Alle einschließen</button><button type="button" id="future-equal-weights">Gleich gewichten</button></div></div>
   <div id="future-cards" class="future-cards" aria-label="Positionen für die Depotprojektion"></div>
@@ -1393,8 +1393,9 @@ const FutureModel = (() => {
       for(const set of sets){const line=document.createElementNS(ns,'polyline');line.setAttribute('points',result.series.map(row=>(75+row.year/settings.years*670).toFixed(2)+','+(280-row[set.key]/max*260).toFixed(2)).join(' '));line.setAttribute('fill','none');line.setAttribute('stroke',set.color);line.setAttribute('stroke-width',String(set.width));if(set.dash)line.setAttribute('stroke-dasharray',set.dash.join(' '));svg.append(line);}fallback.append(svg,el('p','',sets.map(set=>set.label).join(' · ')));
     }
     function futureYearTable(result, settings) {
-      const body=$('future-year-body');body.replaceChildren(); if(!result||result.error)return;
-      for(let year=0;year<=settings.years;year++){const row=result.series.find(item=>item.month===year*12);if(!row)continue;const tr=el('tr');for(const value of [year===0?'Start':'Jahr '+year,futureMoney(row.contributions),futureMoney(row.portfolio),futureMoney(row.dividendsCumulative),futureMoney(row.cash),futureMoney(row.wealth)])tr.append(el('td','',value));body.append(tr);}
+      const body=$('future-year-body'),note=$('future-year-note');body.replaceChildren();note.textContent='';if(!result||result.error)return;
+      note.textContent='Jede Zeile zeigt die Dividenden des einzelnen Jahres. '+(settings.reinvest?'Sie werden direkt reinvestiert und sind bereits im Depotwert enthalten.':'Sie werden ausgezahlt. Der Cashbestand summiert alle bisherigen Auszahlungen ohne Verzinsung.');
+      for(let year=0;year<=settings.years;year++){const row=result.series.find(item=>item.month===year*12);if(!row)continue;const tr=el('tr');for(const value of [year===0?'Start':'Jahr '+year,futureMoney(row.contributions),futureMoney(row.portfolio),futureMoney(row.last12MonthsDividends),futureMoney(row.cash),futureMoney(row.wealth)])tr.append(el('td','',value));body.append(tr);}
     }
     function futureMethod(rows, settings) {
       const root=$('future-method-copy');root.replaceChildren();
