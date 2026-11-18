@@ -976,6 +976,7 @@
     }
     const CNN_FEAR_GREED_ENDPOINT = 'https://production.dataviz.cnn.io/index/fearandgreed/graphdata';
     const CNN_FEAR_GREED_SOURCE = 'https://edition.cnn.com/markets/fear-and-greed';
+    const CNN_SNAPSHOT_STORAGE = 'floyd-projects-cnn-snapshot-v1';
     const cnnComparisonKeys = { previous_close: 'previous_close', previous_week: 'previous_1_week', previous_month: 'previous_1_month', previous_year: 'previous_1_year' };
     const cnnScore = value => typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 100;
     const cnnRating = score => score <= 25 ? 'extreme fear' : score < 45 ? 'fear' : score <= 55 ? 'neutral' : score < 75 ? 'greed' : 'extreme greed';
@@ -985,6 +986,11 @@
       const asOf = cnnTime(value.as_of), retrieved = cnnTime(value.retrieved_at), now = Date.now();
       return Number.isFinite(asOf) && Number.isFinite(retrieved) && asOf <= now + 300000 && retrieved <= now + 300000 && asOf <= retrieved + 300000;
     }
+    function cachedCnnSnapshot() {
+      try { const raw = localStorage.getItem(CNN_SNAPSHOT_STORAGE); if (!raw || raw.length > 20000) return null; const value = JSON.parse(raw); return validCnnSnapshot(value) ? value : null; } catch (_) { return null; }
+    }
+    function saveCnnSnapshot(value) { try { if (validCnnSnapshot(value)) localStorage.setItem(CNN_SNAPSHOT_STORAGE, JSON.stringify(value)); } catch (_) {} }
+    function newestCnnSnapshot(...values) { return values.filter(validCnnSnapshot).sort((a,b) => cnnTime(b.as_of) - cnnTime(a.as_of) || cnnTime(b.retrieved_at) - cnnTime(a.retrieved_at))[0] || null; }
     function normalizeCnnFearGreed(payload) {
       const value = payload && payload.fear_and_greed, now = Date.now(), asOf = value && cnnTime(value.timestamp);
       if (!value || !cnnScore(value.score) || typeof value.rating !== 'string' || value.rating.trim().toLowerCase() !== cnnRating(value.score) || !Number.isFinite(asOf) || asOf > now + 300000 || now - asOf > 4 * 86400000) throw new Error('CNN lieferte keinen aktuellen, gültigen Gesamtindex.');
@@ -1005,7 +1011,7 @@
       finally { clearTimeout(timeout); parentSignal.removeEventListener('abort', abort); }
     }
     function selectCnnFearGreed(snapshot, previous, attempt) {
-      const prior = [snapshot, previous].filter(validCnnSnapshot).sort((a,b) => cnnTime(b.as_of) - cnnTime(a.as_of))[0];
+      const prior = newestCnnSnapshot(snapshot, previous);
       if (attempt.value && (!prior || cnnTime(attempt.value.as_of) >= cnnTime(prior.as_of))) return attempt.value;
       const note = attempt.error || 'CNN lieferte einen älteren Indexstand; letzter bestätigter Stand bleibt erhalten.';
       return prior ? { ...prior, source_status: 'previous', last_attempted_at: new Date().toISOString(), note } : { version: 1, provider: 'CNN', source_url: CNN_FEAR_GREED_SOURCE, source_status: 'unavailable', score: null, rating: null, as_of: null, retrieved_at: null, last_attempted_at: new Date().toISOString(), comparisons: {}, note };
@@ -1019,7 +1025,7 @@
     async function load({ notify = false } = {}) {
       if (state.request) return;
       const controller = new AbortController(); state.request = controller; const started = performance.now();
-      const previous = state.data ? JSON.stringify({ ...state.data, fear_and_greed: undefined }) : null, previousSentiment = state.data && state.data.fear_and_greed; let notice = null;
+      const previous = state.data ? JSON.stringify({ ...state.data, fear_and_greed: undefined }) : null, previousSentiment = newestCnnSnapshot(state.data && state.data.fear_and_greed, cachedCnnSnapshot()); let notice = null;
       // Automatic updates are published by the morning workflow. A direct CNN
       // request is made only once for an explicit refresh, never on page open.
       const sentimentAttempt = notify ? fetchCnnFearGreed(controller.signal) : Promise.resolve(null);
@@ -1032,19 +1038,19 @@
         let data; try { data = await response.json(); } catch (error) { if (error.name === 'AbortError') throw error; throw new Error('data.json enthält kein gültiges JSON.'); }
         const validated = validate(data); if (controller.signal.aborted) throw new DOMException('Zeitüberschreitung', 'AbortError'); if (state.request !== controller) return;
         const changed = previous !== JSON.stringify({ ...validated, fear_and_greed: undefined }), publishedSentiment = validated.fear_and_greed;
-        if (validCnnSnapshot(previousSentiment) && (!validCnnSnapshot(publishedSentiment) || cnnTime(previousSentiment.as_of) > cnnTime(publishedSentiment.as_of))) validated.fear_and_greed = previousSentiment;
+        validated.fear_and_greed = newestCnnSnapshot(publishedSentiment, previousSentiment) || publishedSentiment;
         state.data = validated;
         if (state.cluster !== 'Alle' && !portfolio().stocks.some(stock => stock.cluster === state.cluster)) state.cluster = 'Alle';
         $('loading').hidden = true; $('app').hidden = false; status(); renderFilters(); render(); renderFearGreed();
         const sentiment = await sentimentAttempt; if (controller.signal.aborted) throw new DOMException('Zeitüberschreitung', 'AbortError');
         if (notify) state.data.fear_and_greed = selectCnnFearGreed(publishedSentiment, previousSentiment, sentiment);
-        state.refreshFailed = false; renderFearGreed(); status();
+        state.refreshFailed = false; saveCnnSnapshot(state.data.fear_and_greed); renderFearGreed(); status();
         notice = notify ? cnnRefreshNotice(refreshNotice(changed), sentiment, state.data.fear_and_greed, previousSentiment) : null;
       } catch (error) {
         if (state.request !== controller) return;
         const sentiment = await sentimentAttempt;
         state.refreshFailed = true;
-        if (state.data && notify) { state.data.fear_and_greed = selectCnnFearGreed(state.data.fear_and_greed, previousSentiment, sentiment); renderFearGreed(); }
+        if (state.data && notify) { state.data.fear_and_greed = selectCnnFearGreed(state.data.fear_and_greed, previousSentiment, sentiment); saveCnnSnapshot(state.data.fear_and_greed); renderFearGreed(); }
         const failure = error.name === 'AbortError' ? new Error('Zeitüberschreitung beim Laden. Bitte erneut versuchen.') : error;
         showError(failure); notice = ['Aktualisierung fehlgeschlagen', (state.data ? 'Der bisherige Datenstand bleibt sichtbar. ' : '') + failure.message, 'error'];
       } finally {
