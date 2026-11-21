@@ -87,7 +87,7 @@
     if (visible(action)) action.focus();
     else if (visible(menu)) menu.focus();
   }
-  function money(value) { return value === undefined || value === null ? 'offen' : new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 2 }).format(value); }
+  function money(value) { return value === undefined || value === null ? 'offen' : new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value); }
   function sharesPreview(settings) {
     const entries = Object.entries(settings.shares || {}).filter(([ticker]) => settings.excluded?.[ticker] !== true && settings.removed?.[ticker] !== true);
     const sum = entries.reduce((total, [, count]) => total + (typeof count === 'number' ? count : 0), 0);
