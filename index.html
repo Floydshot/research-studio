@@ -1120,7 +1120,7 @@
       cell.append(val);
       const status = reference && (!meta || meta.verified_at) ? 'reference' : source(stock, field), forecast = !reference && field === 'div_yield' ? dividendForecast(stock) : null;
       const url = httpsSource(issuer ? meta.source_url : forecast ? forecast.source_url : null);
-      const sourceLabel = missingReference ? 'Keine Referenz' : reference && !meta ? 'Vorgabe (5J/10J)' : fieldSourceText(stock, field);
+      const sourceLabel = missingReference ? 'Keine Referenz' : reference && !meta ? '' : fieldSourceText(stock, field);
       if (!sourceLabel) return cell;
       const labelNode = el(url ? 'a' : 'span', 'metric-source ' + (status === 'reference' ? 'reference' : status === 'live' ? 'fresh' : status === 'unavailable' ? '' : 'fallback'), sourceLabel);
       if (url) { labelNode.href = url; labelNode.target = '_blank'; labelNode.rel = 'noopener noreferrer'; labelNode.addEventListener('click', event => event.stopPropagation()); labelNode.addEventListener('keydown', event => event.stopPropagation()); }
