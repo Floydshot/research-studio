@@ -377,7 +377,7 @@
       <label class="future-field" for="future-allocation" hidden>Positionen erfassen <select id="future-allocation"><option value="weights">Gewichtung in %</option><option value="shares">Anzahl Shares</option></select></label>
     </div>
     <p id="future-allocation-note" hidden class="future-allocation-note"></p>
-    <div class="future-options-row"><div class="future-dividend-mode"><label class="future-check future-reinvest-label"><input id="future-reinvest" type="checkbox" checked> Dividenden reinvestieren</label><p id="future-dividend-mode-copy" hidden>Ausschüttungen bleiben im Depot und wachsen mit.</p></div></div>
+    <div id="future-dividend-options" class="future-options-row"><div class="future-dividend-mode"><label class="future-check future-reinvest-label"><input id="future-reinvest" type="checkbox" checked> Dividenden reinvestieren</label><p id="future-dividend-mode-copy" hidden>Ausschüttungen bleiben im Depot und wachsen mit.</p></div></div>
     <p id="future-assumption-note" hidden class="future-assumption-note"></p>
     <p id="future-estimate-note" class="future-estimate-note" hidden></p>
     <p id="future-extreme-note" class="future-estimate-note future-extreme-note" hidden></p>
@@ -643,7 +643,7 @@
         'Bewertung im Vergleich':'Aktuelle Bewertung, historische Referenz und Schätzungen im Vergleich.',
         'Werte im Detail':'Kennzahlen und individuelle Nachkauf-Indikatoren der ausgewählten Positionen.',
         'Rendite':'Gesamtrendite inklusive wiederangelegter Ausschüttungen; mehrjährige Zeiträume pro Jahr.',
-        'Jahreswerte':'Jährlicher Depotwert und Ausschüttungen; netto nach pauschal 26,375 % Steuer ohne Kirchensteuer.',
+        'Jahreswerte':futureUsesDividends()?'Jährlicher Depotwert und Ausschüttungen; netto nach pauschal 26,375 % Steuer ohne Kirchensteuer.':'Einzahlung je Jahr ohne Startkapital; Rendite = Wertzuwachs abzüglich Einzahlungen, vor Steuern.',
         'Portfolio input':'Eine Position pro Zeile mit Prozentgewicht oder Shares; nicht genannte Werte werden ausgeschlossen.'
       };
       if(fixed[title])return fixed[title];
@@ -1656,6 +1656,7 @@ const PortfolioInput = (() => {
     const futureMoney = (value, compact = true) => futureNumber(value) === null ? '—' : new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: compact ? 0 : 2, ...(Math.abs(value) >= 1e12 ? { notation: 'scientific', maximumFractionDigits: 2 } : compact && Math.abs(value) >= 1e9 ? { notation: 'compact', maximumFractionDigits: 2 } : {}) }).format(value);
     const futureAxisMoney = value => futureNumber(value) === null ? '—' : new Intl.NumberFormat('de-DE',{notation:Math.abs(value)>=1e12?'scientific':'compact',maximumFractionDigits:1}).format(value)+' €';
     const futurePercent = value => futureNumber(value) === null ? '—' : fmt(value, 2) + '%';
+    function futureUsesDividends() { return state.portfolio !== 'tech'; }
     function futureDefaults() { return { schemaVersion: 2, allocationMode: 'weights', initial: 10000, monthly: 0, source: 'manual', manual: 7, years: 20, extend: true, reinvest: true, excluded: {}, weights: {}, shares: {}, extraTickers: [], migrated: false }; }
     function futureSettings() {
       if (!futureStudio.settings[state.portfolio]) futureStudio.settings[state.portfolio] = futureDefaults();
@@ -1769,12 +1770,13 @@ const PortfolioInput = (() => {
       return [meta.status === 'confirmed' ? 'Annualisiertes Dividendenwachstum über 10 Jahre (CAGR).' : meta.status === 'no_dividend' ? 'Bestätigter Nichtzahler. Im Szenario werden keine Dividenden angesetzt.' : 'Keine vollständige 10-Jahres-Wachstumsrate; gekennzeichnete Ersatzbasis.', meta.start && meta.end ? meta.start + ' bis ' + meta.end : '', meta.currency ? 'Währung: ' + meta.currency : '', futureNumber(meta.start_annual_dividend) !== null ? 'Anfangsdividende/Aktie (12M): ' + fmt(meta.start_annual_dividend, 4) : '', futureNumber(meta.end_annual_dividend) !== null ? 'Enddividende/Aktie (12M): ' + fmt(meta.end_annual_dividend, 4) : '', meta.method || '', meta.warning || '', meta.retrieved_at ? 'Abruf: ' + meta.retrieved_at : '', meta.source_url ? 'Quelle: ' + meta.source_url : ''].filter(Boolean).join(' · ');
     }
     function futureStockAssumptions(stock, settings) {
+      const dividends = futureUsesDividends();
       const growth = stock.dividend_growth, growthCurrencyMatches = growth && growth.currency === stock.currency;
-      const dividendGrowthPct = growthCurrencyMatches && ['confirmed','short_history','no_dividend','assumption'].includes(growth.status) ? futureNumber(growth.projection_rate_pct) : null;
+      const dividendGrowthPct = !dividends ? 0 : growthCurrencyMatches && ['confirmed','short_history','no_dividend','assumption'].includes(growth.status) ? futureNumber(growth.projection_rate_pct) : null;
       const annualDividend = growthCurrencyMatches && futureNumber(stock.dividend_annual) !== null && stock.dividend_annual >= 0 ? stock.dividend_annual : null;
       const yieldField = stock.asset_type === 'etf' ? 'distribution_yield_ttm' : 'div_yield', yieldSource = stock.field_sources && stock.field_sources[yieldField];
       const providedYield = number(stock[yieldField]), price = positive(stock.price);
-      const dividendYieldPct = annualDividend !== null && price !== null ? annualDividend / price * 100 : ['live','previous'].includes(yieldSource) && providedYield !== null && providedYield >= 0 ? providedYield : null;
+      const dividendYieldPct = !dividends ? 0 : annualDividend !== null && price !== null ? annualDividend / price * 100 : ['live','previous'].includes(yieldSource) && providedYield !== null && providedYield >= 0 ? providedYield : null;
       const details = settings.source === 'manual' ? null : FutureModel.resolveHistoricalRate(stock, settings.source);
       const period = details ? details.period : settings.source === 'manual' ? null : returnPeriod(stock, settings.source);
       const totalReturnPct = settings.source === 'manual' ? settings.manual : details ? details.ratePct : null;
@@ -1844,9 +1846,10 @@ const PortfolioInput = (() => {
       if (document.activeElement !== $('future-rate')) $('future-rate').value = manual ? settings.manual === null ? '' : String(settings.manual) : result && !result.error ? String(Math.round(result.weightedReturnPct * 100) / 100) : '';
       $('future-rate-field').firstChild.textContent = manual ? 'Gesamtrendite als Basis ' : 'Startgewichtete Renditebasis ';
       $('future-reinvest').checked = settings.reinvest; $('future-years-30').hidden = false;
+      $('future-dividend-options').hidden = !futureUsesDividends();
       $('future-years').querySelectorAll('button[data-years]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.years) === settings.years)));
       $('future-dividend-mode-copy').textContent = settings.reinvest ? 'Nur Netto-Ausschüttungen nach pauschaler Steuer kaufen weitere Anteile.' : 'Nur Netto-Ausschüttungen nach pauschaler Steuer fließen auf ein unverzinstes Cash-Konto.';
-      $('future-assumption-note').textContent = (manual ? 'Die manuelle Brutto-Gesamtrendite gilt als Ausgangsbasis für jede Position.' : 'Die historische Brutto-Gesamtrendite ist die Ausgangsbasis; kürzere eigene Historien sind gekennzeichnet.') + ' Daraus wird nach Abzug der aktuellen Brutto-Dividendenrendite das Kurswachstum angenähert. Die Dividende je Aktie wächst separat mit ihrer historischen Rate; auf Ausschüttungen wird die pauschale Steuer angewendet. EUR-Szenario mit konstanten Wechselkursen.';
+      $('future-assumption-note').textContent = !futureUsesDividends() ? 'Die gewählte Gesamtrenditebasis wird direkt als jährliche Wertentwicklung fortgeschrieben; monatliche Einzahlungen erfolgen am Monatsende.' : (manual ? 'Die manuelle Brutto-Gesamtrendite gilt als Ausgangsbasis für jede Position.' : 'Die historische Brutto-Gesamtrendite ist die Ausgangsbasis; kürzere eigene Historien sind gekennzeichnet.') + ' Daraus wird nach Abzug der aktuellen Brutto-Dividendenrendite das Kurswachstum angenähert. Die Dividende je Aktie wächst separat mit ihrer historischen Rate; auf Ausschüttungen wird die pauschale Steuer angewendet. EUR-Szenario mit konstanten Wechselkursen.';
       const included = rows.filter(row => row.included), sum = included.reduce((total,row) => total + (futureNumber(row.weight) !== null ? row.weight : 0), 0);
       const note = $('future-allocation-note');
       if (shares) {
@@ -1858,9 +1861,9 @@ const PortfolioInput = (() => {
       const good = result && !result.error, start = good ? result.initial : initial;
       const values = [
         ['Startkapital', futureMoney(start)],
-        ['Ausschüttung netto heute', good ? futureMoney(result.initialDividendNetAnnual, false) : '—'],
+        [futureUsesDividends() ? 'Ausschüttung netto heute' : 'Weitere Einzahlungen gesamt', good ? futureMoney(futureUsesDividends() ? result.initialDividendNetAnnual : result.final.contributions - result.initial, false) : '—'],
         ['Depotwert nach ' + settings.years + ' Jahren', good ? futureMoney(result.final.portfolio) : '—'],
-        ['Ausschüttung netto Jahr ' + settings.years, good ? futureMoney(result.final.last12MonthsDividendsNet, false) : '—']
+        [futureUsesDividends() ? 'Ausschüttung netto Jahr ' + settings.years : 'Rendite nach ' + settings.years + ' Jahren', good ? futureMoney(futureUsesDividends() ? result.final.last12MonthsDividendsNet : result.final.gain, false) : '—']
       ];
       const root = $('summary'); root.replaceChildren();
       for (const [label, value] of values) { const card=el('div','summary-item');card.append(el('p','summary-label',label),el('div','summary-value',value));root.append(card); }
@@ -1874,11 +1877,13 @@ const PortfolioInput = (() => {
       const rate = el('div','future-card-rate', (row.estimated ? '≈ ' : '') + futurePercent(row.totalReturnPct) + ' p. a.');
       const sourceLabel = settings.source === 'manual' ? 'Eigene Renditebasis' : row.estimated ? 'Ersatzbasis · ' + fmt(row.details.sampleYears,2) + ' J Historie' : {'5y':'5 Jahre · Gesamtrendite','10y':'10 Jahre · Gesamtrendite',all:'All Time · Gesamtrendite'}[settings.source]; rate.append(sectionInfoButton('Renditebasis · '+stock.name,sourceLabel));
       rate.title = row.period && row.period.start && row.period.end ? (row.estimated ? 'Ersatzannahme: ' + row.details.reason + ' ' : '') + 'Gesamtrenditebasis: ' + row.period.start + ' bis ' + row.period.end + ' · ' + stock.currency + (row.details && row.details.warning ? ' · ' + row.details.warning : '') : 'Eigene jährliche Gesamtrendite als Ausgangsbasis, inklusive Dividenden.'; rate.querySelector('.section-info').dataset.infoText=sourceLabel+'. '+rate.title; card.append(rate);
+      if (futureUsesDividends()) {
       const metrics = el('div','future-card-metrics'), dividend = el('div','future-readonly'), growth = el('div','future-readonly');
       dividend.append(el('span','', stock.asset_type === 'etf' ? 'Ausschüttungsrendite · netto' : 'Dividendenrendite · netto'), el('strong','',futurePercent(futureNumber(row.dividendYieldPct)===null?null:row.dividendYieldPct*(1-FutureModel.DIVIDEND_TAX_RATE))));
       dividend.title = row.annualDividend !== null ? 'Ausschüttungen je Aktie nach Ex-Tag in den letzten 12 Monaten ÷ aktueller Kurs. ' + fmt(row.annualDividend,4) + ' ' + stock.currency + ' je Aktie. ' + (row.growth?.source_url || '') : provenance(stock,row.yieldField);
       growth.append(el('span','',row.growth?.status === 'confirmed' ? 'Dividendenwachstum · 10J' : 'Dividendenwachstum'),el('strong',row.growth?.status === 'confirmed' || row.growth?.status === 'no_dividend' ? '' : 'future-growth-estimate',futureGrowthText(row.growth))); growth.title = futureGrowthProvenance(row.growth); metrics.append(dividend,growth); card.append(metrics);
       growth.firstChild.append(sectionInfoButton('Dividendenwachstum · '+stock.name,futureGrowthProvenance(row.growth)+(row.growth?.warning?' '+row.growth.warning:''))); dividend.firstChild.append(sectionInfoButton('Ausschüttungsrendite · '+stock.name,'Pauschale Netto-Rendite: Brutto-Rendite '+futurePercent(row.dividendYieldPct)+' × 73,625 %. Abzug 25 % Kapitalertragsteuer zuzüglich 5,5 % Solidaritätszuschlag auf die Steuer; ohne Kirchensteuer, Freibeträge, Quellensteueranrechnung oder Fonds-Teilfreistellung. '+dividend.title));
+      }
       const fields = el('div','future-card-fields future-allocation-fields'), sharesMode = settings.allocationMode === 'shares';
       const quantityLabel = el('label','',sharesMode ? 'Anzahl Shares' : 'Gewichtung'), quantityWrap = el('span','future-small-input'), quantity = el('input'); quantity.type = 'number'; quantity.min = '0'; quantity.max = sharesMode ? '1000000000' : '100'; quantity.step = sharesMode ? 'any' : '0.1'; quantity.value = futureNumber(row.quantity) === null ? '' : String(Math.round(row.quantity * 1e8) / 1e8); quantity.setAttribute('aria-label',stock.name + (sharesMode ? ' Anzahl Shares' : ' Gewichtung in Prozent')); quantityWrap.append(quantity,el('span','',sharesMode ? 'Shares' : '%')); quantityLabel.append(quantityWrap);
       quantity.addEventListener('change',event => { const value = event.target.value.trim() === '' ? null : Number(event.target.value); (sharesMode ? settings.shares : settings.weights)[stock.ticker] = value; if (value > 0) delete settings.excluded[stock.ticker]; else if (value === 0) settings.excluded[stock.ticker] = true; saveFutureSettings(); renderFutureStudio(); });
@@ -1918,7 +1923,7 @@ const PortfolioInput = (() => {
       const geometry=futureChartGeometry(settings),style=getComputedStyle($('future-panel')),color=key=>style.getPropertyValue(key).trim();
       const years=result.series.filter(row=>row.month>0&&row.month%12===0);
       const sets=[{label:'Depotwert',key:'portfolio',color:color('--teal'),width:2.5}];
-      if(settings.reinvest&&settings.monthly>0)sets.push({label:'Einzahlungen',key:'contributions',color:color('--muted'),width:1.5,dash:[5,4]});
+      if((!futureUsesDividends()||settings.reinvest)&&settings.monthly>0)sets.push({label:'Einzahlungen',key:'contributions',color:color('--muted'),width:1.5,dash:[5,4]});
       if(window.Chart){
         try{
           wrap.hidden=false;fallback.hidden=true;
@@ -1945,7 +1950,7 @@ const PortfolioInput = (() => {
     function futureDividendChart(result, settings) {
       if(futureStudio.dividendChart){futureStudio.dividendChart.destroy();futureStudio.dividendChart=null;}
       const section=$('future-dividends-panel'),wrap=$('future-dividends-wrap'),fallback=$('future-dividends-fallback');
-      section.hidden=!result||!!result.error;fallback.replaceChildren();if(section.hidden)return;
+      section.hidden=!futureUsesDividends()||!result||!!result.error;fallback.replaceChildren();if(section.hidden)return;
       const geometry=futureChartGeometry(settings),years=result.series.filter(row=>row.month>0&&row.month%12===0);
       const components=[['Aus Startkapital','annualDividendInitialNet','--teal'],['Aus Einzahlungen','annualDividendContributionsNet','--sky'],['Aus Wiederanlage','annualDividendReinvestedNet','--amber']];
       if(!years.every(row=>components.every(([,key])=>futureNumber(row[key])!==null))){wrap.hidden=true;fallback.hidden=false;fallback.append(el('p','','Die Aufteilung der Jahresdividenden ist noch nicht verfügbar.'));return;}
@@ -1974,12 +1979,18 @@ const PortfolioInput = (() => {
       fallback.append(svg);
     }
     function futureYearTable(result, settings) {
-      const body=$('future-year-body'),note=$('future-year-note');body.replaceChildren();note.textContent='';if(!result||result.error)return;
-      note.textContent='Jahresbeträge: brutto und netto nach pauschal 26,375 % Steuer ohne Kirchensteuer.';
-      for(let year=1;year<=settings.years;year++){const row=result.series.find(item=>item.month===year*12);if(!row)continue;const tr=el('tr');const label=el('th','','Jahr '+year);label.scope='row';tr.append(label);for(const value of [futureMoney(row.portfolio),futureMoney(row.last12MonthsDividends,false),futureMoney(row.last12MonthsDividendsNet,false)])tr.append(el('td','',value));body.append(tr);}
+      const body=$('future-year-body'),note=$('future-year-note'),table=body.closest('table'),dividends=futureUsesDividends();body.replaceChildren();
+      const header=el('tr');for(const title of dividends?['Jahr','Depotwert','Dividenden im Jahr (brutto)','Ausschüttung im Jahr (netto)']:['Jahr','Depotwert','Einzahlung','Rendite']){const th=el('th','',title);th.scope='col';header.append(th);}table.querySelector('thead').replaceChildren(header);
+      table.querySelector('caption').textContent=dividends?'Depotwert und jährliche Brutto- und Netto-Ausschüttungen ab Jahr 1':'Depotwert, Einzahlungen und Wertzuwachs im jeweiligen Jahr ab Jahr 1';
+      note.textContent=dividends?'Jahresbeträge: brutto und netto nach pauschal 26,375 % Steuer ohne Kirchensteuer.':'Einzahlung je Jahr ohne Startkapital; Rendite = Depotwert am Jahresende minus Vorjahreswert minus Einzahlungen, vor Steuern.';
+      if(!result||result.error)return;
+      for(let year=1;year<=settings.years;year++){const row=result.series.find(item=>item.month===year*12),previous=result.series.find(item=>item.month===(year-1)*12);if(!row||!previous)continue;const paidIn=row.contributions-previous.contributions,annualGain=row.portfolio-previous.portfolio-paidIn;
+        const values=dividends?[futureMoney(row.portfolio),futureMoney(row.last12MonthsDividends,false),futureMoney(row.last12MonthsDividendsNet,false)]:[futureMoney(row.portfolio),futureMoney(paidIn,false),futureMoney(annualGain,false)];
+        const tr=el('tr'),label=el('th','','Jahr '+year);label.scope='row';tr.append(label);for(const value of values)tr.append(el('td','',value));body.append(tr);}
     }
     function futureMethod(rows, settings) {
       const root=$('future-method-copy');root.replaceChildren();
+      if(!futureUsesDividends()){root.append(el('p','','Die gewählte Gesamtrenditebasis wird direkt als jährliche Wertentwicklung fortgeschrieben; Einzahlungen erfolgen am Monatsende und Gewinne sind unversteuert. Historische Gesamtrenditen enthalten bereits wiederangelegte Ausschüttungen.'));return;}
       root.append(el('p','','Outlook ist eine Modellrechnung. Historische Renditen und Dividendensteigerungen sind keine Vorhersage. Deine eingegebenen Stückzahlen, Gewichte und Szenarien werden nur lokal in diesem Browser und getrennt nach Depot gespeichert.'));
       const list=el('ul');for(const text of ['Alle Beträge werden in EUR modelliert. Bei Stückzahlen ergibt sich der Startwert aus Shares × aktuellem Kurs ÷ Währungseinheiten je EUR. Die ausgewiesenen Wechselkurse bleiben im Szenario konstant; historische Prozentrenditen werden nicht nachträglich in EUR umgerechnet.','Gewichtungen sind Prozentwerte. Nach Ausschlüssen oder Sektorfiltern wird die sichtbare, eingeschlossene Auswahl für die Projektion auf 100% normiert. Im Shares-Modus ergibt sich die Gewichtung aus den aktuellen Positionswerten. Monatliche Einzahlungen erfolgen am Monatsende nach diesen Startgewichten; kein automatisches Rebalancing.','Kurswachstum und Dividenden werden getrennt modelliert. Das jährliche Kurswachstum wird näherungsweise als gewählte Brutto-Gesamtrenditebasis minus heutiger Brutto-Ausschüttungsrendite angesetzt. Die komplette Gesamtrendite wird nicht zusätzlich aufgeschlagen; durch die separaten Annahmen kann die spätere Gesamtrendite von der gewählten Basis abweichen.','Die Dividende je Aktie startet mit den Ausschüttungen nach Ex-Tag der letzten 12 Monate. Ab dem zweiten Szenariojahr wächst sie jährlich mit der historischen Dividendenwachstumsrate. Ausschüttungen werden als monatliche Teilbeträge modelliert. Auf jede monatliche Brutto-Ausschüttung wird die pauschale Ausschüttungssteuer genau einmal angewendet. Nur der verbleibende Netto-Betrag kauft weitere Anteile; deren spätere Netto-Ausschüttungen sind im Diagramm als „Aus Wiederanlage“ enthalten.','Die 10-Jahres-Rate ist das geometrische Jahreswachstum (CAGR) der Dividendensumme je Aktie in vergleichbaren Zwölfmonatsfenstern: (Enddividende / Anfangsdividende)^(1 / Jahre) − 1. Kürzere Historien und neutrale Ersatzannahmen stehen an der jeweiligen Kennzahl. Bei Nichtzahlern werden keine künftigen Dividenden erfunden.','Ausgeschüttete Netto-Dividenden werden als unverzinstes Cash gesammelt. Gesamtvermögen = Depotwert + Netto-Cashbestand. Reinvestierte Netto-Dividenden sind bereits im Depotwert enthalten und dürfen nicht noch einmal hinzuaddiert werden. Die heutigen Netto-Ausschüttungen oben basieren ausschließlich auf dem heutigen Startbestand × seiner Brutto-Ausschüttungsrendite × 73,625 %, ohne künftige Sparraten, Dividendensteigerungen oder Wiederanlage.','Die Netto-Modellrechnung zieht pauschal 25 % Kapitalertragsteuer und 5,5 % Solidaritätszuschlag auf diese Steuer ab, zusammen 26,375 % der Brutto-Ausschüttung; ohne Kirchensteuer. Sparer-Pauschbetrag/Freistellungsauftrag, Verlustverrechnung, Quellensteueranrechnung, ETF-/Fonds-Teilfreistellung und sonstige individuelle Steuermerkmale werden nicht berücksichtigt. Gebühren und Inflation fehlen ebenfalls. Nicht realisierte Kursgewinne werden nicht besteuert; ein Verkauf des Depots ist nicht modelliert. Die Prozentangaben sind Startgewichte; die Gewichte verändern sich mit Kursen und Ausschüttungen.'])list.append(el('li','',text));root.append(list);
       if(settings.source!=='manual'){
@@ -1997,16 +2008,16 @@ const PortfolioInput = (() => {
       if(!included.length)result={error:settings.allocationMode==='shares'?'Trage die Anzahl Shares deiner Positionen ein oder nutze „Portfolio input“.':'Schließe mindestens eine Position mit einer positiven Gewichtung ein.'};
       else if(problems.length)result={error:'Für dieses Szenario fehlen passende Eingangsdaten.'};
       else if(futureNumber(initial)===null||initial<0||initial>1e9||futureNumber(settings.monthly)===null||settings.monthly<0||settings.monthly>1e7)result={error:'Bitte gültige Werte für Startkapital und monatliche Einzahlung eingeben.'};
-      else result=FutureModel.project({positions:included.map(row=>({id:row.id,weight:row.weight,totalReturnPct:row.totalReturnPct,dividendYieldPct:row.dividendYieldPct,dividendGrowthPct:row.dividendGrowthPct})),initial,monthly:settings.monthly,years:settings.years,reinvest:settings.reinvest,dividendTaxRate:FutureModel.DIVIDEND_TAX_RATE});
+      else result=FutureModel.project({positions:included.map(row=>({id:row.id,weight:row.weight,totalReturnPct:row.totalReturnPct,dividendYieldPct:row.dividendYieldPct,dividendGrowthPct:row.dividendGrowthPct})),initial,monthly:settings.monthly,years:settings.years,reinvest:futureUsesDividends()&&settings.reinvest,dividendTaxRate:futureUsesDividends()?FutureModel.DIVIDEND_TAX_RATE:0});
       syncFutureControls(settings,result,rows,initial);futureSummary(rows,settings,result,initial);
-      const estimates=included.filter(row=>row.estimated||row.growth&&!['confirmed','no_dividend'].includes(row.growth.status)),estimateNote=$('future-estimate-note');estimateNote.hidden=true;estimateNote.textContent=estimates.length?'≈ '+estimates.length+' Position'+(estimates.length===1?'':'en')+' mit kürzerer Historie oder Ersatzannahme: '+estimates.map(row=>row.stock.name).join(', ')+'. Verwendete Zeiträume und Quellen stehen an den Kennzahlen.':'';
+      const estimates=included.filter(row=>row.estimated||futureUsesDividends()&&row.growth&&!['confirmed','no_dividend'].includes(row.growth.status)),estimateNote=$('future-estimate-note');estimateNote.hidden=true;estimateNote.textContent=estimates.length?'≈ '+estimates.length+' Position'+(estimates.length===1?'':'en')+' mit kürzerer Historie oder Ersatzannahme: '+estimates.map(row=>row.stock.name).join(', ')+'. Verwendete Zeiträume und Quellen stehen an den Kennzahlen.':'';
       const extremeNote=$('future-extreme-note'),extreme=!!(result&&!result.error&&result.final.contributions>0&&result.final.wealth>result.final.contributions*1000);extremeNote.hidden=true;extremeNote.textContent='';
       if(extreme){const highGrowth=included.filter(row=>row.dividendGrowthPct>=20).sort((a,b)=>b.dividendGrowthPct-a.dividendGrowthPct).slice(0,4);extremeNote.textContent='Extremer Modellwert: Historische Steigerungsraten werden unverändert fortgeschrieben'+(highGrowth.length?', besonders '+highGrowth.map(row=>row.stock.name+' ('+futurePercent(row.dividendGrowthPct)+' p. a.)').join(', '):'')+'. Hohe Wachstums- oder Renditeannahmen verstärken sich langfristig und führen hier zu sehr großen Ergebnissen. Sondereffekte und die verwendeten Zeiträume stehen an den Quellen; keine Prognose.';}
-      $('future-chart-subtitle').textContent=portfolio().name+' · '+(state.cluster==='Alle'?'alle Kategorien':state.cluster)+' · '+settings.years+' Jahre · '+(settings.reinvest?'Dividenden reinvestiert':'Dividenden ausgeschüttet');
+      $('future-chart-subtitle').textContent=portfolio().name+' · '+(state.cluster==='Alle'?'alle Kategorien':state.cluster)+' · '+settings.years+' Jahre'+(futureUsesDividends()?' · '+(settings.reinvest?'Dividenden reinvestiert':'Dividenden ausgeschüttet'):'');
       const weightedGrowth=result&&!result.error?result.final.positions.reduce((sum,position)=>sum+position.weight*position.dividendGrowthPct,0):null;
-      $('future-initial-rates').textContent=result&&!result.error?'Renditebasis: '+futurePercent(result.weightedReturnPct)+' p. a.'+(settings.reinvest?' · Ausschüttungsrendite netto zu Beginn: '+futurePercent(result.weightedYieldPct*(1-result.dividendTaxRate))+' · Dividendenwachstum: '+futurePercent(weightedGrowth)+' p. a.':''):'';
+      $('future-initial-rates').textContent=result&&!result.error?'Renditebasis: '+futurePercent(result.weightedReturnPct)+' p. a.'+(futureUsesDividends()&&settings.reinvest?' · Ausschüttungsrendite netto zu Beginn: '+futurePercent(result.weightedYieldPct*(1-result.dividendTaxRate))+' · Dividendenwachstum: '+futurePercent(weightedGrowth)+' p. a.':''):'';
       const error=$('future-error');error.hidden=!result.error;error.replaceChildren();if(result.error){error.append(el('strong','',result.error));if(problems.length){error.append(el('p','','Prüfe die Datenhinweise, wähle eine andere Renditebasis oder schließe die betroffenen Positionen aus.'));const list=el('ul');problems.forEach(row=>list.append(el('li','',row.stock.name+': '+row.problem)));error.append(list);}}
-      $('future-chart-caption').textContent=result.error?'Das Szenario wird mit vollständigen Annahmen berechnet.':settings.reinvest?'Reinvestierte Netto-Dividenden sind im Depotwert enthalten. Summe der Netto-Reinvestitionen: '+futureMoney(result.final.dividendsNetCumulative)+'.':'Depotwert + unverzinstes Cash = '+futureMoney(result.final.wealth)+' Gesamtvermögen. Ausgezahlte Netto-Dividenden gesamt: '+futureMoney(result.final.cash)+'.';
+      $('future-chart-caption').textContent=result.error?'Das Szenario wird mit vollständigen Annahmen berechnet.':!futureUsesDividends()?'Wertentwicklung auf Basis der gewählten Gesamtrendite, vor Steuern.':settings.reinvest?'Reinvestierte Netto-Dividenden sind im Depotwert enthalten. Summe der Netto-Reinvestitionen: '+futureMoney(result.final.dividendsNetCumulative)+'.':'Depotwert + unverzinstes Cash = '+futureMoney(result.final.wealth)+' Gesamtvermögen. Ausgezahlte Netto-Dividenden gesamt: '+futureMoney(result.final.cash)+'.';
       futureChart(result,settings);futureDividendChart(result,settings);futureYearTable(result,settings);
       const cards=$('future-cards');cards.replaceChildren();const total=included.reduce((sum,row)=>sum+(futureNumber(row.weight)!==null&&row.weight>0?row.weight:0),0);for(const row of rows)cards.append(futureCard(row,settings,total));$('future-no-cards').hidden=!!rows.length;
       $('future-selection-copy').textContent='Kachel anklicken: grau = ausgeschlossen. '+included.length+' von '+rows.length+' sichtbaren Positionen enthalten. '+(settings.allocationMode==='shares'?'Startwert und Gewichte folgen deinen Shares.':'Gewichte gelten für diese Auswahl.');
