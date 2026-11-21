@@ -4,7 +4,7 @@
   const PROJECTS = Object.freeze({
     open: Object.freeze({ label: 'Open Projects', emoji: '🌐' }),
     floyd: Object.freeze({ label: 'Floyd Projects', emoji: '🏛️' }),
-    ts: Object.freeze({ label: 'TS Projects', emoji: '🧭' })
+    ts: Object.freeze({ label: 'TS Projects', emoji: '🏛️' })
   });
   const $ = id => document.getElementById(id);
   let config = null, project = 'open', unlocked = true, revision = null;
