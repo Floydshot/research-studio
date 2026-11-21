@@ -73,6 +73,7 @@ TOKIO_HIST_PE_MEAN = round(math.fsum(pe for _, pe in TOKIO_HIST_PE_OBSERVATIONS)
 TOKYO = ZoneInfo("Asia/Tokyo")
 RETURN_PERIODS = ("1d", "1w", "1m", "6m", "ytd", "1y", "3y", "5y", "10y", "all")
 RETURN_VERSION = 1
+PRICE_RETURN_METHOD = "split_adjusted_price_return_excluding_distributions"
 JEPQ_RETURN_CASH_SOURCE = "https://am.jpmorgan.com/FundsMarketingHandler/historicalData?cusip=46654Q203&country=us&role=adv&userLoggedIn=false&language=en"
 RETURN_METHOD = (
     "Gesamtrendite in Handelswährung aus splitbereinigten Schlusskursen und tatsächlichen "
@@ -3763,6 +3764,2043 @@ PORTFOLIOS.append(dict(id='classic', name='A24', valuation_style='income', tranc
                       stocks=[dict(deepcopy(ref), initial={field: None for field in NUMERIC_FIELDS})
                               for ref in CLASSIC_REFERENCES]))
 
+# A research inventory is deliberately separate from the three user portfolios.
+# Issuer-reviewed seed records are populated here before publishing this data.
+RESERVE_REFERENCES: list[dict[str, Any]] = [{'name': 'Rio Tinto plc',
+  'ticker': 'RIO',
+  'isin': 'US7672041008',
+  'exchange': 'NYSE',
+  'currency': 'USD',
+  'quote_currency': 'USD',
+  'financial_currency': 'USD',
+  'asset_type': 'stock',
+  'instrument_subtype': 'mining_ads',
+  'cluster': 'Rohstoffe / Bergbau',
+  'share_basis': '1 NYSE ADS represents 1 Rio Tinto plc ordinary share since 2010-04-30; earlier ADR ratio was 1:4. Do not '
+                 'use Rio Tinto Limited/Australian share prices.',
+  'identity_sources': ['https://www.riotinto.com/en/invest/shareholder-information/shareholder-faqs',
+                       'https://company-announcements.afr.com/asx/rio/67046b18-0146-11f1-895b-3ec68c5b4fc7.pdf'],
+  'hist_pe': 9.363492497138635,
+  'hist_ps': None,
+  'hist_ps_not_used': {'status': 'not_used_not_required_for_primary_valuation',
+                       'checked_source_url': 'https://www.sec.gov/Archives/edgar/data/887028/000162828026009531/R11.htm',
+                       'checked_source_scope': 'FY2025 annual report EPS note R11, including combined plc+Limited weighted '
+                                               'shares and dilution.',
+                       'available_years': [2023, 2024, 2025],
+                       'diluted_weighted_combined_shares_million': [1631.5, 1633.4, 1638.0],
+                       'basis_note': 'Combined weighted plc and Limited shares plus dilutive awards, consistent with '
+                                     'consolidated revenues; plc-only sharesOutstanding would misstate the denominator.',
+                       'remaining_requirement': '2021/2022 combined diluted weighted shares were not in the checked 2025 '
+                                                'note. No five-year reference was created from mixed denominators or a '
+                                                'three-observation sample.',
+                       'valuation_choice': 'Reserve primary valuation uses P/E with operating/free cashflow and cyclical '
+                                           'dividend coverage; historical P/S is supplemental, not required by the '
+                                           'individual buy proposal.'},
+  'primary_valuation': 'pe_and_cashflow',
+  'field_metadata': {'hist_pe': {'reference_version': 1,
+                                 'provider': 'Emittenten-IR + Jahresendkurse',
+                                 'label': '5J-Median · JE',
+                                 'source_label': 'IFRS · IR / Kurse',
+                                 'accounting_basis': 'IFRS diluted EPS',
+                                 'currency': 'USD',
+                                 'share_basis': '1 ADS = 1 ordinary share',
+                                 'period': 'FY2021–FY2025',
+                                 'verified_at': '2026-11-21',
+                                 'sample_count': 5,
+                                 'window_count': 5,
+                                 'observations': [{'fiscal_year': 2021,
+                                                   'fiscal_end': '2021-12-31',
+                                                   'price_date': '2021-12-31',
+                                                   'close': 66.94000244140625,
+                                                   'currency': 'USD',
+                                                   'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm',
+                                                   'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm',
+                                                   'price_source_url': 'https://finance.yahoo.com/quote/RIO/history/',
+                                                   'share_basis': '1 ADS = 1 ordinary share',
+                                                   'diluted_eps': 12.963,
+                                                   'pe': 5.1639282913990785},
+                                                  {'fiscal_year': 2022,
+                                                   'fiscal_end': '2022-12-31',
+                                                   'price_date': '2022-12-30',
+                                                   'close': 71.19999694824219,
+                                                   'currency': 'USD',
+                                                   'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm',
+                                                   'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm',
+                                                   'price_source_url': 'https://finance.yahoo.com/quote/RIO/history/',
+                                                   'share_basis': '1 ADS = 1 ordinary share',
+                                                   'diluted_eps': 7.604,
+                                                   'pe': 9.363492497138635},
+                                                  {'fiscal_year': 2023,
+                                                   'fiscal_end': '2023-12-31',
+                                                   'price_date': '2023-12-29',
+                                                   'close': 74.45999908447266,
+                                                   'currency': 'USD',
+                                                   'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm',
+                                                   'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm',
+                                                   'price_source_url': 'https://finance.yahoo.com/quote/RIO/history/',
+                                                   'share_basis': '1 ADS = 1 ordinary share',
+                                                   'diluted_eps': 6.165,
+                                                   'pe': 12.077858732274558},
+                                                  {'fiscal_year': 2024,
+                                                   'fiscal_end': '2024-12-31',
+                                                   'price_date': '2024-12-31',
+                                                   'close': 58.810001373291016,
+                                                   'currency': 'USD',
+                                                   'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm',
+                                                   'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm',
+                                                   'price_source_url': 'https://finance.yahoo.com/quote/RIO/history/',
+                                                   'share_basis': '1 ADS = 1 ordinary share',
+                                                   'diluted_eps': 7.072,
+                                                   'pe': 8.315893859345449},
+                                                  {'fiscal_year': 2025,
+                                                   'fiscal_end': '2025-12-31',
+                                                   'price_date': '2025-12-31',
+                                                   'close': 80.02999877929688,
+                                                   'currency': 'USD',
+                                                   'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm',
+                                                   'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm',
+                                                   'price_source_url': 'https://finance.yahoo.com/quote/RIO/history/',
+                                                   'share_basis': '1 ADS = 1 ordinary share',
+                                                   'diluted_eps': 6.084,
+                                                   'pe': 13.154174684302577}],
+                                 'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm',
+                                 'method': 'Letzter Handelsschluss am oder vor dem 31. Dezember geteilt durch das '
+                                           'berichtete verwässerte EPS desselben Geschäftsjahres; Median der fünf positiven '
+                                           'Einzelwerte. Keine kursbereinigten Total-Return-Kurse. Jahresergebnis wurde '
+                                           'erst nach dem Jahresende publiziert; rückblickende Bewertungsreferenz, keine '
+                                           'handelbare zeitpunktgerechte Backtestreihe. ',
+                                 'comparable_to_current': True,
+                                 'comparison_note': 'Diversifizierter Qualitäts-Rohstoffkonzern, aber variable/kürzbare '
+                                                    'Dividende; kein stetiger Dividendenwachstumswert.'},
+                     'hist_div': {'reference_version': 1,
+                                  'provider': 'Yahoo Finance / datierte Emittentenprüfung',
+                                  'label': 'Hist. Div. 5J',
+                                  'accounting_basis': 'Ex-Tag-Barausschüttungen',
+                                  'currency': 'USD',
+                                  'share_basis': '1 NYSE ADS represents 1 Rio Tinto plc ordinary share since 2010-04-30; '
+                                                 'earlier ADR ratio was 1:4. Do not use Rio Tinto Limited/Australian share '
+                                                 'prices.',
+                                  'period': 'FY2021–FY2025',
+                                  'verified_at': '2026-11-21',
+                                  'sample_count': 5,
+                                  'window_count': 5,
+                                  'source_url': 'https://finance.yahoo.com/quote/RIO/history/',
+                                  'observations': [{'fiscal_year': 2021,
+                                                    'price_date': '2021-12-31',
+                                                    'close': 66.94000244140625,
+                                                    'dividends_per_share': 9.63,
+                                                    'dividend_yield': 14.386016804270819,
+                                                    'currency': 'USD',
+                                                    'share_basis': '1 NYSE ADS represents 1 Rio Tinto plc ordinary share '
+                                                                   'since 2010-04-30; earlier ADR ratio was 1:4. Do not use '
+                                                                   'Rio Tinto Limited/Australian share prices.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/RIO/history/'},
+                                                   {'fiscal_year': 2022,
+                                                    'price_date': '2022-12-30',
+                                                    'close': 71.19999694824219,
+                                                    'dividends_per_share': 7.46,
+                                                    'dividend_yield': 10.477528538973027,
+                                                    'currency': 'USD',
+                                                    'share_basis': '1 NYSE ADS represents 1 Rio Tinto plc ordinary share '
+                                                                   'since 2010-04-30; earlier ADR ratio was 1:4. Do not use '
+                                                                   'Rio Tinto Limited/Australian share prices.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/RIO/history/'},
+                                                   {'fiscal_year': 2023,
+                                                    'price_date': '2023-12-29',
+                                                    'close': 74.45999908447266,
+                                                    'dividends_per_share': 4.02,
+                                                    'dividend_yield': 5.3988719439002795,
+                                                    'currency': 'USD',
+                                                    'share_basis': '1 NYSE ADS represents 1 Rio Tinto plc ordinary share '
+                                                                   'since 2010-04-30; earlier ADR ratio was 1:4. Do not use '
+                                                                   'Rio Tinto Limited/Australian share prices.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/RIO/history/'},
+                                                   {'fiscal_year': 2024,
+                                                    'price_date': '2024-12-31',
+                                                    'close': 58.810001373291016,
+                                                    'dividends_per_share': 4.35,
+                                                    'dividend_yield': 7.396701068562776,
+                                                    'currency': 'USD',
+                                                    'share_basis': '1 NYSE ADS represents 1 Rio Tinto plc ordinary share '
+                                                                   'since 2010-04-30; earlier ADR ratio was 1:4. Do not use '
+                                                                   'Rio Tinto Limited/Australian share prices.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/RIO/history/'},
+                                                   {'fiscal_year': 2025,
+                                                    'price_date': '2025-12-31',
+                                                    'close': 80.02999877929688,
+                                                    'dividends_per_share': 3.73,
+                                                    'dividend_yield': 4.660752289009058,
+                                                    'currency': 'USD',
+                                                    'share_basis': '1 NYSE ADS represents 1 Rio Tinto plc ordinary share '
+                                                                   'since 2010-04-30; earlier ADR ratio was 1:4. Do not use '
+                                                                   'Rio Tinto Limited/Australian share prices.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/RIO/history/'}],
+                                  'method': 'Median der tatsächlichen 12M-Cash-Ausschüttungen nach Ex-Tag bis zum letzten '
+                                            'Jahreshandelsschluss geteilt durch diesen Kurs. Gemeldete Cash-Sonderzahlungen '
+                                            'enthalten; keine künftige Zusage. Bei O ist Orion-Sachdividende ausgeschlossen '
+                                            'und die synthetische 1,032-Rückrechnung aufgehoben.'},
+                     'ps_ratio': {'provider': 'Yahoo Finance',
+                                  'source_url': 'https://finance.yahoo.com/quote/RIO/key-statistics/',
+                                  'role': 'informational_only',
+                                  'note': 'Kein primärer Kaufmaßstab für diesen Reservewert; historische Vergleichsbasis '
+                                          'nicht angesetzt. Sektorpassende Kennzahlen und Methoden stehen in '
+                                          'primary_valuation/valuation_references.'}},
+  'buy_trigger': 'Forward P/E ≤ 10x und reguläre Dividendenrendite ≥ 6%',
+  'buy_trigger_type': 'proposal_not_backtested',
+  'buy_trigger_rationale': 'Vorschlag: Bewertungsabschlag und laufende Ertragskompensation für Rohstoff- und '
+                           'Investitionszyklus kombinieren. KGV kann am Gewinnhoch künstlich günstig sein; 10x/6% sind '
+                           'eigene Einstiegsschwellen, keine ermittelte optimale Strategie.',
+  'buy_trigger_evaluation_policy': 'Kein automatisches positives Signal bei unklarer Forward-EPS-/ADS-Basis, veralteten '
+                                   'Daten oder fehlenden regulären Dividenden. Sonderdividenden aus Yield-Bedingung '
+                                   'ausschließen.',
+  'buy_trigger_sources': [{'url': 'https://www.sec.gov/Archives/edgar/data/887028/000162828026009531/R11.htm',
+                           'label': 'Emittentenbericht / aktuelle Kennzahlen'},
+                          {'url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026050377/rio-20260630_d2.htm',
+                           'label': 'Emittentenbericht / aktuelle Kennzahlen'}],
+  'classification_note': 'Diversifizierter Qualitäts-Rohstoffkonzern, aber variable/kürzbare Dividende; kein stetiger '
+                         'Dividendenwachstumswert.',
+  'current_primary_ttm': {'diluted_eps': 7.381999999999998,
+                          'currency': 'USD',
+                          'per': '1 ADS / 1 ordinary share',
+                          'period_end': '2026-06-30',
+                          'formula': 'FY2025 diluted EPS6.084 + H12026 diluted EPS4.063 − H12025 diluted EPS2.765',
+                          'source_urls': ['https://www.sec.gov/Archives/edgar/data/887028/000162828026009531/R11.htm',
+                                          'https://www.sec.gov/Archives/edgar/data/863064/000162828026050377/rio-20260630_d2.htm'],
+                          'source_pages': 'H1 2026 Form6K p28, FY2025 EPS note',
+                          'price_date': '2026-11-20',
+                          'price': 72.73,
+                          'pe': 9.852343538336498,
+                          'caveat': 'Synthetic TTM sum/difference of rounded published diluted EPS; not basic underlying '
+                                    'EPS421.4c.'},
+  'dividend_policy': {'regular_fy2025': {'value': 4.02,
+                                         'unit': 'USD/ADS',
+                                         'period': 'FY2025 declared',
+                                         'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm'},
+                      'latest_regular': {'value': 2.11,
+                                         'unit': 'USD/ADS',
+                                         'period': '2026 interim',
+                                         'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026050377/rio-20260630_d2.htm',
+                                         'note': 'Paid2026-09-24; do not double as guaranteed full-year payout.'},
+                      'trailing_official_gross_cash': {'value': 4.65,
+                                                       'currency': 'USD',
+                                                       'period': '12 months to2026-11-20',
+                                                       'components': [{'value': 2.54,
+                                                                       'ex_date': '2026-03-06',
+                                                                       'payment_date': '2026-04-16',
+                                                                       'type': 'FY2025 final ordinary'},
+                                                                      {'value': 2.11,
+                                                                       'ex_date': '2026-08-14',
+                                                                       'payment_date': '2026-09-24',
+                                                                       'type': '2026 interim ordinary'}],
+                                                       'source_urls': ['https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm',
+                                                                       'https://www.sec.gov/Archives/edgar/data/863064/000162828026050377/rio-20260630_d2.htm'],
+                                                       'note': 'Gross issuer cash before depositary fees and investor '
+                                                               'taxes; vendor cash may reflect fees.'},
+                      'special_history_example': {'fiscal_year': 2021,
+                                                  'ordinary': 7.93,
+                                                  'special': 2.47,
+                                                  'total': 10.4,
+                                                  'currency': 'USD/ADS',
+                                                  'source_url': 'https://www.sec.gov/Archives/edgar/data/887028/000162828022003937/rio-20211231.htm'},
+                      'projection_note': 'Zyklische ordentliche Dividenden und Sonderzahlungen getrennt halten. '
+                                         'Historisches Gesamt-Cash-CAGR ist rückblickend; Sonderdividenden nicht als '
+                                         'regelmäßige Wachstumsbasis fortschreiben.'},
+  'issuer_snapshot': {'as_of': '2026-06-30',
+                      'verified_at': '2026-11-21',
+                      'currency': 'USD',
+                      'metrics': {'operating_cashflow': {'value': 9173,
+                                                         'unit': 'USD million',
+                                                         'period': 'H1 2026',
+                                                         'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026050377/rio-20260630_d2.htm'},
+                                  'free_cashflow': {'value': 3834,
+                                                    'unit': 'USD million',
+                                                    'period': 'H1 2026',
+                                                    'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026050377/rio-20260630_d2.htm',
+                                                    'note': 'New definition: operating cashflow less Rio share of capital '
+                                                            'investment and lease principal; capital investment5037m, '
+                                                            'lease302m.'},
+                                  'net_debt': {'value': 14061,
+                                               'unit': 'USD million',
+                                               'period': '2026-06-30',
+                                               'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026050377/rio-20260630_d2.htm'},
+                                  'underlying_earnings': {'value': 6851,
+                                                          'unit': 'USD million',
+                                                          'period': 'H1 2026',
+                                                          'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026050377/rio-20260630_d2.htm'},
+                                  'interim_dividend_payout': {'value': 50,
+                                                              'unit': '% of underlying EPS',
+                                                              'period': 'H1 2026',
+                                                              'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026050377/rio-20260630_d2.htm'},
+                                  'dividend_policy': {'range_pct': [40, 60],
+                                                      'basis': 'Underlying earnings, averaged across cycle; special '
+                                                               'dividends also enter payout numerator. Variable policy, no '
+                                                               'fixed growth promise.',
+                                                      'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026050377/rio-20260630_d2.htm'},
+                                  'fy2025_fcf': {'value': 4025,
+                                                 'unit': 'USD million',
+                                                 'period': 'FY2025',
+                                                 'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026009503/ye25-pressreleasex19feb.htm'},
+                                  'fy2025_declared_ordinary_dividends': {'value': 6500,
+                                                                         'unit': 'USD million approx',
+                                                                         'period': 'FY2025',
+                                                                         'source_url': 'https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm',
+                                                                         'note': 'Declared ordinary cash cost; larger than '
+                                                                                 'FY2025 FCF amid investment programme. Not '
+                                                                                 'a dividend/FCF paid-cash ratio.'}},
+                      'source_urls': ['https://www.sec.gov/Archives/edgar/data/887028/000162828026009531/R11.htm',
+                                      'https://www.sec.gov/Archives/edgar/data/863064/000162828026050377/rio-20260630_d2.htm'],
+                      'refresh_policy': 'Datiertes Emittenten-Research; bei neuer Berichtsperiode erneut prüfen. Aktuelle '
+                                        'Kurse, Dividendenhistorien und Renditen werden täglich aktualisiert.'},
+  'regular_dividend_reference': {'value': 4.65,
+                                 'currency': 'USD',
+                                 'as_of': '2026-11-20',
+                                 'kind': 'trailing_regular_cash_12m_not_a_forward_promise',
+                                 'source_urls': ['https://www.sec.gov/Archives/edgar/data/863064/000162828026009531/rio-20251231.htm',
+                                                 'https://www.sec.gov/Archives/edgar/data/863064/000162828026050377/rio-20260630_d2.htm']},
+  'hist_div': 7.396701068562776,
+  'reference_set': 'income-universe-2026',
+  'tranche_policy': 'individual_only',
+  'active_in_portfolios': False,
+  'prepared_for': 'future_custom_portfolio_simulation',
+  'logo': {'source_url': 'https://www.riotinto.com/-/media/project/riotinto/shared/favicon-32x32-new.png?rev=ca7eb2791f3040399e6332e59d664bbd',
+           'homepage': 'https://www.riotinto.com/',
+           'mime_type': 'image/png',
+           'data_uri': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAABmFBMVEXIIiLKLCzyysryzc3////KLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzIIiLKLCzIIiLKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzIIiLKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzIIiLKLCzKLCzIIiLKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzIIiLKLCzKLCzIIiLKLCzIIiLKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCzKLCwgYgPKAAAAh3RSTlMAAAAAAAECAwUICQoLDA0REhYWFxcYGhseICMkJSYnKCkqKzAyMzpBQkVJSUtMTU9QUlNVVldZWl9gYWNkZ2dpamxucHJzdHV2d3t9g4iKjY6Rk5aZmpqcnZ6foKKjpKWmqKutr7K6wsXGyMvN09TV19jZ2tze4ePk5ujp7/Hy8/T19vf6+/y7gbPLAAABa0lEQVQ4jXXT6VsBURQG8LlMSps2LZQkaVPatZP2fV8JbUobadEiIfFv55wxmol7Pt33Pr85M3fODMNKR10uJ5Z7b3naOtJTRzLFSFiGlR4kRRUPuE0FIlA+8538V556IWDIDmy+mzuN3eOOIAp/rQiYYe+Ou0h5gsIhAn2w5SvkRMkjpGijEPQLAVnDFgN0MIRglg5MCBbpYAyBiQ5OIb1WUEF7DJKNZIF73FJYQhA28rPB1/76pt3zBMu3KdEs0iBToQUlyQWeDc0tXZepRXhblhPgLBQ3sDyU5QLcKfQRWFvpgGzh6KvpQIstVuiAnEH4qKEDI551ng6KfZAeSunDWsIWw0LQKwKqT4hXMgGYxKNV8e/PCTHR9gfkXmzKT4gYEhAvMqDjlhtS3K7iQN45tmjlwVE8EktVOPozmG6hx1/tWp4GlQ1anU7XpNGoi/ibzGHL4zL+IbPLht9VcIIKiHrV6w+87ErYX7zzylL9XLMAAAAAAElFTkSuQmCC'},
+  'research_verified_at': '2026-11-21'},
+ {'name': 'Main Street Capital',
+  'ticker': 'MAIN',
+  'isin': 'US56035L1044',
+  'exchange': 'NYSE',
+  'currency': 'USD',
+  'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine ADR-/ADS-Umrechnung.',
+  'asset_type': 'stock',
+  'instrument_subtype': 'BDC',
+  'valuation_style': 'bdc_nav_and_nii',
+  'cluster': 'Private Credit / BDC',
+  'hist_pe': 10.013675214,
+  'hist_ps': None,
+  'hist_div': 7.016046212926522,
+  'field_metadata': {'hist_pe': {'provider': 'Emittentenberichte; Schlusskurse zusätzlich gegen Yahoo-Historie geprüft',
+                                 'validation_version': 1,
+                                 'label': '5J-Median · JE',
+                                 'source_label': 'US-GAAP · IR',
+                                 'accounting_basis': 'US GAAP; basic EPS = diluted EPS laut Note B.13',
+                                 'period': 'FY2021–FY2025',
+                                 'verified_at': '2026-11-21',
+                                 'sample_count': 5,
+                                 'window_count': 5,
+                                 'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                 'currency': 'USD',
+                                 'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                'ADR-/ADS-Umrechnung.',
+                                 'observations': [{'fiscal_year': 2021,
+                                                   'fiscal_end': '2021-12-31',
+                                                   'price_date': '2021-12-31',
+                                                   'close': 44.86,
+                                                   'diluted_eps': 4.8,
+                                                   'eps_unit': 'USD je Common Share',
+                                                   'nav_per_share': 25.29,
+                                                   'nii_per_share': 2.65,
+                                                   'dividends_per_share': 2.58,
+                                                   'pe': 9.345833333,
+                                                   'p_nav': 1.773823646,
+                                                   'p_nii': 16.928301887,
+                                                   'div_yield_pct': 5.751226037,
+                                                   'eps_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'price_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'nav_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'nii_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'currency': 'USD'},
+                                                  {'fiscal_year': 2022,
+                                                   'fiscal_end': '2022-12-31',
+                                                   'price_date': '2022-12-30',
+                                                   'close': 36.95,
+                                                   'diluted_eps': 3.24,
+                                                   'eps_unit': 'USD je Common Share',
+                                                   'nav_per_share': 26.86,
+                                                   'nii_per_share': 3.29,
+                                                   'dividends_per_share': 2.95,
+                                                   'pe': 11.404320988,
+                                                   'p_nav': 1.375651526,
+                                                   'p_nii': 11.23100304,
+                                                   'div_yield_pct': 7.98376184,
+                                                   'eps_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'price_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'nav_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'nii_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'currency': 'USD'},
+                                                  {'fiscal_year': 2023,
+                                                   'fiscal_end': '2023-12-31',
+                                                   'price_date': '2023-12-29',
+                                                   'close': 43.23,
+                                                   'diluted_eps': 5.23,
+                                                   'eps_unit': 'USD je Common Share',
+                                                   'nav_per_share': 29.2,
+                                                   'nii_per_share': 4.04,
+                                                   'dividends_per_share': 3.7,
+                                                   'pe': 8.265774379,
+                                                   'p_nav': 1.480479452,
+                                                   'p_nii': 10.70049505,
+                                                   'div_yield_pct': 8.558871154,
+                                                   'eps_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'price_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'nav_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'nii_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'currency': 'USD'},
+                                                  {'fiscal_year': 2024,
+                                                   'fiscal_end': '2024-12-31',
+                                                   'price_date': '2024-12-31',
+                                                   'close': 58.58,
+                                                   'diluted_eps': 5.85,
+                                                   'eps_unit': 'USD je Common Share',
+                                                   'nav_per_share': 31.65,
+                                                   'nii_per_share': 3.93,
+                                                   'dividends_per_share': 4.11,
+                                                   'pe': 10.013675214,
+                                                   'p_nav': 1.850868878,
+                                                   'p_nii': 14.905852417,
+                                                   'div_yield_pct': 7.016046432,
+                                                   'eps_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'price_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'nav_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'nii_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'currency': 'USD'},
+                                                  {'fiscal_year': 2025,
+                                                   'fiscal_end': '2025-12-31',
+                                                   'price_date': '2025-12-31',
+                                                   'close': 60.39,
+                                                   'diluted_eps': 5.52,
+                                                   'eps_unit': 'USD je Common Share',
+                                                   'nav_per_share': 33.33,
+                                                   'nii_per_share': 3.95,
+                                                   'dividends_per_share': 4.23,
+                                                   'pe': 10.940217391,
+                                                   'p_nav': 1.811881188,
+                                                   'p_nii': 15.288607595,
+                                                   'div_yield_pct': 7.004470939,
+                                                   'eps_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'price_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'nav_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'nii_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                   'currency': 'USD'}],
+                                 'comparable_to_current': True,
+                                 'fact_type': 'historical_year_end_pe_median',
+                                 'method': 'Median von fünf Jahresend-KGVs FY2021–FY2025: vom Emittenten veröffentlichter '
+                                           'unbereinigter Schlusskurs am letzten Handelstag des Geschäftsjahres in USD '
+                                           'dividiert durch US-GAAP diluted EPS des jeweiligen ganzen Geschäftsjahres in '
+                                           'USD je Common Share. Kein Dividendenabzug, keine Währungsumrechnung. '
+                                           'Nachträglich rekonstruierte Jahresend-Stichprobe; kein Mittel täglicher '
+                                           'TTM-KGVs und kein historisch handelbarer Backtest.',
+                                 'comparison_note': 'GAAP-Gewinne eines BDC enthalten realisierte und unrealisierte '
+                                                    'Bewertungsänderungen. Für Nachkäufe sind NAV und nachhaltige laufende '
+                                                    'Erträge aussagekräftiger; aktuelles TTM-KGV kann einen anderen '
+                                                    'Berichtszeitraum verwenden.',
+                                 'source_locator': '2025 Form 10-K, Note F Financial Highlights, p.175; Note B.13 Earnings '
+                                                   'Per Share, p.153.',
+                                 'reference_version': 1},
+                     'hist_div': {'reference_version': 1,
+                                  'provider': 'Yahoo Finance / datierte Emittentenprüfung',
+                                  'label': 'Hist. Div. 5J',
+                                  'accounting_basis': 'Ex-Tag-Barausschüttungen',
+                                  'currency': 'USD',
+                                  'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                 'ADR-/ADS-Umrechnung.',
+                                  'period': 'FY2021–FY2025',
+                                  'verified_at': '2026-11-21',
+                                  'sample_count': 5,
+                                  'window_count': 5,
+                                  'source_url': 'https://finance.yahoo.com/quote/MAIN/history/',
+                                  'observations': [{'fiscal_year': 2021,
+                                                    'price_date': '2021-12-31',
+                                                    'close': 44.86000061035156,
+                                                    'dividends_per_share': 2.575,
+                                                    'dividend_yield': 5.740080171567836,
+                                                    'currency': 'USD',
+                                                    'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                                   'ADR-/ADS-Umrechnung.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/MAIN/history/'},
+                                                   {'fiscal_year': 2022,
+                                                    'price_date': '2022-12-30',
+                                                    'close': 36.95000076293945,
+                                                    'dividends_per_share': 2.945,
+                                                    'dividend_yield': 7.970229876026987,
+                                                    'currency': 'USD',
+                                                    'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                                   'ADR-/ADS-Umrechnung.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/MAIN/history/'},
+                                                   {'fiscal_year': 2023,
+                                                    'price_date': '2023-12-29',
+                                                    'close': 43.22999954223633,
+                                                    'dividends_per_share': 3.695,
+                                                    'dividend_yield': 8.547305202698261,
+                                                    'currency': 'USD',
+                                                    'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                                   'ADR-/ADS-Umrechnung.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/MAIN/history/'},
+                                                   {'fiscal_year': 2024,
+                                                    'price_date': '2024-12-31',
+                                                    'close': 58.58000183105469,
+                                                    'dividends_per_share': 4.11,
+                                                    'dividend_yield': 7.016046212926522,
+                                                    'currency': 'USD',
+                                                    'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                                   'ADR-/ADS-Umrechnung.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/MAIN/history/'},
+                                                   {'fiscal_year': 2025,
+                                                    'price_date': '2025-12-31',
+                                                    'close': 60.38999938964844,
+                                                    'dividends_per_share': 4.23,
+                                                    'dividend_yield': 7.004471009690179,
+                                                    'currency': 'USD',
+                                                    'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                                   'ADR-/ADS-Umrechnung.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/MAIN/history/'}],
+                                  'method': 'Median der tatsächlichen 12M-Cash-Ausschüttungen nach Ex-Tag bis zum letzten '
+                                            'Jahreshandelsschluss geteilt durch diesen Kurs. Gemeldete Cash-Sonderzahlungen '
+                                            'enthalten; keine künftige Zusage. Bei O ist Orion-Sachdividende ausgeschlossen '
+                                            'und die synthetische 1,032-Rückrechnung aufgehoben.'},
+                     'ps_ratio': {'provider': 'Yahoo Finance',
+                                  'source_url': 'https://finance.yahoo.com/quote/MAIN/key-statistics/',
+                                  'role': 'informational_only',
+                                  'note': 'Kein primärer Kaufmaßstab für diesen Reservewert; historische Vergleichsbasis '
+                                          'nicht angesetzt. Sektorpassende Kennzahlen und Methoden stehen in '
+                                          'primary_valuation/valuation_references.'}},
+  'valuation_references': {'p_nav': {'provider': 'Emittentenberichte; Schlusskurse zusätzlich gegen Yahoo-Historie geprüft',
+                                     'validation_version': 1,
+                                     'label': '5J-Median · JE',
+                                     'source_label': 'US-GAAP · IR',
+                                     'accounting_basis': 'US GAAP',
+                                     'period': 'FY2021–FY2025',
+                                     'verified_at': '2026-11-21',
+                                     'sample_count': 5,
+                                     'window_count': 5,
+                                     'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                     'currency': 'USD',
+                                     'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                    'ADR-/ADS-Umrechnung.',
+                                     'observations': [{'fiscal_year': 2021,
+                                                       'fiscal_end': '2021-12-31',
+                                                       'price_date': '2021-12-31',
+                                                       'close': 44.86,
+                                                       'diluted_eps': 4.8,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 25.29,
+                                                       'nii_per_share': 2.65,
+                                                       'dividends_per_share': 2.58,
+                                                       'pe': 9.345833333,
+                                                       'p_nav': 1.773823646,
+                                                       'p_nii': 16.928301887,
+                                                       'div_yield_pct': 5.751226037,
+                                                       'eps_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'price_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nav_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nii_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2022,
+                                                       'fiscal_end': '2022-12-31',
+                                                       'price_date': '2022-12-30',
+                                                       'close': 36.95,
+                                                       'diluted_eps': 3.24,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 26.86,
+                                                       'nii_per_share': 3.29,
+                                                       'dividends_per_share': 2.95,
+                                                       'pe': 11.404320988,
+                                                       'p_nav': 1.375651526,
+                                                       'p_nii': 11.23100304,
+                                                       'div_yield_pct': 7.98376184,
+                                                       'eps_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'price_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nav_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nii_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2023,
+                                                       'fiscal_end': '2023-12-31',
+                                                       'price_date': '2023-12-29',
+                                                       'close': 43.23,
+                                                       'diluted_eps': 5.23,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 29.2,
+                                                       'nii_per_share': 4.04,
+                                                       'dividends_per_share': 3.7,
+                                                       'pe': 8.265774379,
+                                                       'p_nav': 1.480479452,
+                                                       'p_nii': 10.70049505,
+                                                       'div_yield_pct': 8.558871154,
+                                                       'eps_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'price_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nav_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nii_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2024,
+                                                       'fiscal_end': '2024-12-31',
+                                                       'price_date': '2024-12-31',
+                                                       'close': 58.58,
+                                                       'diluted_eps': 5.85,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 31.65,
+                                                       'nii_per_share': 3.93,
+                                                       'dividends_per_share': 4.11,
+                                                       'pe': 10.013675214,
+                                                       'p_nav': 1.850868878,
+                                                       'p_nii': 14.905852417,
+                                                       'div_yield_pct': 7.016046432,
+                                                       'eps_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'price_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nav_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nii_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2025,
+                                                       'fiscal_end': '2025-12-31',
+                                                       'price_date': '2025-12-31',
+                                                       'close': 60.39,
+                                                       'diluted_eps': 5.52,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 33.33,
+                                                       'nii_per_share': 3.95,
+                                                       'dividends_per_share': 4.23,
+                                                       'pe': 10.940217391,
+                                                       'p_nav': 1.811881188,
+                                                       'p_nii': 15.288607595,
+                                                       'div_yield_pct': 7.004470939,
+                                                       'eps_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'price_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nav_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nii_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'currency': 'USD'}],
+                                     'comparable_to_current': True,
+                                     'fact_type': 'historical_year_end_price_nav_median',
+                                     'method': 'Median der fünf Jahresendschlusskurse dividiert durch den jeweils gleich '
+                                               'datierten NAV je Common Share, USD/USD; Emittentenangaben, FY2021–FY2025.',
+                                     'median': 1.773823646},
+                           'p_nii': {'provider': 'Emittentenberichte; Schlusskurse zusätzlich gegen Yahoo-Historie geprüft',
+                                     'validation_version': 1,
+                                     'label': '5J-Median · JE',
+                                     'source_label': 'US-GAAP · IR',
+                                     'accounting_basis': 'US GAAP',
+                                     'period': 'FY2021–FY2025',
+                                     'verified_at': '2026-11-21',
+                                     'sample_count': 5,
+                                     'window_count': 5,
+                                     'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                     'currency': 'USD',
+                                     'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                    'ADR-/ADS-Umrechnung.',
+                                     'observations': [{'fiscal_year': 2021,
+                                                       'fiscal_end': '2021-12-31',
+                                                       'price_date': '2021-12-31',
+                                                       'close': 44.86,
+                                                       'diluted_eps': 4.8,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 25.29,
+                                                       'nii_per_share': 2.65,
+                                                       'dividends_per_share': 2.58,
+                                                       'pe': 9.345833333,
+                                                       'p_nav': 1.773823646,
+                                                       'p_nii': 16.928301887,
+                                                       'div_yield_pct': 5.751226037,
+                                                       'eps_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'price_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nav_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nii_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2022,
+                                                       'fiscal_end': '2022-12-31',
+                                                       'price_date': '2022-12-30',
+                                                       'close': 36.95,
+                                                       'diluted_eps': 3.24,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 26.86,
+                                                       'nii_per_share': 3.29,
+                                                       'dividends_per_share': 2.95,
+                                                       'pe': 11.404320988,
+                                                       'p_nav': 1.375651526,
+                                                       'p_nii': 11.23100304,
+                                                       'div_yield_pct': 7.98376184,
+                                                       'eps_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'price_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nav_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nii_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2023,
+                                                       'fiscal_end': '2023-12-31',
+                                                       'price_date': '2023-12-29',
+                                                       'close': 43.23,
+                                                       'diluted_eps': 5.23,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 29.2,
+                                                       'nii_per_share': 4.04,
+                                                       'dividends_per_share': 3.7,
+                                                       'pe': 8.265774379,
+                                                       'p_nav': 1.480479452,
+                                                       'p_nii': 10.70049505,
+                                                       'div_yield_pct': 8.558871154,
+                                                       'eps_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'price_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nav_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nii_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2024,
+                                                       'fiscal_end': '2024-12-31',
+                                                       'price_date': '2024-12-31',
+                                                       'close': 58.58,
+                                                       'diluted_eps': 5.85,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 31.65,
+                                                       'nii_per_share': 3.93,
+                                                       'dividends_per_share': 4.11,
+                                                       'pe': 10.013675214,
+                                                       'p_nav': 1.850868878,
+                                                       'p_nii': 14.905852417,
+                                                       'div_yield_pct': 7.016046432,
+                                                       'eps_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'price_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nav_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nii_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2025,
+                                                       'fiscal_end': '2025-12-31',
+                                                       'price_date': '2025-12-31',
+                                                       'close': 60.39,
+                                                       'diluted_eps': 5.52,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 33.33,
+                                                       'nii_per_share': 3.95,
+                                                       'dividends_per_share': 4.23,
+                                                       'pe': 10.940217391,
+                                                       'p_nav': 1.811881188,
+                                                       'p_nii': 15.288607595,
+                                                       'div_yield_pct': 7.004470939,
+                                                       'eps_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'price_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nav_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'nii_source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'source_url': 'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                                                       'currency': 'USD'}],
+                                     'comparable_to_current': True,
+                                     'fact_type': 'historical_year_end_price_nii_median',
+                                     'method': 'Median der fünf Jahresendschlusskurse dividiert durch den veröffentlichten '
+                                               'gewichteten basic NII je Common Share des ganzen Geschäftsjahres, USD/USD. '
+                                               'Einheitlich die NII-Werte des Financial-Highlights-Tables im 2025-10-K; '
+                                               'kein DNII und kein Core EPS.',
+                                     'comparison_note': 'NII ist laufender Nettoinvestmentertrag und schließt '
+                                                        'Bewertungsänderungen aus. Der Nenner ist basic NII; die '
+                                                        'KGV-Referenz verwendet diluted GAAP EPS. Diese Reihen sind separat '
+                                                        'benannt und nicht austauschbar.',
+                                     'median': 14.905852417}},
+  'identity_sources': ['https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm',
+                       'https://www.boerse-stuttgart.de/en/products/equities/stuttgart/a0x8y3-main-street-cap-cp-dl--01'],
+  'buy_trigger': 'P/NAV ≤ 1,5× und DNII deckt die Basisdividende ≥ 1,1×',
+  'buy_trigger_rationale': 'Vorschlag: Die interne Verwaltung, niedrige Kosten und Equity-Beteiligungen können einen '
+                           'NAV-Aufschlag begründen. Ein Limit von 1,5× NAV verlangt dennoch einen Abschlag zur '
+                           'rekonstruierten 5J-Jahresend-Medianbewertung; mindestens 1,1× DNII-Deckung gibt der regulären '
+                           'Dividende einen Puffer. Die Schwellen sind eigene Vorschläge, kein belegtes Optimum oder '
+                           'Backtest. Sonderausschüttungen separat behandeln.',
+  'buy_trigger_sources': ['https://www.mainstcapital.com/investors/news-events/press-releases/detail/2775/main-street-announces-third-quarter-2026-results',
+                          'https://www.mainstcapital.com/investors/news-events/press-releases/detail/2774/main-street-announces-first-quarter-2027-regular-monthly',
+                          'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000161/q32026maininvestorlender.htm',
+                          'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000016/main-20251231.htm'],
+  'buy_trigger_type': 'proposal',
+  'dividend_policy': {'as_of': '2026-11-03',
+                      'regular_frequency': 'monthly',
+                      'regular_latest_declared_per_payment': 0.27,
+                      'regular_latest_declared_payments': ['2027-01-15', '2027-02-12', '2027-03-15'],
+                      'regular_latest_declared_quarterly_total': 0.81,
+                      'regular_forward_annualized': 3.24,
+                      'regular_current_q4_2026_per_payment': 0.265,
+                      'regular_current_q4_2026_quarterly_total': 0.795,
+                      'supplemental_latest_declared': 0.3,
+                      'supplemental_latest_payment_date': '2026-12-28',
+                      'supplemental_guaranteed': False,
+                      'dnii_latest_declared_regular_quarter_coverage': 1.185185185,
+                      'nii_latest_declared_regular_quarter_coverage': 1.098765432,
+                      'source_url': 'https://www.mainstcapital.com/investors/news-events/press-releases/detail/2774/main-street-announces-first-quarter-2027-regular-monthly',
+                      'simulation_note': 'Für eine vorsichtige wiederkehrende Dividendensimulation reguläre Dividende und '
+                                         'Supplements getrennt führen. 3,24 USD ist eine Annualisierung des zuletzt '
+                                         'deklarierten Monatsbetrags, keine Jahresgarantie; weitere Supplements nicht als '
+                                         'zugesichert ansetzen. Ein historisches Ausschüttungs-CAGR inklusive Supplements '
+                                         'ausdrücklich als solches markieren.'},
+  'financial_currency': 'USD',
+  'quote_currency': 'USD',
+  'primary_valuation': 'p_nav',
+  'issuer_snapshot': {'as_of': '2026-09-30',
+                      'published_at': '2026-11-05',
+                      'verified_at': '2026-11-21',
+                      'currency': 'USD',
+                      'metrics': {'as_of': '2026-09-30',
+                                  'released_at': '2026-11-05',
+                                  'verified_at': '2026-11-21',
+                                  'currency': 'USD',
+                                  'period': 'Q3 2026',
+                                  'net_investment_income_usd': 83823000,
+                                  'nii_per_share': 0.89,
+                                  'distributable_nii_usd': 89937000,
+                                  'distributable_nii_per_share': 0.96,
+                                  'distributable_nii_before_tax_per_share': 0.98,
+                                  'gaap_eps': 1.25,
+                                  'nav_per_share': 34.22,
+                                  'regular_dividend_paid_in_period': 0.795,
+                                  'supplemental_dividend_paid_in_period': 0.3,
+                                  'total_dividend_paid_in_period': 1.095,
+                                  'dnii_regular_dividend_coverage': 1.20754717,
+                                  'dnii_total_dividend_coverage': 0.876712329,
+                                  'nii_regular_dividend_coverage': 1.119496855,
+                                  'debt_nav_ratio': 0.81,
+                                  'regulatory_debt_nav_ratio': 0.7,
+                                  'net_debt_nav_ratio': 0.78,
+                                  'interest_coverage_ratio': 3.66,
+                                  'nonaccrual_fair_value_pct': 0.9,
+                                  'nonaccrual_cost_pct': 3.5,
+                                  'ttm_operating_expenses_to_assets_pct': 1.3,
+                                  'ttm_roe_pct': 14.4,
+                                  'sources': ['https://www.mainstcapital.com/investors/news-events/press-releases/detail/2775/main-street-announces-third-quarter-2026-results',
+                                              'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000161/q32026maininvestorlender.htm'],
+                                  'notes': ['DNII ist eine vom Unternehmen definierte Non-GAAP-Größe; sie addiert nicht '
+                                            'zahlungswirksame Vergütungsaufwendungen zum NII hinzu.',
+                                            'Die 0,96 USD DNII deckten die Q3-Basisdividende 1,208×, die vollständige '
+                                            'Ausschüttung inklusive Supplement aber nur 0,877×. Supplements können unter '
+                                            'anderem durch realisierte Gewinne und zuvor einbehaltenes steuerpflichtiges '
+                                            'Einkommen finanziert werden.',
+                                            'Nicht börsennotierte Mittelstandskredite und Equity-Investments beinhalten '
+                                            'Kredit-, Bewertungs- und Liquiditätsrisiken; der hohe NAV-Aufschlag kann '
+                                            'schrumpfen.']},
+                      'source_urls': ['https://www.mainstcapital.com/investors/news-events/press-releases/detail/2775/main-street-announces-third-quarter-2026-results',
+                                      'https://www.mainstcapital.com/investors/sec-filings/all-sec-filings/content/0001396440-26-000161/q32026maininvestorlender.htm'],
+                      'refresh_policy': 'Datiertes Emittenten-Research; bei neuer Berichtsperiode erneut prüfen. Aktuelle '
+                                        'Kurse, Dividendenhistorien und Renditen werden täglich aktualisiert.'},
+  'hist_ps_not_used': 'KUV ist für einen kreditinvestierenden BDC keine sinnvolle Nachkauf-Referenz; NAV und NII werden als '
+                      'passende ergänzende Bewertungsgrößen vollständig rekonstruiert.',
+  'regular_dividend_reference': {'value': 3.24,
+                                 'currency': 'USD',
+                                 'as_of': '2026-11-03',
+                                 'kind': 'latest_declared_payment_annualized_not_guaranteed',
+                                 'source_url': 'https://www.mainstcapital.com/investors/news-events/press-releases/detail/2774/main-street-announces-first-quarter-2027-regular-monthly'},
+  'reference_set': 'income-universe-2026',
+  'tranche_policy': 'individual_only',
+  'active_in_portfolios': False,
+  'prepared_for': 'future_custom_portfolio_simulation',
+  'logo': {'source_url': 'https://d1io3yog0oux5.cloudfront.net/_a4e908e41eed2a06e52395a353a7ea8f/mainstcapital/files/theme/images/favicons/apple-touch-icon.png',
+           'homepage': 'https://www.mainstcapital.com/',
+           'mime_type': 'image/png',
+           'data_uri': 'data:image/png;base64,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'},
+  'research_verified_at': '2026-11-21'},
+ {'name': 'Ares Capital',
+  'ticker': 'ARCC',
+  'isin': 'US04010L1035',
+  'exchange': 'NASDAQ Global Select',
+  'currency': 'USD',
+  'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine ADR-/ADS-Umrechnung.',
+  'asset_type': 'stock',
+  'instrument_subtype': 'BDC',
+  'valuation_style': 'bdc_nav_and_nii',
+  'cluster': 'Private Credit / BDC',
+  'hist_pe': 8.971311475,
+  'hist_ps': None,
+  'hist_div': 9.490855380354365,
+  'field_metadata': {'hist_pe': {'provider': 'Emittentenberichte; Schlusskurse zusätzlich gegen Yahoo-Historie geprüft',
+                                 'validation_version': 1,
+                                 'label': '5J-Median · JE',
+                                 'source_label': 'US-GAAP · IR',
+                                 'accounting_basis': 'US GAAP diluted EPS; Convertible-Note-Verwässerung in 2022/2023 '
+                                                     'berücksichtigt',
+                                 'period': 'FY2021–FY2025',
+                                 'verified_at': '2026-11-21',
+                                 'sample_count': 5,
+                                 'window_count': 5,
+                                 'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                 'currency': 'USD',
+                                 'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                'ADR-/ADS-Umrechnung.',
+                                 'observations': [{'fiscal_year': 2021,
+                                                   'fiscal_end': '2021-12-31',
+                                                   'price_date': '2021-12-31',
+                                                   'close': 21.19,
+                                                   'diluted_eps': 3.51,
+                                                   'eps_unit': 'USD je Common Share',
+                                                   'nav_per_share': 18.96,
+                                                   'nii_per_share': 1.66,
+                                                   'dividends_per_share': 1.62,
+                                                   'pe': 6.037037037,
+                                                   'p_nav': 1.117616034,
+                                                   'p_nii': 12.765060241,
+                                                   'div_yield_pct': 7.645115621,
+                                                   'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775024000011/arcc-20231231.htm',
+                                                   'price_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'nav_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'nii_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'currency': 'USD'},
+                                                  {'fiscal_year': 2022,
+                                                   'fiscal_end': '2022-12-31',
+                                                   'price_date': '2022-12-30',
+                                                   'close': 18.47,
+                                                   'diluted_eps': 1.19,
+                                                   'eps_unit': 'USD je Common Share',
+                                                   'nav_per_share': 18.4,
+                                                   'nii_per_share': 2.19,
+                                                   'dividends_per_share': 1.87,
+                                                   'pe': 15.521008403,
+                                                   'p_nav': 1.003804348,
+                                                   'p_nii': 8.433789954,
+                                                   'div_yield_pct': 10.124526259,
+                                                   'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775024000011/arcc-20231231.htm',
+                                                   'price_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'nav_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'nii_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'currency': 'USD'},
+                                                  {'fiscal_year': 2023,
+                                                   'fiscal_end': '2023-12-31',
+                                                   'price_date': '2023-12-29',
+                                                   'close': 20.03,
+                                                   'diluted_eps': 2.68,
+                                                   'eps_unit': 'USD je Common Share',
+                                                   'nav_per_share': 19.24,
+                                                   'nii_per_share': 2.27,
+                                                   'dividends_per_share': 1.92,
+                                                   'pe': 7.473880597,
+                                                   'p_nav': 1.041060291,
+                                                   'p_nii': 8.823788546,
+                                                   'div_yield_pct': 9.585621568,
+                                                   'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'price_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'nav_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'nii_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'currency': 'USD'},
+                                                  {'fiscal_year': 2024,
+                                                   'fiscal_end': '2024-12-31',
+                                                   'price_date': '2024-12-31',
+                                                   'close': 21.89,
+                                                   'diluted_eps': 2.44,
+                                                   'eps_unit': 'USD je Common Share',
+                                                   'nav_per_share': 19.89,
+                                                   'nii_per_share': 2.3,
+                                                   'dividends_per_share': 1.92,
+                                                   'pe': 8.971311475,
+                                                   'p_nav': 1.100553042,
+                                                   'p_nii': 9.517391304,
+                                                   'div_yield_pct': 8.771128369,
+                                                   'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'price_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'nav_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'nii_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'currency': 'USD'},
+                                                  {'fiscal_year': 2025,
+                                                   'fiscal_end': '2025-12-31',
+                                                   'price_date': '2025-12-31',
+                                                   'close': 20.23,
+                                                   'diluted_eps': 1.86,
+                                                   'eps_unit': 'USD je Common Share',
+                                                   'nav_per_share': 19.94,
+                                                   'nii_per_share': 2.02,
+                                                   'dividends_per_share': 1.92,
+                                                   'pe': 10.876344086,
+                                                   'p_nav': 1.014543631,
+                                                   'p_nii': 10.014851485,
+                                                   'div_yield_pct': 9.490855166,
+                                                   'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'price_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'nav_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'nii_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                   'currency': 'USD'}],
+                                 'comparable_to_current': True,
+                                 'fact_type': 'historical_year_end_pe_median',
+                                 'method': 'Median von fünf Jahresend-KGVs FY2021–FY2025: vom Emittenten veröffentlichter '
+                                           'unbereinigter Schlusskurs am letzten Handelstag des Geschäftsjahres in USD '
+                                           'dividiert durch US-GAAP diluted EPS des jeweiligen ganzen Geschäftsjahres in '
+                                           'USD je Common Share. Kein Dividendenabzug, keine Währungsumrechnung. '
+                                           'Nachträglich rekonstruierte Jahresend-Stichprobe; kein Mittel täglicher '
+                                           'TTM-KGVs und kein historisch handelbarer Backtest.',
+                                 'comparison_note': 'GAAP-Gewinne eines BDC enthalten realisierte und unrealisierte '
+                                                    'Bewertungsänderungen. Für Nachkäufe sind NAV und nachhaltige laufende '
+                                                    'Erträge aussagekräftiger; aktuelles TTM-KGV kann einen anderen '
+                                                    'Berichtszeitraum verwenden.',
+                                 'source_locator': '2025 Form 10-K Note 10 Earnings per Share, F-198 (PDF p.312); 2023 Form '
+                                                   '10-K Note 10 für FY2021/2022. Kurs/NAV aus Note 14 Financial '
+                                                   'Highlights, F-203 (PDF p.317).',
+                                 'source_mirror_url': 'https://materials.proxyvote.com/Approved/04010L/20260302/10K_625711.PDF',
+                                 'method_caveat': 'Die Financial-Highlights-Zeile Net increase in stockholders equity '
+                                                  'resulting from operations ist eine NAV-Brücke und weicht vom echten GAAP '
+                                                  'EPS ab. Hier wird ausdrücklich der diluted EPS aus Note 10 verwendet '
+                                                  '(2021 3,51; 2022 1,19; 2023 2,68; 2024 2,44; 2025 1,86 USD).',
+                                 'reference_version': 1},
+                     'hist_div': {'reference_version': 1,
+                                  'provider': 'Yahoo Finance / datierte Emittentenprüfung',
+                                  'label': 'Hist. Div. 5J',
+                                  'accounting_basis': 'Ex-Tag-Barausschüttungen',
+                                  'currency': 'USD',
+                                  'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                 'ADR-/ADS-Umrechnung.',
+                                  'period': 'FY2021–FY2025',
+                                  'verified_at': '2026-11-21',
+                                  'sample_count': 5,
+                                  'window_count': 5,
+                                  'source_url': 'https://finance.yahoo.com/quote/ARCC/history/',
+                                  'observations': [{'fiscal_year': 2021,
+                                                    'price_date': '2021-12-31',
+                                                    'close': 21.190000534057617,
+                                                    'dividends_per_share': 1.62,
+                                                    'dividend_yield': 7.6451154278937175,
+                                                    'currency': 'USD',
+                                                    'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                                   'ADR-/ADS-Umrechnung.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/ARCC/history/'},
+                                                   {'fiscal_year': 2022,
+                                                    'price_date': '2022-12-30',
+                                                    'close': 18.469999313354492,
+                                                    'dividends_per_share': 1.87,
+                                                    'dividend_yield': 10.12452663519008,
+                                                    'currency': 'USD',
+                                                    'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                                   'ADR-/ADS-Umrechnung.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/ARCC/history/'},
+                                                   {'fiscal_year': 2023,
+                                                    'price_date': '2023-12-29',
+                                                    'close': 20.030000686645508,
+                                                    'dividends_per_share': 1.92,
+                                                    'dividend_yield': 9.585621239045244,
+                                                    'currency': 'USD',
+                                                    'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                                   'ADR-/ADS-Umrechnung.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/ARCC/history/'},
+                                                   {'fiscal_year': 2024,
+                                                    'price_date': '2024-12-31',
+                                                    'close': 21.88999938964844,
+                                                    'dividends_per_share': 1.92,
+                                                    'dividend_yield': 8.771128613680768,
+                                                    'currency': 'USD',
+                                                    'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                                   'ADR-/ADS-Umrechnung.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/ARCC/history/'},
+                                                   {'fiscal_year': 2025,
+                                                    'price_date': '2025-12-31',
+                                                    'close': 20.229999542236328,
+                                                    'dividends_per_share': 1.92,
+                                                    'dividend_yield': 9.490855380354365,
+                                                    'currency': 'USD',
+                                                    'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                                   'ADR-/ADS-Umrechnung.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/ARCC/history/'}],
+                                  'method': 'Median der tatsächlichen 12M-Cash-Ausschüttungen nach Ex-Tag bis zum letzten '
+                                            'Jahreshandelsschluss geteilt durch diesen Kurs. Gemeldete Cash-Sonderzahlungen '
+                                            'enthalten; keine künftige Zusage. Bei O ist Orion-Sachdividende ausgeschlossen '
+                                            'und die synthetische 1,032-Rückrechnung aufgehoben.'},
+                     'ps_ratio': {'provider': 'Yahoo Finance',
+                                  'source_url': 'https://finance.yahoo.com/quote/ARCC/key-statistics/',
+                                  'role': 'informational_only',
+                                  'note': 'Kein primärer Kaufmaßstab für diesen Reservewert; historische Vergleichsbasis '
+                                          'nicht angesetzt. Sektorpassende Kennzahlen und Methoden stehen in '
+                                          'primary_valuation/valuation_references.'}},
+  'valuation_references': {'p_nav': {'provider': 'Emittentenberichte; Schlusskurse zusätzlich gegen Yahoo-Historie geprüft',
+                                     'validation_version': 1,
+                                     'label': '5J-Median · JE',
+                                     'source_label': 'US-GAAP · IR',
+                                     'accounting_basis': 'US GAAP',
+                                     'period': 'FY2021–FY2025',
+                                     'verified_at': '2026-11-21',
+                                     'sample_count': 5,
+                                     'window_count': 5,
+                                     'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                     'currency': 'USD',
+                                     'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                    'ADR-/ADS-Umrechnung.',
+                                     'observations': [{'fiscal_year': 2021,
+                                                       'fiscal_end': '2021-12-31',
+                                                       'price_date': '2021-12-31',
+                                                       'close': 21.19,
+                                                       'diluted_eps': 3.51,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 18.96,
+                                                       'nii_per_share': 1.66,
+                                                       'dividends_per_share': 1.62,
+                                                       'pe': 6.037037037,
+                                                       'p_nav': 1.117616034,
+                                                       'p_nii': 12.765060241,
+                                                       'div_yield_pct': 7.645115621,
+                                                       'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775024000011/arcc-20231231.htm',
+                                                       'price_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nav_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nii_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2022,
+                                                       'fiscal_end': '2022-12-31',
+                                                       'price_date': '2022-12-30',
+                                                       'close': 18.47,
+                                                       'diluted_eps': 1.19,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 18.4,
+                                                       'nii_per_share': 2.19,
+                                                       'dividends_per_share': 1.87,
+                                                       'pe': 15.521008403,
+                                                       'p_nav': 1.003804348,
+                                                       'p_nii': 8.433789954,
+                                                       'div_yield_pct': 10.124526259,
+                                                       'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775024000011/arcc-20231231.htm',
+                                                       'price_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nav_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nii_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2023,
+                                                       'fiscal_end': '2023-12-31',
+                                                       'price_date': '2023-12-29',
+                                                       'close': 20.03,
+                                                       'diluted_eps': 2.68,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 19.24,
+                                                       'nii_per_share': 2.27,
+                                                       'dividends_per_share': 1.92,
+                                                       'pe': 7.473880597,
+                                                       'p_nav': 1.041060291,
+                                                       'p_nii': 8.823788546,
+                                                       'div_yield_pct': 9.585621568,
+                                                       'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'price_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nav_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nii_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2024,
+                                                       'fiscal_end': '2024-12-31',
+                                                       'price_date': '2024-12-31',
+                                                       'close': 21.89,
+                                                       'diluted_eps': 2.44,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 19.89,
+                                                       'nii_per_share': 2.3,
+                                                       'dividends_per_share': 1.92,
+                                                       'pe': 8.971311475,
+                                                       'p_nav': 1.100553042,
+                                                       'p_nii': 9.517391304,
+                                                       'div_yield_pct': 8.771128369,
+                                                       'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'price_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nav_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nii_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2025,
+                                                       'fiscal_end': '2025-12-31',
+                                                       'price_date': '2025-12-31',
+                                                       'close': 20.23,
+                                                       'diluted_eps': 1.86,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 19.94,
+                                                       'nii_per_share': 2.02,
+                                                       'dividends_per_share': 1.92,
+                                                       'pe': 10.876344086,
+                                                       'p_nav': 1.014543631,
+                                                       'p_nii': 10.014851485,
+                                                       'div_yield_pct': 9.490855166,
+                                                       'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'price_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nav_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nii_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'currency': 'USD'}],
+                                     'comparable_to_current': True,
+                                     'fact_type': 'historical_year_end_price_nav_median',
+                                     'method': 'Median der fünf Jahresendschlusskurse dividiert durch den jeweils gleich '
+                                               'datierten NAV je Common Share, USD/USD; Emittentenangaben, FY2021–FY2025.',
+                                     'median': 1.041060291},
+                           'p_nii': {'provider': 'Emittentenberichte; Schlusskurse zusätzlich gegen Yahoo-Historie geprüft',
+                                     'validation_version': 1,
+                                     'label': '5J-Median · JE',
+                                     'source_label': 'US-GAAP · IR',
+                                     'accounting_basis': 'US GAAP',
+                                     'period': 'FY2021–FY2025',
+                                     'verified_at': '2026-11-21',
+                                     'sample_count': 5,
+                                     'window_count': 5,
+                                     'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                     'currency': 'USD',
+                                     'share_basis': 'Eine an der US-Heimatbörse notierte Common Share; keine '
+                                                    'ADR-/ADS-Umrechnung.',
+                                     'observations': [{'fiscal_year': 2021,
+                                                       'fiscal_end': '2021-12-31',
+                                                       'price_date': '2021-12-31',
+                                                       'close': 21.19,
+                                                       'diluted_eps': 3.51,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 18.96,
+                                                       'nii_per_share': 1.66,
+                                                       'dividends_per_share': 1.62,
+                                                       'pe': 6.037037037,
+                                                       'p_nav': 1.117616034,
+                                                       'p_nii': 12.765060241,
+                                                       'div_yield_pct': 7.645115621,
+                                                       'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775024000011/arcc-20231231.htm',
+                                                       'price_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nav_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nii_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2022,
+                                                       'fiscal_end': '2022-12-31',
+                                                       'price_date': '2022-12-30',
+                                                       'close': 18.47,
+                                                       'diluted_eps': 1.19,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 18.4,
+                                                       'nii_per_share': 2.19,
+                                                       'dividends_per_share': 1.87,
+                                                       'pe': 15.521008403,
+                                                       'p_nav': 1.003804348,
+                                                       'p_nii': 8.433789954,
+                                                       'div_yield_pct': 10.124526259,
+                                                       'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775024000011/arcc-20231231.htm',
+                                                       'price_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nav_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nii_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2023,
+                                                       'fiscal_end': '2023-12-31',
+                                                       'price_date': '2023-12-29',
+                                                       'close': 20.03,
+                                                       'diluted_eps': 2.68,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 19.24,
+                                                       'nii_per_share': 2.27,
+                                                       'dividends_per_share': 1.92,
+                                                       'pe': 7.473880597,
+                                                       'p_nav': 1.041060291,
+                                                       'p_nii': 8.823788546,
+                                                       'div_yield_pct': 9.585621568,
+                                                       'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'price_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nav_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nii_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2024,
+                                                       'fiscal_end': '2024-12-31',
+                                                       'price_date': '2024-12-31',
+                                                       'close': 21.89,
+                                                       'diluted_eps': 2.44,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 19.89,
+                                                       'nii_per_share': 2.3,
+                                                       'dividends_per_share': 1.92,
+                                                       'pe': 8.971311475,
+                                                       'p_nav': 1.100553042,
+                                                       'p_nii': 9.517391304,
+                                                       'div_yield_pct': 8.771128369,
+                                                       'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'price_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nav_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nii_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'currency': 'USD'},
+                                                      {'fiscal_year': 2025,
+                                                       'fiscal_end': '2025-12-31',
+                                                       'price_date': '2025-12-31',
+                                                       'close': 20.23,
+                                                       'diluted_eps': 1.86,
+                                                       'eps_unit': 'USD je Common Share',
+                                                       'nav_per_share': 19.94,
+                                                       'nii_per_share': 2.02,
+                                                       'dividends_per_share': 1.92,
+                                                       'pe': 10.876344086,
+                                                       'p_nav': 1.014543631,
+                                                       'p_nii': 10.014851485,
+                                                       'div_yield_pct': 9.490855166,
+                                                       'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'price_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nav_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'nii_source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'source_url': 'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                                                       'currency': 'USD'}],
+                                     'comparable_to_current': True,
+                                     'fact_type': 'historical_year_end_price_nii_median',
+                                     'method': 'Median der fünf Jahresendschlusskurse dividiert durch den veröffentlichten '
+                                               'gewichteten basic NII je Common Share des ganzen Geschäftsjahres, USD/USD. '
+                                               'Einheitlich die NII-Werte des Financial-Highlights-Tables im 2025-10-K; '
+                                               'kein DNII und kein Core EPS.',
+                                     'comparison_note': 'NII ist laufender Nettoinvestmentertrag und schließt '
+                                                        'Bewertungsänderungen aus. Der Nenner ist basic NII; die '
+                                                        'KGV-Referenz verwendet diluted GAAP EPS. Diese Reihen sind separat '
+                                                        'benannt und nicht austauschbar.',
+                                     'median': 9.517391304}},
+  'identity_sources': ['https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm',
+                       'https://www.quotrix.de/dokument-download/quotrix/kursblatt/Kursblatt-Quotrix-2026.04.28.pdf'],
+  'buy_trigger': 'P/NAV ≤ 1,0× und NII deckt die Dividende ≥ 1,05×',
+  'buy_trigger_rationale': 'Vorschlag: Für den extern verwalteten Direct-Lending-BDC ist NAV eine passendere Kaufreferenz '
+                           'als KGV allein. Höchstens Buchwert und mindestens 5 % Puffer zwischen laufendem NII und '
+                           'regulärer Quartalsdividende verbinden Bewertung und Ausschüttungsdeckung. Aktuell fehlt dieser '
+                           'NII-Puffer. Eigene Schwellen, kein nachgewiesenes Optimum oder Backtest.',
+  'buy_trigger_sources': ['https://arcc.ares.com/news/ares-capital-corporation-announces-september-30-2026-financial-results-and-declares-fourth-quarter-2026-dividend/0bf958ac-18eb-4a60-9868-fa8914e548a8',
+                          'https://www.sec.gov/Archives/edgar/data/1287750/000128775026000006/arcc-20251231.htm'],
+  'buy_trigger_type': 'proposal',
+  'dividend_policy': {'as_of': '2026-10-27',
+                      'regular_frequency': 'quarterly',
+                      'regular_latest_declared_per_payment': 0.48,
+                      'regular_latest_declared_payments': ['2026-12-29'],
+                      'regular_forward_annualized': 1.92,
+                      'supplemental_latest_declared': 0,
+                      'source_url': 'https://arcc.ares.com/news/ares-capital-corporation-announces-september-30-2026-financial-results-and-declares-fourth-quarter-2026-dividend/0bf958ac-18eb-4a60-9868-fa8914e548a8',
+                      'simulation_note': '1,92 USD annualisiert die zuletzt erklärte Quartalsdividende; keine Garantie für '
+                                         'vier künftige Quartale. In der Historie gab es zusätzliche Ausschüttungen; '
+                                         'Gesamtdividenden-CAGR darf nicht als garantierte reguläre Steigerungsrate '
+                                         'erscheinen.'},
+  'financial_currency': 'USD',
+  'quote_currency': 'USD',
+  'primary_valuation': 'p_nav',
+  'issuer_snapshot': {'as_of': '2026-09-30',
+                      'published_at': '2026-10-27',
+                      'verified_at': '2026-11-21',
+                      'currency': 'USD',
+                      'metrics': {'as_of': '2026-09-30',
+                                  'released_at': '2026-10-27',
+                                  'verified_at': '2026-11-21',
+                                  'currency': 'USD',
+                                  'period': 'Q3 2026',
+                                  'net_investment_income_usd': 328000000,
+                                  'nii_per_share': 0.46,
+                                  'core_eps': 0.46,
+                                  'gaap_eps': 0.44,
+                                  'nav_per_share': 19.31,
+                                  'nav_previous_year_end': 19.94,
+                                  'nav_ytd_change_pct': -3.159478435,
+                                  'regular_dividend_paid_in_period': 0.48,
+                                  'supplemental_dividend_paid_in_period': 0,
+                                  'total_dividend_paid_in_period': 0.48,
+                                  'nii_regular_dividend_coverage': 0.958333333,
+                                  'core_eps_regular_dividend_coverage': 0.958333333,
+                                  'debt_equity_ratio': 1.11,
+                                  'net_debt_equity_ratio': 1.06,
+                                  'nonaccrual_fair_value_pct': 1.4,
+                                  'nonaccrual_cost_pct': 2.4,
+                                  'nonaccrual_previous_year_end_fair_value_pct': 1.2,
+                                  'nonaccrual_previous_year_end_cost_pct': 1.8,
+                                  'portfolio_fair_value_usd': 29213000000,
+                                  'portfolio_company_count': 636,
+                                  'first_lien_fair_value_pct': 58,
+                                  'floating_rate_fair_value_pct': 70,
+                                  'sources': ['https://arcc.ares.com/news/ares-capital-corporation-announces-september-30-2026-financial-results-and-declares-fourth-quarter-2026-dividend/0bf958ac-18eb-4a60-9868-fa8914e548a8'],
+                                  'notes': ['Die Q3-Dividende von 0,48 USD war durch Q3-NII/Core EPS von 0,46 USD nur zu '
+                                            '95,8 % gedeckt. Eine Unterdeckung in einem Quartal beweist keine unmittelbar '
+                                            'bevorstehende Kürzung, rechtfertigt aber keinen ungeprüften positiven '
+                                            'Qualitätsstatus.',
+                                            'NAV je Aktie lag rund 3,16 % unter Ende 2025, Nonaccrual-Anteile über Ende '
+                                            '2025. Hohe laufende Rendite ersetzt keine Kreditqualitätsprüfung.',
+                                            'Core EPS ist eine Non-GAAP-Kennzahl, die realisierte/unrealisierte Gewinne und '
+                                            'Verluste sowie zugehörige Gebühren und Steuern ausklammert. Für diese Deckung '
+                                            'wird explizit der ebenfalls veröffentlichte NII verwendet.',
+                                            'Externe Verwaltung, private Kreditnehmer, variabel verzinste Kredite und '
+                                            'Fremdfinanzierung erzeugen Kredit-, Zins-, Gebühren- und Bewertungsrisiken.']},
+                      'source_urls': ['https://arcc.ares.com/news/ares-capital-corporation-announces-september-30-2026-financial-results-and-declares-fourth-quarter-2026-dividend/0bf958ac-18eb-4a60-9868-fa8914e548a8'],
+                      'refresh_policy': 'Datiertes Emittenten-Research; bei neuer Berichtsperiode erneut prüfen. Aktuelle '
+                                        'Kurse, Dividendenhistorien und Renditen werden täglich aktualisiert.'},
+  'hist_ps_not_used': 'KUV ist für einen kreditinvestierenden BDC keine sinnvolle Nachkauf-Referenz; NAV und NII werden als '
+                      'passende ergänzende Bewertungsgrößen vollständig rekonstruiert.',
+  'regular_dividend_reference': {'value': 1.92,
+                                 'currency': 'USD',
+                                 'as_of': '2026-10-27',
+                                 'kind': 'latest_declared_payment_annualized_not_guaranteed',
+                                 'source_url': 'https://arcc.ares.com/news/ares-capital-corporation-announces-september-30-2026-financial-results-and-declares-fourth-quarter-2026-dividend/0bf958ac-18eb-4a60-9868-fa8914e548a8'},
+  'reference_set': 'income-universe-2026',
+  'tranche_policy': 'individual_only',
+  'active_in_portfolios': False,
+  'prepared_for': 'future_custom_portfolio_simulation',
+  'logo': {'source_url': 'https://arcc.ares.com/apple-touch-icon.png',
+           'homepage': 'https://www.arescapitalcorp.com/',
+           'mime_type': 'image/png',
+           'data_uri': 'data:image/png;base64,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'},
+  'research_verified_at': '2026-11-21'},
+ {'name': 'Realty Income Corporation',
+  'ticker': 'O',
+  'isin': 'US7561091049',
+  'exchange': 'NYSE',
+  'currency': 'USD',
+  'quote_currency': 'USD',
+  'financial_currency': 'USD',
+  'asset_type': 'stock',
+  'instrument_subtype': 'equity_reit',
+  'cluster': 'Immobilien / REIT',
+  'share_basis': '1 common share, USD0.01 par value. No ADR conversion.',
+  'identity_sources': ['https://www.realtyincome.com/sites/realty-income/files/2026-02/q4-realty-income-12-31-25-10k.pdf',
+                       'https://itsx.kz/trading-and-data/traded-instruments/share/?issue=5207'],
+  'hist_pe': 48.179486266568176,
+  'hist_ps': None,
+  'hist_ps_not_used': 'KUV wird bei diesem REIT nicht als Bewertungsreferenz verwendet; Emittenten-AFFO ist für die '
+                      'Ausschüttungsdeckung geeigneter als Umsatzerlöse.',
+  'primary_valuation': 'p_affo',
+  'field_metadata': {'hist_pe': {'reference_version': 1,
+                                 'provider': 'Emittenten-IR + Jahresendkurse',
+                                 'label': '5J-Median · JE',
+                                 'source_label': 'US-GAAP · IR / Kurse',
+                                 'accounting_basis': 'US GAAP diluted EPS',
+                                 'currency': 'USD',
+                                 'share_basis': '1 common share',
+                                 'period': 'FY2021–FY2025',
+                                 'verified_at': '2026-11-21',
+                                 'sample_count': 5,
+                                 'window_count': 5,
+                                 'observations': [{'fiscal_year': 2021,
+                                                   'fiscal_end': '2021-12-31',
+                                                   'price_date': '2021-12-31',
+                                                   'close': 71.58999633789062,
+                                                   'currency': 'USD',
+                                                   'source_url': 'https://www.sec.gov/Archives/edgar/data/726728/000072672823000038/realtyincomeex991q42022.htm',
+                                                   'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/726728/000072672823000038/realtyincomeex991q42022.htm',
+                                                   'price_source_url': 'https://finance.yahoo.com/quote/O/history/',
+                                                   'share_basis': '1 common share',
+                                                   'diluted_eps': 0.87,
+                                                   'pe': 82.28735211251796},
+                                                  {'fiscal_year': 2022,
+                                                   'fiscal_end': '2022-12-31',
+                                                   'price_date': '2022-12-30',
+                                                   'close': 63.43000030517578,
+                                                   'currency': 'USD',
+                                                   'source_url': 'https://www.sec.gov/Archives/edgar/data/726728/000072672823000038/realtyincomeex991q42022.htm',
+                                                   'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/726728/000072672823000038/realtyincomeex991q42022.htm',
+                                                   'price_source_url': 'https://finance.yahoo.com/quote/O/history/',
+                                                   'share_basis': '1 common share',
+                                                   'diluted_eps': 1.42,
+                                                   'pe': 44.669014299419565},
+                                                  {'fiscal_year': 2023,
+                                                   'fiscal_end': '2023-12-31',
+                                                   'price_date': '2023-12-29',
+                                                   'close': 57.41999816894531,
+                                                   'currency': 'USD',
+                                                   'source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-02/q4-realty-income-12-31-25-10k.pdf',
+                                                   'eps_source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-02/q4-realty-income-12-31-25-10k.pdf',
+                                                   'price_source_url': 'https://finance.yahoo.com/quote/O/history/',
+                                                   'share_basis': '1 common share',
+                                                   'diluted_eps': 1.26,
+                                                   'pe': 45.571427118210565},
+                                                  {'fiscal_year': 2024,
+                                                   'fiscal_end': '2024-12-31',
+                                                   'price_date': '2024-12-31',
+                                                   'close': 53.40999984741211,
+                                                   'currency': 'USD',
+                                                   'source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-02/q4-realty-income-12-31-25-10k.pdf',
+                                                   'eps_source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-02/q4-realty-income-12-31-25-10k.pdf',
+                                                   'price_source_url': 'https://finance.yahoo.com/quote/O/history/',
+                                                   'share_basis': '1 common share',
+                                                   'diluted_eps': 0.98,
+                                                   'pe': 54.499999844298074},
+                                                  {'fiscal_year': 2025,
+                                                   'fiscal_end': '2025-12-31',
+                                                   'price_date': '2025-12-31',
+                                                   'close': 56.369998931884766,
+                                                   'currency': 'USD',
+                                                   'source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-02/q4-realty-income-12-31-25-10k.pdf',
+                                                   'eps_source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-02/q4-realty-income-12-31-25-10k.pdf',
+                                                   'price_source_url': 'https://finance.yahoo.com/quote/O/history/',
+                                                   'share_basis': '1 common share',
+                                                   'diluted_eps': 1.17,
+                                                   'pe': 48.179486266568176}],
+                                 'source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-02/q4-realty-income-12-31-25-10k.pdf',
+                                 'method': 'Letzter Handelsschluss am oder vor dem 31. Dezember geteilt durch das '
+                                           'berichtete verwässerte EPS desselben Geschäftsjahres; Median der fünf positiven '
+                                           'Einzelwerte. Keine kursbereinigten Total-Return-Kurse. Jahresergebnis wurde '
+                                           'erst nach dem Jahresende publiziert; rückblickende Bewertungsreferenz, keine '
+                                           'handelbare zeitpunktgerechte Backtestreihe. ',
+                                 'comparable_to_current': True,
+                                 'comparison_note': 'GAAP EPS wird stark durch Immobilienabschreibungen, Impairments und '
+                                                    'Veräußerungen beeinflusst; Kauf-Indikator mit P/AFFO statt GAAP-KGV '
+                                                    'bewerten.'},
+                     'hist_div': {'reference_version': 1,
+                                  'provider': 'Yahoo Finance / datierte Emittentenprüfung',
+                                  'label': 'Hist. Div. 5J',
+                                  'accounting_basis': 'Ex-Tag-Barausschüttungen',
+                                  'currency': 'USD',
+                                  'share_basis': '1 common share, USD0.01 par value. No ADR conversion.',
+                                  'period': 'FY2021–FY2025',
+                                  'verified_at': '2026-11-21',
+                                  'sample_count': 5,
+                                  'window_count': 5,
+                                  'source_url': 'https://finance.yahoo.com/quote/O/history/',
+                                  'observations': [{'fiscal_year': 2021,
+                                                    'price_date': '2021-12-31',
+                                                    'close': 71.58999633789062,
+                                                    'dividends_per_share': 2.8479982,
+                                                    'dividend_yield': 3.9782069362848014,
+                                                    'currency': 'USD',
+                                                    'share_basis': '1 common share, USD0.01 par value. No ADR conversion.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/O/history/'},
+                                                   {'fiscal_year': 2022,
+                                                    'price_date': '2022-12-30',
+                                                    'close': 63.43000030517578,
+                                                    'dividends_per_share': 3.219,
+                                                    'dividend_yield': 5.074885676356106,
+                                                    'currency': 'USD',
+                                                    'share_basis': '1 common share, USD0.01 par value. No ADR conversion.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/O/history/'},
+                                                   {'fiscal_year': 2023,
+                                                    'price_date': '2023-12-29',
+                                                    'close': 57.41999816894531,
+                                                    'dividends_per_share': 3.311,
+                                                    'dividend_yield': 5.766283708784061,
+                                                    'currency': 'USD',
+                                                    'share_basis': '1 common share, USD0.01 par value. No ADR conversion.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/O/history/'},
+                                                   {'fiscal_year': 2024,
+                                                    'price_date': '2024-12-31',
+                                                    'close': 53.40999984741211,
+                                                    'dividends_per_share': 2.872,
+                                                    'dividend_yield': 5.377270189487106,
+                                                    'currency': 'USD',
+                                                    'share_basis': '1 common share, USD0.01 par value. No ADR conversion.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/O/history/'},
+                                                   {'fiscal_year': 2025,
+                                                    'price_date': '2025-12-31',
+                                                    'close': 56.369998931884766,
+                                                    'dividends_per_share': 3.49,
+                                                    'dividend_yield': 6.1912365906147615,
+                                                    'currency': 'USD',
+                                                    'share_basis': '1 common share, USD0.01 par value. No ADR conversion.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/O/history/'}],
+                                  'method': 'Median der tatsächlichen 12M-Cash-Ausschüttungen nach Ex-Tag bis zum letzten '
+                                            'Jahreshandelsschluss geteilt durch diesen Kurs. Gemeldete Cash-Sonderzahlungen '
+                                            'enthalten; keine künftige Zusage. Bei O ist Orion-Sachdividende ausgeschlossen '
+                                            'und die synthetische 1,032-Rückrechnung aufgehoben.'},
+                     'ps_ratio': {'provider': 'Yahoo Finance',
+                                  'source_url': 'https://finance.yahoo.com/quote/O/key-statistics/',
+                                  'role': 'informational_only',
+                                  'note': 'Kein primärer Kaufmaßstab für diesen Reservewert; historische Vergleichsbasis '
+                                          'nicht angesetzt. Sektorpassende Kennzahlen und Methoden stehen in '
+                                          'primary_valuation/valuation_references.'}},
+  'buy_trigger': 'Forward P/AFFO ≤ 13x und AFFO-Ausschüttungsquote ≤ 80%',
+  'buy_trigger_type': 'proposal_not_backtested',
+  'buy_trigger_rationale': 'Vorschlag: AFFO bildet bei Net-Lease-Immobilien den ausschüttungsrelevanten laufenden Ertrag '
+                           'geeigneter ab als Abschreibungs-geprägtes GAAP EPS. 13x verlangt Abschlag zum '
+                           'rekonstruierten14.35x-Median; 80% lässt Dividendenpuffer. Schwellen sind eigenes Urteil.',
+  'buy_trigger_evaluation_policy': 'Forward P/AFFO ausschließlich mit frischer issuer-defined AFFO-Guidance derselben '
+                                   'USD/common-share-Basis; AFFO-Payout aus tatsächlicher passender Periodenausschüttung, '
+                                   'nicht aus GAAP EPS. Kein Signal aus unsicherer REIT-KGV-Grenze.',
+  'buy_trigger_sources': [{'url': 'https://www.realtyincome.com/sites/realty-income/files/2026-02/q4-realty-income-12-31-25-10k.pdf',
+                           'label': 'Emittentenbericht / aktuelle Kennzahlen'},
+                          {'url': 'https://www.realtyincome.com/sites/realty-income/files/2026-11/realty-income-announces-operating-results-for-the-three-and-nine-months-ended-september-30-2026-v2.pdf',
+                           'label': 'Emittentenbericht / aktuelle Kennzahlen'}],
+  'classification_note': 'Hohe laufende Ausschüttung und breite Vermietung; Zins-/Refinanzierungs- und Mieterrisiken sowie '
+                         'Kapitalerhöhungen berücksichtigen.',
+  'current_primary_ttm': {'diluted_eps': 1.46,
+                          'diluted_affo_per_share': 4.440000000000001,
+                          'currency': 'USD',
+                          'period_end': '2026-09-30',
+                          'formula_eps': '1.17FY2025 +1.13nineMonths2026 −0.84nineMonths2025',
+                          'formula_affo': '4.28FY2025 +3.35nineMonths2026 −3.19nineMonths2025',
+                          'source_urls': ['https://www.realtyincome.com/sites/realty-income/files/2026-02/q4-realty-income-12-31-25-10k.pdf',
+                                          'https://www.realtyincome.com/sites/realty-income/files/2026-11/realty-income-announces-operating-results-for-the-three-and-nine-months-ended-september-30-2026-v2.pdf'],
+                          'price_date': '2026-11-20',
+                          'price': 58.03,
+                          'pe': 39.74657534246575,
+                          'p_affo': 13.069819819819816,
+                          'caveat': 'Synthetic TTM from rounded reported EPS/AFFO; not company-reported four-quarter '
+                                    'share-weighted denominator.'},
+  'dividend_policy': {'actual_paid_fy2025': {'value': 3.217,
+                                             'unit': 'USD/common share',
+                                             'period': 'FY2025 cash paid',
+                                             'source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-02/q4-realty-income-12-31-25-10k.pdf'},
+                      'actual_paid_9m2026': {'value': 2.4345,
+                                             'unit': 'USD/common share',
+                                             'period': '9M2026 cash paid',
+                                             'source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-11/realty-income-announces-operating-results-for-the-three-and-nine-months-ended-september-30-2026-v2.pdf'},
+                      'latest_monthly_declared': {'value': 0.274,
+                                                  'unit': 'USD/common share',
+                                                  'period': 'Declared2026-11-10',
+                                                  'source_url': 'https://www.realtyincome.com/sites/realty-income/files/realty-income/press-releases/11%2010%2026%20137th%20Common%20Stock%20Monthly%20Dividend%20Increase%20Declared%20by%20Realty%20Income.pdf',
+                                                  'note': 'Payable2026-12-15; record2026-11-30.'},
+                      'latest_annualized_regular': {'value': 3.288,
+                                                    'unit': 'USD/common share/year run rate',
+                                                    'period': 'Declared2026-11-10',
+                                                    'source_url': 'https://www.realtyincome.com/sites/realty-income/files/realty-income/press-releases/11%2010%2026%20137th%20Common%20Stock%20Monthly%20Dividend%20Increase%20Declared%20by%20Realty%20Income.pdf',
+                                                    'note': '12timeslatestmonthly; not actual trailing cash or guaranteed '
+                                                            'future dividend.'},
+                      'special_corporate_action': {'date': '2021-11-12',
+                                                   'type': 'Orion Office REIT noncash stock distribution',
+                                                   'ratio': '1 ONL per10 O',
+                                                   'source_url': 'https://www.sec.gov/Archives/edgar/data/1528059/000110465921000210/exhibit991-mergerclosingda.htm',
+                                                   'total_return_note': 'Orion-Verteilung wurde separat als bewertete '
+                                                                        'Sachdividende rekonstruiert. Der veröffentlichte '
+                                                                        '5-Tage-VWAP dient als ausdrückliche '
+                                                                        'Wiederanlage-Näherung; kein Bestandteil des '
+                                                                        'regulären Cash-DPS-Wachstums.'},
+                      'projection_note': 'Monatlicher regulärer Bruttocash; Wachstum nicht mit '
+                                         'GAAP-Gewinnausschüttungsquote verwechseln. AFFO-Deckung separat anzeigen.'},
+  'issuer_snapshot': {'as_of': '2026-09-30',
+                      'verified_at': '2026-11-21',
+                      'currency': 'USD',
+                      'metrics': {'affo_per_share_q3': {'value': 1.12,
+                                                        'unit': 'USD/common share diluted',
+                                                        'period': 'Q3 2026',
+                                                        'source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-11/realty-income-announces-operating-results-for-the-three-and-nine-months-ended-september-30-2026-v2.pdf'},
+                                  'dividends_paid_q3': {'value': 0.813,
+                                                        'unit': 'USD/common share',
+                                                        'period': 'Q3 2026',
+                                                        'source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-11/realty-income-announces-operating-results-for-the-three-and-nine-months-ended-september-30-2026-v2.pdf'},
+                                  'affo_dividend_payout_q3': {'value': 72.6,
+                                                              'unit': '%',
+                                                              'period': 'Q3 2026',
+                                                              'source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-11/realty-income-announces-operating-results-for-the-three-and-nine-months-ended-september-30-2026-v2.pdf'},
+                                  'net_debt_ebitdare': {'value': 5.4,
+                                                        'unit': 'x',
+                                                        'period': '2026-09-30',
+                                                        'source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-11/realty-income-announces-operating-results-for-the-three-and-nine-months-ended-september-30-2026-v2.pdf',
+                                                        'note': 'Company pro forma annualized adjusted EBITDAre definition; '
+                                                                'with unsettled forward equity5.2x.'},
+                                  'occupancy': {'value': 98.8,
+                                                'unit': '%',
+                                                'period': '2026-09-30',
+                                                'source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-11/realty-income-announces-operating-results-for-the-three-and-nine-months-ended-september-30-2026-v2.pdf'},
+                                  'fy2026_affo_guidance': {'value': [4.45, 4.46],
+                                                           'unit': 'USD/common share diluted',
+                                                           'period': 'FY2026 guidance at2026-11-02',
+                                                           'source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-11/realty-income-announces-operating-results-for-the-three-and-nine-months-ended-september-30-2026-v2.pdf'},
+                                  'fy2026_eps_guidance': {'value': [1.55, 1.56],
+                                                          'unit': 'USD/common share diluted',
+                                                          'period': 'FY2026 guidance at2026-11-02',
+                                                          'source_url': 'https://www.realtyincome.com/sites/realty-income/files/2026-11/realty-income-announces-operating-results-for-the-three-and-nine-months-ended-september-30-2026-v2.pdf'}},
+                      'source_urls': ['https://www.realtyincome.com/sites/realty-income/files/2026-02/q4-realty-income-12-31-25-10k.pdf',
+                                      'https://www.realtyincome.com/sites/realty-income/files/2026-11/realty-income-announces-operating-results-for-the-three-and-nine-months-ended-september-30-2026-v2.pdf'],
+                      'refresh_policy': 'Datiertes Emittenten-Research; bei neuer Berichtsperiode erneut prüfen. Aktuelle '
+                                        'Kurse, Dividendenhistorien und Renditen werden täglich aktualisiert.'},
+  'valuation_references': {'p_affo': {'reference_version': 1,
+                                      'provider': 'Emittenten-IR + Jahresendkurse',
+                                      'label': 'Hist. P/AFFO 5J',
+                                      'source_label': 'US-GAAP · IR / Kurse',
+                                      'accounting_basis': 'Issuer-defined diluted AFFO per common share (non-GAAP)',
+                                      'currency': 'USD',
+                                      'share_basis': '1 common share',
+                                      'period': 'FY2021–FY2025',
+                                      'verified_at': '2026-11-21',
+                                      'sample_count': 5,
+                                      'window_count': 5,
+                                      'observations': [{'fiscal_year': 2021,
+                                                        'fiscal_end': '2021-12-31',
+                                                        'price_date': '2021-12-31',
+                                                        'close': 71.58999633789062,
+                                                        'currency': 'USD',
+                                                        'source_url': 'https://www.sec.gov/Archives/edgar/data/726728/000072672826000009/realtyincomeq42025supple.htm',
+                                                        'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/726728/000072672826000009/realtyincomeq42025supple.htm',
+                                                        'price_source_url': 'https://finance.yahoo.com/quote/O/history/',
+                                                        'share_basis': '1 common share',
+                                                        'diluted_affo_per_share': 3.59,
+                                                        'p_affo': 19.941503158186805},
+                                                       {'fiscal_year': 2022,
+                                                        'fiscal_end': '2022-12-31',
+                                                        'price_date': '2022-12-30',
+                                                        'close': 63.43000030517578,
+                                                        'currency': 'USD',
+                                                        'source_url': 'https://www.sec.gov/Archives/edgar/data/726728/000072672826000009/realtyincomeq42025supple.htm',
+                                                        'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/726728/000072672826000009/realtyincomeq42025supple.htm',
+                                                        'price_source_url': 'https://finance.yahoo.com/quote/O/history/',
+                                                        'share_basis': '1 common share',
+                                                        'diluted_affo_per_share': 3.92,
+                                                        'p_affo': 16.181122526830556},
+                                                       {'fiscal_year': 2023,
+                                                        'fiscal_end': '2023-12-31',
+                                                        'price_date': '2023-12-29',
+                                                        'close': 57.41999816894531,
+                                                        'currency': 'USD',
+                                                        'source_url': 'https://www.sec.gov/Archives/edgar/data/726728/000072672826000009/realtyincomeq42025supple.htm',
+                                                        'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/726728/000072672826000009/realtyincomeq42025supple.htm',
+                                                        'price_source_url': 'https://finance.yahoo.com/quote/O/history/',
+                                                        'share_basis': '1 common share',
+                                                        'diluted_affo_per_share': 4,
+                                                        'p_affo': 14.354999542236328},
+                                                       {'fiscal_year': 2024,
+                                                        'fiscal_end': '2024-12-31',
+                                                        'price_date': '2024-12-31',
+                                                        'close': 53.40999984741211,
+                                                        'currency': 'USD',
+                                                        'source_url': 'https://www.sec.gov/Archives/edgar/data/726728/000072672826000009/realtyincomeq42025supple.htm',
+                                                        'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/726728/000072672826000009/realtyincomeq42025supple.htm',
+                                                        'price_source_url': 'https://finance.yahoo.com/quote/O/history/',
+                                                        'share_basis': '1 common share',
+                                                        'diluted_affo_per_share': 4.19,
+                                                        'p_affo': 12.747016670026754},
+                                                       {'fiscal_year': 2025,
+                                                        'fiscal_end': '2025-12-31',
+                                                        'price_date': '2025-12-31',
+                                                        'close': 56.369998931884766,
+                                                        'currency': 'USD',
+                                                        'source_url': 'https://www.sec.gov/Archives/edgar/data/726728/000072672826000009/realtyincomeq42025supple.htm',
+                                                        'eps_source_url': 'https://www.sec.gov/Archives/edgar/data/726728/000072672826000009/realtyincomeq42025supple.htm',
+                                                        'price_source_url': 'https://finance.yahoo.com/quote/O/history/',
+                                                        'share_basis': '1 common share',
+                                                        'diluted_affo_per_share': 4.28,
+                                                        'p_affo': 13.170560498103917}],
+                                      'source_url': 'https://www.sec.gov/Archives/edgar/data/726728/000072672826000009/realtyincomeq42025supple.htm',
+                                      'method': 'Wie P/E-Jahresend-Median, mit issuer-defined verwässertem AFFO/Aktie als '
+                                                'Nenner; fünf FY2021–FY2025-Werte. AFFO ist eine unternehmensdefinierte '
+                                                'Non-GAAP-Kennzahl, kein IFRS-/GAAP-Gewinn. Jahresergebnis wurde erst nach '
+                                                'dem Jahresende publiziert; rückblickende Bewertungsreferenz, keine '
+                                                'handelbare zeitpunktgerechte Backtestreihe. ',
+                                      'comparable_to_current': True,
+                                      'comparison_note': 'GAAP EPS wird stark durch Immobilienabschreibungen, Impairments '
+                                                         'und Veräußerungen beeinflusst; Kauf-Indikator mit P/AFFO statt '
+                                                         'GAAP-KGV bewerten.'}},
+  'hist_p_affo': 14.354999542236328,
+  'regular_dividend_reference': {'value': 3.288,
+                                 'currency': 'USD',
+                                 'as_of': '2026-11-10',
+                                 'kind': 'latest_declared_payment_annualized_not_guaranteed',
+                                 'source_url': 'https://www.realtyincome.com/sites/realty-income/files/realty-income/press-releases/11%2010%2026%20137th%20Common%20Stock%20Monthly%20Dividend%20Increase%20Declared%20by%20Realty%20Income.pdf'},
+  'hist_div': 5.377270189487106,
+  'reference_set': 'income-universe-2026',
+  'tranche_policy': 'individual_only',
+  'active_in_portfolios': False,
+  'prepared_for': 'future_custom_portfolio_simulation',
+  'logo': {'source_url': 'https://www.realtyincome.com/sites/realty-income/files/realty-income/favicon.png',
+           'homepage': 'https://www.realtyincome.com/',
+           'mime_type': 'image/png',
+           'data_uri': 'data:image/png;base64,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'},
+  'research_verified_at': '2026-11-21'},
+ {'name': 'TotalEnergies SE',
+  'ticker': 'TTE.PA',
+  'isin': 'FR0000120271',
+  'exchange': 'Euronext Paris',
+  'currency': 'EUR',
+  'quote_currency': 'EUR',
+  'financial_currency': 'USD',
+  'asset_type': 'stock',
+  'instrument_subtype': 'integrated_energy',
+  'cluster': 'Integrierte Energie',
+  'share_basis': '1 Paris ordinary share; no ADR multiplier. NYSE ADS programme ended with ordinary-share listing '
+                 'from2025-12-08; do not splice USD/EUR histories.',
+  'identity_sources': ['https://totalenergies.com/fr/investisseurs/action-dividende/laction-totalenergies/actions-totalenergies-cotees-sur-le-nyse'],
+  'hist_pe': 8.635922157262907,
+  'hist_ps': None,
+  'hist_ps_not_used': {'status': 'not_used_not_required_for_primary_valuation',
+                       'checked_source_url': 'https://totalenergies.com/system/files/documents/totalenergies_universal-registration-document-2025_2026_en.pdf',
+                       'checked_source_pages': [453, 495, 636],
+                       'available_consolidated_years': [2023, 2024, 2025],
+                       'revenue_after_excise_usd_million': [218945, 195610, 182344],
+                       'diluted_weighted_shares': [2433767578, 2314560722, 2214350417],
+                       'excluded_five_year_table': {'page': 636,
+                                                    'scope': 'Statutory financial statements of parent TotalEnergies SE, '
+                                                             'not consolidated group',
+                                                    'net_commercial_sales_2025_eur_million': 1903,
+                                                    'reason': 'Do not substitute parent sales/EPS or year-end shares from '
+                                                              'this five-year table for group revenue and diluted weighted '
+                                                              'group shares.'},
+                       'additional_source_check': {'url': 'https://totalenergies.com/sites/g/files/nytnzq121/files/documents/totalenergies_factbook-2025_2026_en.pdf',
+                                                   'result': 'Web fetch exceeded27MB tool size limit; no unverified '
+                                                             'revenue/share/FX series was inferred from unavailable full '
+                                                             'text.'},
+                       'remaining_requirement': 'For a full2021–25 reference: compatible2021/22 consolidated sales and '
+                                                'diluted weighted shares plus each year official average USD/EUR, using '
+                                                'revenue after excise consistently.2025 URD provides a directly comparable '
+                                                'three-year set only.',
+                       'valuation_choice': 'Primary reserve valuation uses basis-consistent IFRS P/E and '
+                                           'cashflow/capital-return coverage. No mixed EUR-price/USD-sales multiple or '
+                                           'shortened five-year reference is stored.'},
+  'primary_valuation': 'pe_and_cashflow',
+  'field_metadata': {'hist_pe': {'reference_version': 1,
+                                 'provider': 'Emittenten-IR + Jahresendkurse',
+                                 'label': '5J-Median · JE',
+                                 'source_label': 'IFRS · IR / Kurse',
+                                 'accounting_basis': 'IFRS diluted EPS',
+                                 'currency': 'EUR',
+                                 'share_basis': '1 Paris ordinary share',
+                                 'period': 'FY2021–FY2025',
+                                 'verified_at': '2026-11-21',
+                                 'sample_count': 5,
+                                 'window_count': 5,
+                                 'observations': [{'fiscal_year': 2021,
+                                                   'fiscal_end': '2021-12-31',
+                                                   'price_date': '2021-12-31',
+                                                   'close': 44.630001068115234,
+                                                   'currency': 'EUR',
+                                                   'source_url': 'https://totalenergies.com/sites/g/files/nytnzq121/files/documents/2023-03/TotalEnergies_URD_2022_EN.pdf',
+                                                   'eps_source_url': 'https://totalenergies.com/sites/g/files/nytnzq121/files/documents/2023-03/TotalEnergies_URD_2022_EN.pdf',
+                                                   'price_source_url': 'https://finance.yahoo.com/quote/TTE.PA/history/',
+                                                   'share_basis': '1 Paris ordinary share',
+                                                   'diluted_eps': 5.01,
+                                                   'pe': 8.908183845931186},
+                                                  {'fiscal_year': 2022,
+                                                   'fiscal_end': '2022-12-31',
+                                                   'price_date': '2022-12-30',
+                                                   'close': 58.650001525878906,
+                                                   'currency': 'EUR',
+                                                   'source_url': 'https://totalenergies.com/system/files/documents/2024-03/totalenergies_universal-registration-document-2023_2023_en_pdf.pdf',
+                                                   'eps_source_url': 'https://totalenergies.com/system/files/documents/2024-03/totalenergies_universal-registration-document-2023_2023_en_pdf.pdf',
+                                                   'price_source_url': 'https://finance.yahoo.com/quote/TTE.PA/history/',
+                                                   'share_basis': '1 Paris ordinary share',
+                                                   'diluted_eps': 7.45,
+                                                   'pe': 7.8724834262924706},
+                                                  {'fiscal_year': 2023,
+                                                   'fiscal_end': '2023-12-31',
+                                                   'price_date': '2023-12-29',
+                                                   'close': 61.599998474121094,
+                                                   'currency': 'EUR',
+                                                   'source_url': 'https://totalenergies.com/system/files/documents/2024-03/totalenergies_universal-registration-document-2023_2023_en_pdf.pdf',
+                                                   'eps_source_url': 'https://totalenergies.com/system/files/documents/2024-03/totalenergies_universal-registration-document-2023_2023_en_pdf.pdf',
+                                                   'price_source_url': 'https://finance.yahoo.com/quote/TTE.PA/history/',
+                                                   'share_basis': '1 Paris ordinary share',
+                                                   'diluted_eps': 8.02,
+                                                   'pe': 7.680797814728316},
+                                                  {'fiscal_year': 2024,
+                                                   'fiscal_end': '2024-12-31',
+                                                   'price_date': '2024-12-31',
+                                                   'close': 53.369998931884766,
+                                                   'currency': 'EUR',
+                                                   'source_url': 'https://totalenergies.com/system/files/documents/totalenergies_universal-registration-document-2025_2026_en.pdf',
+                                                   'eps_source_url': 'https://totalenergies.com/system/files/documents/totalenergies_universal-registration-document-2025_2026_en.pdf',
+                                                   'price_source_url': 'https://finance.yahoo.com/quote/TTE.PA/history/',
+                                                   'share_basis': '1 Paris ordinary share',
+                                                   'diluted_eps': 6.18,
+                                                   'pe': 8.635922157262907},
+                                                  {'fiscal_year': 2025,
+                                                   'fiscal_end': '2025-12-31',
+                                                   'price_date': '2025-12-31',
+                                                   'close': 55.59000015258789,
+                                                   'currency': 'EUR',
+                                                   'source_url': 'https://totalenergies.com/system/files/documents/totalenergies_universal-registration-document-2025_2026_en.pdf',
+                                                   'eps_source_url': 'https://totalenergies.com/system/files/documents/totalenergies_universal-registration-document-2025_2026_en.pdf',
+                                                   'price_source_url': 'https://finance.yahoo.com/quote/TTE.PA/history/',
+                                                   'share_basis': '1 Paris ordinary share',
+                                                   'diluted_eps': 5.12,
+                                                   'pe': 10.857421904802322}],
+                                 'source_url': 'https://totalenergies.com/system/files/documents/totalenergies_universal-registration-document-2025_2026_en.pdf',
+                                 'method': 'Letzter Handelsschluss am oder vor dem 31. Dezember geteilt durch das '
+                                           'berichtete verwässerte EPS desselben Geschäftsjahres; Median der fünf positiven '
+                                           'Einzelwerte. Keine kursbereinigten Total-Return-Kurse. Jahresergebnis wurde '
+                                           'erst nach dem Jahresende publiziert; rückblickende Bewertungsreferenz, keine '
+                                           'handelbare zeitpunktgerechte Backtestreihe. Direkt vom Emittenten berichtetes '
+                                           'verwässertes EUR-EPS: IFRS-USD-EPS vom Emittenten zum jeweiligen '
+                                           'Jahresdurchschnittskurs übersetzt; keine eigene Spotumrechnung. '
+                                           'Konzernabschluss bleibt USD.',
+                                 'comparable_to_current': True,
+                                 'comparison_note': 'Integrierter Energie-/LNG-/Stromkonzern mit hoher Cashgenerierung; '
+                                                    'Öl-/Gas-/Raffineriezyklus bleibt wesentlich.'},
+                     'hist_div': {'reference_version': 1,
+                                  'provider': 'Yahoo Finance / datierte Emittentenprüfung',
+                                  'label': 'Hist. Div. 5J',
+                                  'accounting_basis': 'Ex-Tag-Barausschüttungen',
+                                  'currency': 'EUR',
+                                  'share_basis': '1 Paris ordinary share; no ADR multiplier. NYSE ADS programme ended with '
+                                                 'ordinary-share listing from2025-12-08; do not splice USD/EUR histories.',
+                                  'period': 'FY2021–FY2025',
+                                  'verified_at': '2026-11-21',
+                                  'sample_count': 5,
+                                  'window_count': 5,
+                                  'source_url': 'https://finance.yahoo.com/quote/TTE.PA/history/',
+                                  'observations': [{'fiscal_year': 2021,
+                                                    'price_date': '2021-12-31',
+                                                    'close': 44.630001068115234,
+                                                    'dividends_per_share': 2.64,
+                                                    'dividend_yield': 5.915303465869915,
+                                                    'currency': 'EUR',
+                                                    'share_basis': '1 Paris ordinary share; no ADR multiplier. NYSE ADS '
+                                                                   'programme ended with ordinary-share listing '
+                                                                   'from2025-12-08; do not splice USD/EUR histories.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/TTE.PA/history/'},
+                                                   {'fiscal_year': 2022,
+                                                    'price_date': '2022-12-30',
+                                                    'close': 58.650001525878906,
+                                                    'dividends_per_share': 3.67,
+                                                    'dividend_yield': 6.257459342742963,
+                                                    'currency': 'EUR',
+                                                    'share_basis': '1 Paris ordinary share; no ADR multiplier. NYSE ADS '
+                                                                   'programme ended with ordinary-share listing '
+                                                                   'from2025-12-08; do not splice USD/EUR histories.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/TTE.PA/history/'},
+                                                   {'fiscal_year': 2023,
+                                                    'price_date': '2023-12-29',
+                                                    'close': 61.599998474121094,
+                                                    'dividends_per_share': 2.86,
+                                                    'dividend_yield': 4.642857257864253,
+                                                    'currency': 'EUR',
+                                                    'share_basis': '1 Paris ordinary share; no ADR multiplier. NYSE ADS '
+                                                                   'programme ended with ordinary-share listing '
+                                                                   'from2025-12-08; do not splice USD/EUR histories.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/TTE.PA/history/'},
+                                                   {'fiscal_year': 2024,
+                                                    'price_date': '2024-12-31',
+                                                    'close': 53.369998931884766,
+                                                    'dividends_per_share': 3.06,
+                                                    'dividend_yield': 5.733558293500112,
+                                                    'currency': 'EUR',
+                                                    'share_basis': '1 Paris ordinary share; no ADR multiplier. NYSE ADS '
+                                                                   'programme ended with ordinary-share listing '
+                                                                   'from2025-12-08; do not splice USD/EUR histories.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/TTE.PA/history/'},
+                                                   {'fiscal_year': 2025,
+                                                    'price_date': '2025-12-31',
+                                                    'close': 55.59000015258789,
+                                                    'dividends_per_share': 4.13,
+                                                    'dividend_yield': 7.429393755466171,
+                                                    'currency': 'EUR',
+                                                    'share_basis': '1 Paris ordinary share; no ADR multiplier. NYSE ADS '
+                                                                   'programme ended with ordinary-share listing '
+                                                                   'from2025-12-08; do not splice USD/EUR histories.',
+                                                    'source_url': 'https://finance.yahoo.com/quote/TTE.PA/history/'}],
+                                  'method': 'Median der tatsächlichen 12M-Cash-Ausschüttungen nach Ex-Tag bis zum letzten '
+                                            'Jahreshandelsschluss geteilt durch diesen Kurs. Gemeldete Cash-Sonderzahlungen '
+                                            'enthalten; keine künftige Zusage. Bei O ist Orion-Sachdividende ausgeschlossen '
+                                            'und die synthetische 1,032-Rückrechnung aufgehoben.'},
+                     'ps_ratio': {'provider': 'Yahoo Finance',
+                                  'source_url': 'https://finance.yahoo.com/quote/TTE.PA/key-statistics/',
+                                  'role': 'informational_only',
+                                  'note': 'Kein primärer Kaufmaßstab für diesen Reservewert; historische Vergleichsbasis '
+                                          'nicht angesetzt. Sektorpassende Kennzahlen und Methoden stehen in '
+                                          'primary_valuation/valuation_references.'}},
+  'buy_trigger': 'Forward P/E ≤ 9x und reguläre Dividendenrendite ≥ 5%',
+  'buy_trigger_type': 'proposal_not_backtested',
+  'buy_trigger_rationale': 'Vorschlag: Bei integriertem Energiegeschäft Bewertungsdisziplin mit mindestens5% regulärem '
+                           'Cash-Ertrag verbinden. Rohstoff- und Raffineriezyklen können das KGV kurzfristig drücken; 9x/5% '
+                           'sind eigene Sicherheitsabstände, keine belegte optimale Einstiegsregel.',
+  'buy_trigger_evaluation_policy': 'Forward-Bedingung nur nach Prüfung von Schätzperiode, EUR-/USD-Umrechnung und '
+                                   'Ordinary-Share-Basis. Bei ungeklärter Analystenbasis kein positives automatisches '
+                                   'Signal; aktuelle IFRS-EUR-TTM-Rekonstruktion ist kein Forward-EPS-Ersatz.',
+  'buy_trigger_sources': [{'url': 'https://totalenergies.com/system/files/documents/totalenergies_universal-registration-document-2025_2026_en.pdf',
+                           'label': 'Emittentenbericht / aktuelle Kennzahlen'},
+                          {'url': 'https://www.sec.gov/Archives/edgar/data/879764/000110465926120831/tm2628570d1_ex99-9.htm',
+                           'label': 'Emittentenbericht / aktuelle Kennzahlen'}],
+  'classification_note': 'Integrierter Energie-/LNG-/Stromkonzern mit hoher Cashgenerierung; Öl-/Gas-/Raffineriezyklus '
+                         'bleibt wesentlich.',
+  'current_primary_ttm': {'diluted_eps': 8.626151385897959,
+                          'currency': 'EUR',
+                          'period_end': '2026-09-30',
+                          'label': 'IR rekonstruiert (ca.)',
+                          'formula': '5.12EUR FY2025 + (8.73USD 9M2026 /1.1610USDperEUR) − (4.49USD 9M2025 '
+                                     '/1.1188USDperEUR)',
+                          'inputs': {'fy2025_diluted_eps_eur': 5.12,
+                                     'fy2025_diluted_eps_usd': 5.78,
+                                     'nine_months_2026_diluted_eps_usd': 8.73,
+                                     'nine_months_2025_diluted_eps_usd': 4.49,
+                                     'nine_months_2026_average_usd_per_eur': 1.161,
+                                     'nine_months_2025_average_usd_per_eur': 1.1188},
+                          'ttm_usd_eps': 10.020000000000001,
+                          'fx_method': 'Same period-average translation convention as the issuer annual EUR EPS; USD9M GAAP '
+                                       'EPS divided by official period-average FX; not current spot FX. Not a full EUR '
+                                       'financial statement.',
+                          'rounding_caveat': 'Approximately reconstructed from two-decimal EPS and four-decimal average FX. '
+                                             'Sum/difference of separately translated EPS uses varying period diluted share '
+                                             'counts; not an issuer-published exact TTM EUR EPS.',
+                          'source_urls': ['https://totalenergies.com/system/files/documents/totalenergies_universal-registration-document-2025_2026_en.pdf',
+                                          'https://www.sec.gov/Archives/edgar/data/879764/000110465926120831/tm2628570d1_ex99-9.htm'],
+                          'source_pages': 'FY2025 USD dilutedEPS URDp453; FY2025/2024EUR dilutedEPS URDp495; 9M2026/25USD '
+                                          'dilutedEPS Q3releasep30; averageFX Q3releasep4 footnote5.',
+                          'price_date': '2026-11-20',
+                          'price': 78.19,
+                          'pe': 9.06429721692864,
+                          'vendor_comparison': {'yahoo_paris_trailing_eps': 8.52,
+                                                'yahoo_paris_pe': 9.177230046948358,
+                                                'yahoo_nyse_ttm_eps_usd': 10.02,
+                                                'note': 'Vendor Paris EPS8.52 differs from the disclosed period-average '
+                                                        'reconstruction. financialCurrency=USD alone does not establish an '
+                                                        'EUR/USD error. Keep vendor raw fields and provenance; do not '
+                                                        'silently overwrite or spot-multiply forward estimate.'}},
+  'dividend_policy': {'regular_fy2025': {'value': 3.4,
+                                         'unit': 'EUR/ordinary share',
+                                         'period': 'FY2025 declared',
+                                         'source_url': 'https://totalenergies.com/investors/shares-and-dividends/dividends'},
+                      'latest_interim': {'value': 0.9,
+                                         'unit': 'EUR/ordinary share',
+                                         'period': 'FY2026 third interim declared2026-10-29',
+                                         'source_url': 'https://totalenergies.com/investors/shares-and-dividends/dividends',
+                                         'note': 'Ex2027-03-31; cash2027-04-02Paris. First2026interim.90already '
+                                                 'paid2026-10-02; second.90ex2026-12-31.'},
+                      'annualized_regular_assumption': {'value': 3.6,
+                                                        'currency': 'EUR/share',
+                                                        'formula': '4×latest.90interim',
+                                                        'not_declared_fy_total': True,
+                                                        'source_url': 'https://totalenergies.com/investors/shares-and-dividends/dividends'},
+                      'official_ttm_gross_cash': {'value': 3.45,
+                                                  'currency': 'EUR/share',
+                                                  'period': '12 months to2026-11-20',
+                                                  'components': [{'ex': '2025-12-31', 'cash': 0.85},
+                                                                 {'ex': '2026-03-31', 'cash': 0.85},
+                                                                 {'ex': '2026-06-30', 'cash': 0.85},
+                                                                 {'ex': '2026-09-30', 'cash': 0.9}],
+                                                  'source_url': 'https://totalenergies.com/investors/shares-and-dividends/dividends'},
+                      'special_history_example': {'fiscal_year': 2022,
+                                                  'ordinary': 2.81,
+                                                  'special': 1.0,
+                                                  'total': 3.81,
+                                                  'currency': 'EUR/share',
+                                                  'special_ex_date': '2022-12-06',
+                                                  'source_url': 'https://totalenergies.com/investors/shares-and-dividends/dividends'},
+                      'projection_note': 'Ordentliche EUR-Dividende separat von2022Sonderdividende. Historische '
+                                         'Gesamtrendite darf Sondercash enthalten, regelmäßiges künftiges '
+                                         'Dividendenwachstum nicht ungeprüft daraus ableiten.'},
+  'issuer_snapshot': {'as_of': '2026-09-30',
+                      'verified_at': '2026-11-21',
+                      'currency': 'USD',
+                      'metrics': {'cfo_ifrs': {'value': 29609,
+                                               'unit': 'USD million',
+                                               'period': '9M2026',
+                                               'source_url': 'https://www.sec.gov/Archives/edgar/data/879764/000110465926120831/tm2628570d1_ex99-9.htm'},
+                                  'cffo_ex_working_capital': {'value': 30635,
+                                                              'unit': 'USD million',
+                                                              'period': '9M2026',
+                                                              'source_url': 'https://www.sec.gov/Archives/edgar/data/879764/000110465926120831/tm2628570d1_ex99-9.htm'},
+                                  'net_investments': {'value': 11204,
+                                                      'unit': 'USD million',
+                                                      'period': '9M2026',
+                                                      'source_url': 'https://www.sec.gov/Archives/edgar/data/879764/000110465926120831/tm2628570d1_ex99-9.htm'},
+                                  'net_cashflow': {'value': 19431,
+                                                   'unit': 'USD million',
+                                                   'period': '9M2026',
+                                                   'source_url': 'https://www.sec.gov/Archives/edgar/data/879764/000110465926120831/tm2628570d1_ex99-9.htm',
+                                                   'note': 'CFFO less net investments; issuer-defined non-GAAP.'},
+                                  'cash_dividends_paid_parent': {'value': 6372,
+                                                                 'unit': 'USD million',
+                                                                 'period': '9M2026',
+                                                                 'source_url': 'https://www.sec.gov/Archives/edgar/data/879764/000110465926120831/tm2628570d1_ex99-9.htm'},
+                                  'gearing_ex_leases': {'value': 9.1,
+                                                        'unit': '%',
+                                                        'period': '2026-09-30',
+                                                        'source_url': 'https://www.sec.gov/Archives/edgar/data/879764/000110465926120831/tm2628570d1_ex99-9.htm'},
+                                  'capital_return_policy': {'value': 40,
+                                                            'unit': '% of CFFO',
+                                                            'basis': 'Dividends PLUS share buybacks; not dividend-only '
+                                                                     'payout ratio.',
+                                                            'source_url': 'https://www.sec.gov/Archives/edgar/data/879764/000110465926120831/tm2628570d1_ex99-9.htm'}},
+                      'source_urls': ['https://totalenergies.com/system/files/documents/totalenergies_universal-registration-document-2025_2026_en.pdf',
+                                      'https://www.sec.gov/Archives/edgar/data/879764/000110465926120831/tm2628570d1_ex99-9.htm'],
+                      'refresh_policy': 'Datiertes Emittenten-Research; bei neuer Berichtsperiode erneut prüfen. Aktuelle '
+                                        'Kurse, Dividendenhistorien und Renditen werden täglich aktualisiert.'},
+  'regular_dividend_reference': {'value': 3.6,
+                                 'currency': 'EUR',
+                                 'as_of': '2026-10-29',
+                                 'kind': 'latest_interim_times_four_not_declared_fy_total',
+                                 'source_url': 'https://totalenergies.com/investors/shares-and-dividends/dividends'},
+  'vendor_cross_listing_check': {'symbol': 'TTE',
+                                 'currency': 'USD',
+                                 'financialCurrency': 'USD',
+                                 'currentPrice': 85.2,
+                                 'trailingEps': 10.02,
+                                 'forwardEps': 12.14362,
+                                 'trailingPE': 8.502994,
+                                 'forwardPE': 7.01603,
+                                 'bookValue': 60.135},
+  'hist_div': 5.915303465869915,
+  'reference_set': 'income-universe-2026',
+  'tranche_policy': 'individual_only',
+  'active_in_portfolios': False,
+  'prepared_for': 'future_custom_portfolio_simulation',
+  'logo': {'source_url': 'https://totalenergies.com/themes/custom/totalenergies_com/dist/img/favicon.png',
+           'homepage': 'https://totalenergies.com/',
+           'mime_type': 'image/png',
+           'data_uri': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAGySURBVHja1dNPSBQBHMXx725qXYSlf2xBNR0qUsgMOgZbFEV0kISCNFIiQiTYoYW9rWNUIB02Imohwks3yb11k0FDxKyWpMxtraEgTCiGivRgy+t3mIMIeQrCBx9+l8e7/VglufUzhVct4GqCbk1yST5tugCAYK85a1ImxvI8CHvIz8sGhCvRJcU7pE1npMYW5REERkuUTNG411qv9jZ5IyL/KyC3eJi0EqRUs61Vx08eq4anjugHgkGjlSzg6DMnvk7RNT7MvWcPN46FuYYvunJg4Q1EESRUT0aNSFspCW6/2N0Q+M3N+lh/MPzAuflXZPWUgoprhsL7yYrvObMOy6M2RtTONADDox5jg6p7fv0RIubhxQP617FS5OIpg5QmgV9MxCf6gkOTp3WjXDvnzzA0947H1TKf9Jb+vw2sV5aibABg58vuHZ3TezoLFfzR98zMVhhfLNOrEg7/JILzZp9JRNaapGkxG0zNkm5d1NlsYqYWQbvpMTeNa+5+g7Qga3K/4aJg4DvcEWRMnxkwHeYJgu3GiZb3m9RrSMqu2WUck5qCLYKj5nLUa5Ld//9nfwA5v/MkQ6im0wAAAABJRU5ErkJggg=='},
+  'research_verified_at': '2026-11-21'}]
+RESERVE_TICKERS = frozenset({'RIO', 'MAIN', 'ARCC', 'O', 'TTE.PA'})
+
 
 def apply_classic_annual_roe(stock: dict[str, Any], previous: dict[str, Any]) -> None:
     """A disclosed annual observation fills an absent vendor ROE, not a fake TTM."""
@@ -3963,7 +6001,7 @@ def refresh_fear_and_greed(previous: Any = None,
 
 
 def tranche_for(portfolio_id: str, forward_pe: Any) -> tuple[str, str, str]:
-    if portfolio_id == 'classic':
+    if portfolio_id in {'classic', 'universe'}:
         return 'Individuell bewerten', 'slate', 'individual'
     pe = finite_number(forward_pe)
     if pe is None or pe <= 0:
@@ -4046,6 +6084,22 @@ def build_seed_data(now: datetime | None = None) -> dict[str, Any]:
             add_derived(stock, portfolio["id"])
             group["stocks"].append(stock)
         result["portfolios"].append(group)
+    reserve_stocks = []
+    for ref in RESERVE_REFERENCES:
+        stock = deepcopy({key: value for key, value in ref.items() if key != "initial"})
+        stock.update({field: None for field in NUMERIC_FIELDS})
+        stock.update(currency=None, source_status="initial", as_of=None,
+                     field_sources={field: "unavailable" for field in (*NUMERIC_FIELDS, "currency")},
+                     field_updated_at={field: None for field in (*NUMERIC_FIELDS, "currency")},
+                     warnings=[INITIAL_WARNING])
+        add_derived(stock, 'universe')
+        reserve_stocks.append(stock)
+    result["security_universe"] = dict(
+        schema_version=1, name="Income research",
+        purpose="Prepared securities for future portfolio simulations",
+        stocks=reserve_stocks, expected_stock_count=len(RESERVE_TICKERS),
+        updated_at=stamp, last_attempted_at=None, data_mode="initial",
+        status_counts=dict(Counter(stock["source_status"] for stock in reserve_stocks)))
     return result
 
 
@@ -5170,16 +7224,128 @@ def calculate_period_returns(history: Any, ticker: str, info: dict[str, Any] | N
     return result
 
 
-def valid_available_history(available: Any, parent: dict[str, Any]) -> bool:
+O_SPINOFF_DATE = "2021-11-15"
+O_SPINOFF_SOURCE = "https://www.sec.gov/Archives/edgar/data/726728/000072672822000046/R37.htm"
+O_SPINOFF_FAIR_VALUE_PER_ONL_SHARE = 20.6272
+O_SPINOFF_ONL_SHARES_PER_O_SHARE = 0.1
+
+
+def prepare_reserve_history(history: Any, ticker: str) -> tuple[Any, Any, list[dict[str, Any]]]:
+    """Keep O's synthetic noncash adjustment out of cash DPS and pure prices."""
+    import pandas as pd
+    cash_history = history.copy()
+    actions: list[dict[str, Any]] = []
+    if ticker != "O":
+        return cash_history, cash_history.copy(), actions
+    dates = pd.DatetimeIndex([pd.Timestamp(index.date()) for index in cash_history.index])
+    event = pd.Timestamp(O_SPINOFF_DATE)
+    if event not in dates:
+        if len(dates) and dates.min() < event < dates.max():
+            raise ValueError("Realty Income: Orion-Stichtag fehlt innerhalb der Historie; keine ungesicherte Langfristbasis verwenden")
+        return cash_history, cash_history.copy(), actions
+    location = dates.get_loc(event)
+    factor = finite_number(cash_history.iloc[location].get("Stock Splits"))
+    if factor is None or not math.isclose(factor, 1.032, abs_tol=1e-6):
+        raise ValueError("Realty Income: providerseitige Orion-Rückrechnung nicht als bestätigter Faktor 1,032 erkannt; keine ungesicherte 10J-Basis verwenden")
+    before = dates < event
+    for field in ("Close", "Dividends", "Capital Gains"):
+        if field in cash_history:
+            cash_history.loc[before, field] = cash_history.loc[before, field] * factor
+    cash_history.iloc[location, cash_history.columns.get_loc("Stock Splits")] = 0.0
+    total_history = cash_history.copy()
+    if "Capital Gains" not in total_history:
+        total_history["Capital Gains"] = 0.0
+    existing = finite_number(total_history.iloc[location]["Capital Gains"])
+    equivalent = O_SPINOFF_FAIR_VALUE_PER_ONL_SHARE * O_SPINOFF_ONL_SHARES_PER_O_SHARE
+    if existing is None or existing != 0:
+        raise ValueError("Realty Income: zusätzliche, nicht eindeutig getrennte Orion-Bar-/Sachkomponente")
+    total_history.iloc[location, total_history.columns.get_loc("Capital Gains")] = equivalent
+    actions.append(dict(
+        type="noncash_spinoff", effective_date="2021-11-12", calculation_date=O_SPINOFF_DATE,
+        parent_ticker="O", distributed_ticker="ONL", child_shares_per_parent_share=0.1,
+        provider_synthetic_split_undone=factor,
+        normalized_fields=["Close", "Dividends", "Capital Gains"],
+        child_fair_value_usd=O_SPINOFF_FAIR_VALUE_PER_ONL_SHARE,
+        noncash_equivalent_usd_per_parent_share=round(equivalent, 8),
+        valuation_basis="Vom Emittenten veröffentlichter 5-Tage-VWAP nach Ausgabe; kein belegter Schlusskurs des ersten Handelstags",
+        source_url=O_SPINOFF_SOURCE,
+        method="Vor dem 15.11.2021 werden Yahoos mit 1,032 rückgerechnete O-Kurse und Cash-Dividenden auf die tatsächliche O-Aktienbasis zurückgeführt. Die Orion-Zuteilung von 1 ONL je 10 O ist kein O-Aktiensplit. Nur für Gesamtrenditen wird ihr publizierter steuerlicher Fair Value von 20,6272 USD je ONL (2,06272 USD je O) am ersten regulären Handelstag als fiktiver Verkauf und Wiederanlage in O angesetzt. Diese bewertete Sachdividende ist eine ausdrücklich gekennzeichnete Näherung; sie ist weder regulärer Cash noch Teil des DPS-Wachstums. Reine Kursrenditen verwenden die zurückgeführten Kurse ohne Sachdividende."))
+    return cash_history, total_history, actions
+
+
+def calculate_reserve_history_payload(history: Any, ticker: str, info: dict[str, Any], stamp: str) -> dict[str, Any]:
+    """Return isolated price, cash-DPS and total-return histories for reserves."""
+    cash_history, total_history, actions = prepare_reserve_history(history, ticker)
+    payload: dict[str, Any] = {}
+    try:
+        growth = calculate_dividend_growth(cash_history, ticker, info, stamp)
+        if actions:
+            growth["corporate_actions"] = deepcopy(actions)
+            growth["warning"] += " Realty Income: Orion-Sachdividende 2021 ist aus der Cash-DPS-Reihe ausgeschlossen; die synthetische Provider-Splitrückrechnung wurde rückgängig gemacht."
+            growth["share_basis"] = "Tatsächliche O-Common-Share-Basis; Orion-Sachdividende und synthetischer 1,032-Faktor sind keine O-Aktienvermehrung"
+        payload["dividend_growth"] = growth
+    except Exception as exc:
+        payload["dividend_growth_error"] = f"Reserve-Dividendenhistorie: {type(exc).__name__}: {str(exc)[:180]}"
+    try:
+        total = calculate_period_returns(total_history, ticker, info, stamp)
+        if actions:
+            total["corporate_actions"] = deepcopy(actions)
+            total["cash_component_note"] = "Zusätzlich zur Cash-Wiederanlage enthält die Reihe die bewertete Orion-Sachdividende; Zeiträume vor 15.11.2021 nutzen deren publizierten 5-Tage-VWAP als Wiederanlage-Näherung."
+            for period in total["periods"].values():
+                if period.get("value") is not None and period.get("start", "9999") < O_SPINOFF_DATE:
+                    period["approximation"] = "Orion-Sachdividende zum veröffentlichten 5-Tage-VWAP statt unbelegtem erstem Schlusskurs bewertet"
+            if total.get("available_history", {}).get("start", "9999") < O_SPINOFF_DATE:
+                total["available_history"]["corporate_action_approximation"] = True
+        payload["returns"] = total
+    except Exception as exc:
+        payload["returns_error"] = f"Reserve-Gesamtrendite: {type(exc).__name__}: {str(exc)[:180]}"
+    try:
+        price = calculate_reserve_price_returns(cash_history, ticker, info, stamp)
+        if actions:
+            price["corporate_actions"] = deepcopy(actions)
+            price["cash_component_note"] = "Keine Cash-/Sachdividenden; O-Kurse vor Orion-Abspaltung aus der synthetischen 1,032-Provider-Rückrechnung zurückgeführt."
+        payload["price_returns"] = price
+    except Exception as exc:
+        payload["price_returns_error"] = f"Reserve-Kursrendite: {type(exc).__name__}: {str(exc)[:180]}"
+    return payload
+
+
+def calculate_reserve_price_returns(history: Any, ticker: str, info: dict[str, Any] | None = None,
+                                    retrieved_at: str | None = None) -> dict[str, Any]:
+    """Use the same periods and split-adjusted closes, excluding every payout.
+
+    The caller can provide issuer-corrected closes for corporate actions without
+    changing the cash-inclusive return calculation or mutating its input frame.
+    """
+    if history is None:
+        raise ValueError("Kursrenditehistorie fehlt")
+    price_history = history.copy(deep=True)
+    price_history["Dividends"] = 0.0
+    price_history["Capital Gains"] = 0.0
+    result = calculate_period_returns(price_history, ticker, info, retrieved_at)
+    result.update(basis="price_return", type="price_return", method=PRICE_RETURN_METHOD)
+    available = result.get("available_history")
+    if isinstance(available, dict):
+        available.update(basis="price_return", method=PRICE_RETURN_METHOD,
+                         reason=("Kursentwicklung ohne Dividenden oder Ausschüttungen im längsten "
+                                 "verfügbaren Zeitraum ohne erkannten Datenbruch; fehlende Jahre werden nicht ergänzt."))
+    for period in result["periods"].values():
+        if "reason" in period:
+            period["reason"] = period["reason"].replace("Gesamtrendite", "Kursrendite")
+    return result
+
+
+def valid_available_history(available: Any, parent: dict[str, Any], *,
+                            basis: str = "total_return") -> bool:
     """Validate optional projection provenance without accepting invented years."""
     if (not isinstance(available, dict) or available.get("version") != 1 or
-            available.get("basis") != "total_return" or
+            available.get("basis") != basis or
             not isinstance(parent.get("currency"), str) or not parent["currency"] or
             available.get("currency") != parent["currency"] or
             available.get("source_url") != parent.get("source_url") or
             available.get("retrieved_at") != parent.get("retrieved_at") or
             available.get("end") != parent.get("as_of") or
-            available.get("method") != AVAILABLE_HISTORY_METHOD or
+            available.get("method") != (AVAILABLE_HISTORY_METHOD if basis == "total_return" else PRICE_RETURN_METHOD) or
             not isinstance(available.get("reason"), str) or not available["reason"].strip() or
             type(available.get("annualized")) is not bool or
             type(available.get("observations")) is not int or available["observations"] < 0):
@@ -5213,9 +7379,10 @@ def valid_available_history(available: Any, parent: dict[str, Any]) -> bool:
     return rate is not None and rate > -100 and days > 0 and available["observations"] >= 2
 
 
-def valid_period_returns(value: Any, ticker: str, stamp: str) -> dict[str, Any] | None:
-    """Accept only this documented total-return schema, including cached rows."""
-    if not isinstance(value, dict) or value.get("version") != RETURN_VERSION or value.get("basis") != "total_return":
+def _valid_period_returns(value: Any, ticker: str, stamp: str, *,
+                          basis: str) -> dict[str, Any] | None:
+    """Shared date/period checks; callers specify the observed return basis."""
+    if not isinstance(value, dict) or value.get("version") != RETURN_VERSION or value.get("basis") != basis:
         return None
     if value.get("source_status") not in {"live", "previous"}:
         return None
@@ -5259,9 +7426,22 @@ def valid_period_returns(value: Any, ticker: str, stamp: str) -> dict[str, Any] 
         if key == "all" and period["annualized"] != ((end - first).days >= 365.2425):
             return None
         has_value = True
-    if "available_history" in value and not valid_available_history(value["available_history"], value):
+    if "available_history" in value and not valid_available_history(value["available_history"], value, basis=basis):
         return None
     return deepcopy(value) if has_value else None
+
+
+def valid_period_returns(value: Any, ticker: str, stamp: str) -> dict[str, Any] | None:
+    """Accept only this documented total-return schema, including cached rows."""
+    return _valid_period_returns(value, ticker, stamp, basis="total_return")
+
+
+def valid_price_returns(value: Any, ticker: str, stamp: str) -> dict[str, Any] | None:
+    """A price series cannot be accepted as reinvested total returns or vice versa."""
+    if (not isinstance(value, dict) or value.get("type") != "price_return" or
+            value.get("method") != PRICE_RETURN_METHOD):
+        return None
+    return _valid_period_returns(value, ticker, stamp, basis="price_return")
 
 
 def apply_period_returns(stock: dict[str, Any], previous: dict[str, Any], payload: dict[str, Any], stamp: str) -> None:
@@ -5276,6 +7456,25 @@ def apply_period_returns(stock: dict[str, Any], previous: dict[str, Any], payloa
         stock["returns"] = prior
     else:
         stock["returns"] = unavailable_period_returns(stock["ticker"], payload.get("returns_error") or "Gesamtrenditehistorie noch nicht verfügbar")
+
+
+def apply_reserve_price_returns(stock: dict[str, Any], previous: dict[str, Any],
+                                payload: dict[str, Any], stamp: str) -> None:
+    fresh = valid_price_returns(payload.get("price_returns"), stock["ticker"], stamp)
+    prior = valid_price_returns(previous.get("price_returns"), stock["ticker"], stamp)
+    if fresh and (not prior or fresh["as_of"] >= prior["as_of"]):
+        chosen = fresh
+        chosen["source_status"] = "live"
+    elif prior:
+        chosen = prior
+        chosen["source_status"] = "previous"
+        chosen["refresh_note"] = payload.get("price_returns_error") or "Kein neuerer bestätigter Kursrendite-Datenstand; geprüfter Vorwert mit ursprünglichem Stichtag."
+    else:
+        chosen = unavailable_period_returns(stock["ticker"], payload.get("price_returns_error") or "Kursrenditehistorie noch nicht verfügbar")
+        chosen.update(basis="price_return", type="price_return", method=PRICE_RETURN_METHOD)
+    stock["price_returns"] = chosen
+    stock["field_sources"]["price_returns"] = chosen["source_status"]
+    stock["field_updated_at"]["price_returns"] = chosen["retrieved_at"]
 
 
 def valid_tsm_fx(value: Any, stamp: str) -> dict[str, Any] | None:
@@ -5422,12 +7621,19 @@ def _fetch_worker(ticker: str, pipe: Any, attempts: int) -> None:
             long_history = security.history(period="max", interval="1d", auto_adjust=False, actions=True, timeout=12)
             metadata = security.get_history_metadata()
             return_info = {**(metadata if isinstance(metadata, dict) else {}), **info}
-            issuer_cash = fetch_jepq_return_cash() if ticker == "JEPQ" else None
-            try:
-                pipe.send(dict(dividend_growth=calculate_dividend_growth(long_history, ticker, return_info, iso_now(), issuer_cash)))
-            except Exception as exc:
-                pipe.send(dict(dividend_growth_error=f"Dividendenwachstum: {type(exc).__name__}: {str(exc)[:180]}"))
-            pipe.send(dict(returns=calculate_period_returns(long_history, ticker, return_info, iso_now(), issuer_cash)))
+            if ticker in RESERVE_TICKERS:
+                try:
+                    pipe.send(calculate_reserve_history_payload(long_history, ticker, return_info, iso_now()))
+                except Exception as exc:
+                    detail = f"Reserve-Historienbasis: {type(exc).__name__}: {str(exc)[:180]}"
+                    pipe.send(dict(dividend_growth_error=detail, returns_error=detail, price_returns_error=detail))
+            else:
+                issuer_cash = fetch_jepq_return_cash() if ticker == "JEPQ" else None
+                try:
+                    pipe.send(dict(dividend_growth=calculate_dividend_growth(long_history, ticker, return_info, iso_now(), issuer_cash)))
+                except Exception as exc:
+                    pipe.send(dict(dividend_growth_error=f"Dividendenwachstum: {type(exc).__name__}: {str(exc)[:180]}"))
+                pipe.send(dict(returns=calculate_period_returns(long_history, ticker, return_info, iso_now(), issuer_cash)))
         except Exception as exc:
             pipe.send(dict(returns_error=f"Gesamtrendite-Historie: {type(exc).__name__}: {str(exc)[:180]}"))
         if ticker == TSM_TICKER:
@@ -5500,6 +7706,83 @@ def _fallback(stock: dict[str, Any], previous: dict[str, Any], field: str) -> No
         stock["field_sources"][field] = "previous"
         stock["field_updated_at"][field] = previous.get("field_updated_at", {}).get(field)
 
+
+def enrich_reserve_stock(stock: dict[str, Any], payload: dict[str, Any], stamp: str) -> None:
+    """Derive price ratios from explicitly dated issuer facts, never buy signals."""
+    info = payload.get("info") or {}
+    price = finite_number(stock.get("price"))
+    quoted_currency = stock.get("currency")
+    expected_currency = stock.get("quote_currency")
+    stock["vendor_metrics"] = dict(
+        provider="Yahoo Finance", source_url=f"https://finance.yahoo.com/quote/{quote(stock['ticker'], safe='')}/key-statistics/",
+        retrieved_at=payload.get("info_retrieved_at"), quote_currency=quoted_currency,
+        financial_currency=info.get("financialCurrency"),
+        trailing_pe=finite_number(info.get("trailingPE")), forward_pe=finite_number(info.get("forwardPE")),
+        trailing_eps=finite_number(info.get("trailingEps")), forward_eps=finite_number(info.get("forwardEps")),
+        dividend_yield=finite_number(info.get("dividendYield")), dividend_rate=finite_number(info.get("dividendRate")),
+        note="Unveränderte Anbieterwerte. financialCurrency ist die Abschlusswährung und beweist allein keine EPS-/Quotierungswährung.")
+    snapshot = stock.get("issuer_snapshot") or {}
+    current = stock.get("current_primary_ttm") or {}
+    expected_period = current.get("period_end") or snapshot.get("as_of")
+    vendor_period = None
+    try:
+        epoch = finite_number(info.get("mostRecentQuarter"))
+        if epoch:
+            vendor_period = datetime.fromtimestamp(epoch, timezone.utc).date().isoformat()
+        verified = datetime.strptime(snapshot.get("verified_at", ""), "%Y-%m-%d").date()
+        age = (datetime.fromisoformat(stamp).date() - verified).days
+    except (ValueError, TypeError, OverflowError, OSError):
+        age = None
+    matched = (quoted_currency == expected_currency and expected_period is not None and
+               vendor_period == expected_period and age is not None and 0 <= age <= 180)
+    snapshot["status"] = "matched_latest_provider_quarter" if matched else "review_required"
+    snapshot["provider_latest_quarter"] = vendor_period
+    snapshot["freshness_note"] = ("Berichtsperiode stimmt mit dem Kursanbieter überein; Emittentenwerte behalten ihren ausgewiesenen Berichts-/Prüfzeitpunkt."
+                                  if matched else "Datierter Emittenten-Snapshot; neueste Periode oder Basis nicht mehr bestätigt. Vor aktuellen Bewertungssignalen erneut prüfen.")
+    stock["issuer_snapshot"] = snapshot
+    if current and matched and price is not None and price > 0:
+        eps = finite_number(current.get("diluted_eps"))
+        if current.get("currency") == quoted_currency and eps is not None and eps > 0:
+            stock["current_pe"] = price / eps
+            stock["field_sources"]["current_pe"] = "live" if stock["field_sources"].get("price") == "live" else "previous"
+            stock["field_updated_at"]["current_pe"] = stock["field_updated_at"].get("price")
+            stock.setdefault("field_metadata", {})["current_pe"] = dict(
+                provider="Emittenten-IR + aktueller Kurs", label=current.get("label", "IR-TTM rekonstruiert (ca.)"),
+                source_url=current["source_urls"][-1], source_urls=current["source_urls"],
+                currency=quoted_currency, share_basis=stock.get("share_basis"),
+                diluted_eps=eps, report_period_end=current["period_end"], verified_at=snapshot.get("verified_at"),
+                method=current.get("formula", current.get("formula_eps", "")),
+                rounding_caveat=current.get("rounding_caveat", current.get("caveat", "")),
+                note="Aktueller Kurs geteilt durch datiert rekonstruierte, basisgleiche TTM-EPS. Kein Emittenten-Ausweis eines exakten Vierquartals-EPS; gerundete Perioden-EPS und variierende Durchschnittsaktien können abweichen.")
+    stock.setdefault("field_metadata", {})["forward_pe"] = dict(
+        provider="Yahoo Finance / Analystenschätzung", source_url=f"https://finance.yahoo.com/quote/{quote(stock['ticker'], safe='')}/analysis/",
+        quote_currency=quoted_currency, financial_currency=info.get("financialCurrency"),
+        share_basis=stock.get("share_basis"), forward_eps_vendor=finite_number(info.get("forwardEps")),
+        note=("Anbieter-Schätzgröße; bei TotalEnergies ist die implizite EPS-Währungsumrechnung nicht unabhängig nachgebaut. Keine pauschale Spot-FX-Korrektur und kein automatisches positives Signal."
+              if stock["ticker"] == "TTE.PA" else "Analysten-EPS-Schätzung des Anbieters auf der jeweiligen gelisteten Aktienbasis, keine Emittentengarantie."))
+    metrics = snapshot.get("metrics") or {}
+    sector = dict(price_as_of=stock.get("as_of"), issuer_period_end=expected_period,
+                  issuer_snapshot_status=snapshot["status"], currency=quoted_currency,
+                  note="Kursabhängige Quotienten auf datiertem Emittenten-Snapshot; keine Nachkauf-Bedingung wird automatisch positiv markiert.")
+    if price is not None and price > 0 and quoted_currency == expected_currency:
+        nav = finite_number(metrics.get("nav_per_share"))
+        if nav is not None and nav > 0:
+            sector["p_nav"] = price / nav
+            sector["nav_per_share"] = nav
+            sector["nav_method"] = "Aktueller USD-Kurs / zuletzt recherchierter NAV je derselben Common Share; NAV-Datum gesondert ausgewiesen."
+        affo = finite_number(current.get("diluted_affo_per_share"))
+        if affo is not None and affo > 0:
+            sector["p_affo_ttm"] = price / affo
+        guidance = metrics.get("fy2026_affo_guidance", {}).get("value") if isinstance(metrics.get("fy2026_affo_guidance"), dict) else None
+        if isinstance(guidance, list) and len(guidance) == 2 and all(finite_number(value) is not None and value > 0 for value in guidance):
+            sector["forward_p_affo_fy2026_midpoint"] = price / ((guidance[0] + guidance[1]) / 2)
+            sector["affo_guidance"] = deepcopy(metrics["fy2026_affo_guidance"])
+        reference = stock.get("regular_dividend_reference") or {}
+        annual = finite_number(reference.get("value"))
+        if reference.get("currency") == quoted_currency and annual is not None and annual >= 0:
+            sector["regular_dividend_reference_yield_pct"] = annual / price * 100
+            sector["regular_dividend_reference"] = deepcopy(reference)
+    stock["sector_valuation"] = sector
 
 def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[str, Any], portfolio_id: str, stamp: str) -> dict[str, Any]:
     stock = {**deepcopy(seed), "field_sources": dict(seed["field_sources"]), "field_updated_at": dict(seed["field_updated_at"]), "warnings": list(payload.get("warnings", []))}
@@ -5584,6 +7867,25 @@ def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[st
         stock["as_of"] = None
     if portfolio_id == 'classic':
         apply_classic_annual_roe(stock, previous)
+    if portfolio_id == 'universe':
+        enrich_reserve_stock(stock, payload, stamp)
+        apply_dividend_growth(stock, previous, payload)
+        growth = stock["dividend_growth"]
+        cash_yield = finite_number(stock.get("dividend_annual_yield_pct"))
+        # Reserve securities use actual trailing cash, including supplements,
+        # consistently with Outlook. Keep vendor annualizations separately.
+        stock["div_yield"] = cash_yield
+        yield_live = growth.get("source_status") == "live" and stock["field_sources"].get("price") == "live"
+        stock["field_sources"]["div_yield"] = "live" if cash_yield is not None and yield_live else "previous" if cash_yield is not None else "unavailable"
+        stock["field_updated_at"]["div_yield"] = growth.get("retrieved_at") if cash_yield is not None else None
+        stock.setdefault("field_metadata", {})["div_yield"] = dict(
+            label="Tatsächliche Barausschüttungen TTM / aktueller Kurs",
+            source_url=f"https://finance.yahoo.com/quote/{quote(stock['ticker'], safe='')}/history/",
+            currency=stock.get("currency"), share_basis=stock.get("share_basis"),
+            cash_dividends_ttm=stock.get("dividend_annual"), price=stock.get("price"),
+            price_as_of=stock.get("as_of"), dividends_as_of=growth.get("end"),
+            dividends_retrieved_at=growth.get("retrieved_at"),
+            method="Summe tatsächlicher Barausschüttungen der letzten zwölf Monate am Ex-Tag / Kurs × 100. Sonder-/Zusatzdividenden enthalten; kein garantierter künftiger Ertrag. Reguläre Dividendenreferenz separat.")
     required = ["price", "sma200", "rsi14", "currency", "distribution_yield_ttm"] if is_etf else ["current_pe", "forward_pe", "price", "sma200", "rsi14", "currency", *( ["ps_ratio"] if portfolio_id == "tech" else ["div_yield", "roe"])]
     sources = [stock["field_sources"][field] for field in required]
     if all(source == "live" for source in sources):
@@ -5602,7 +7904,16 @@ def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[st
     # The run stamp is its start, while this optional endpoint arrives later.
     # Validate against the actual merge time without changing its source stamp.
     apply_period_returns(stock, previous, payload, iso_now())
-    apply_dividend_growth(stock, previous, payload)
+    if portfolio_id != 'universe':
+        apply_dividend_growth(stock, previous, payload)
+    if portfolio_id == 'universe':
+        apply_reserve_price_returns(stock, previous, payload, iso_now())
+        stock["simulation_ready"] = (finite_number(stock.get("price")) is not None and stock["price"] > 0
+                                     and stock.get("currency") in {"USD", "EUR"}
+                                     and valid_dividend_growth(stock.get("dividend_growth"), stock["ticker"], stock["currency"]) is not None
+                                     and valid_period_returns(stock.get("returns"), stock["ticker"], iso_now()) is not None
+                                     and valid_price_returns(stock.get("price_returns"), stock["ticker"], iso_now()) is not None)
+        stock["simulation_readiness_note"] = "Daten für künftige Szenarien vorbereitet; keine Aufnahme in ein Depot und kein Kaufsignal."
     add_derived(stock, portfolio_id)
     return stock
 
@@ -5620,12 +7931,17 @@ def build_live_data(previous: dict[str, Any] | None = None,
     old_stocks = {(group.get('id'), stock['ticker']): stock
                   for group in previous.get('portfolios', []) for stock in group.get('stocks', [])
                   if isinstance(stock, dict) and 'ticker' in stock}
-    unique_tickers = list(dict.fromkeys(stock['ticker'] for group in result['portfolios'] for stock in group['stocks']))
+    prior_universe = previous.get('security_universe') or {}
+    old_stocks.update({('universe', stock['ticker']): stock
+                       for stock in prior_universe.get('stocks', [])
+                       if isinstance(stock, dict) and 'ticker' in stock})
+    groups = [*result['portfolios'], dict(id='universe', stocks=result['security_universe']['stocks'])]
+    unique_tickers = list(dict.fromkeys(stock['ticker'] for group in groups for stock in group['stocks']))
     # One bounded request pipeline per distinct security. Four workers keep a
     # larger watchlist within the workflow timeout; overlaps reuse one payload.
     with ThreadPoolExecutor(max_workers=min(4, len(unique_tickers))) as executor:
         pending = {ticker: executor.submit(fetcher, ticker) for ticker in unique_tickers}
-        for group in result['portfolios']:
+        for group in groups:
             for index, seed in enumerate(group['stocks']):
                 print(f"[{group['id']}] {seed['ticker']}: lade Daten …", flush=True)
                 prior = old_stocks.get((group['id'], seed['ticker']), {})
@@ -5652,6 +7968,18 @@ def build_live_data(previous: dict[str, Any] | None = None,
         result["warnings"].append("Keine neuen Yahoo-Finance-Daten; bisherige Werte bzw. Startwerte bleiben mit ursprünglicher Herkunft erhalten.")
         result["last_updated"] = previous.get("last_updated", result["last_updated"])
         result["updated_at"] = previous.get("updated_at", result["updated_at"])
+    universe = result['security_universe']
+    universe['last_attempted_at'] = result['last_attempted_at']
+    reserve_counts = Counter(stock['source_status'] for stock in universe['stocks'])
+    universe['status_counts'] = dict(reserve_counts)
+    reserve_live = any('live' in stock['field_sources'].values() for stock in universe['stocks'])
+    if reserve_counts['live'] == universe['expected_stock_count']:
+        universe['data_mode'] = 'live'
+    elif reserve_live:
+        universe['data_mode'] = 'partial'
+    else:
+        universe['data_mode'] = 'stale'
+        universe['updated_at'] = prior_universe.get('updated_at', universe['updated_at'])
     result["fear_and_greed"] = refresh_fear_and_greed(previous.get("fear_and_greed"), fear_greed_fetcher)
     result["fx_rates"] = refresh_ecb_fx(previous.get("fx_rates"), fx_fetcher)
     return result
