@@ -80,6 +80,12 @@
     if (!canImport()) { reset(); return; }
     $('project-import-legacy').hidden = false;
   }
+  function focusImportTrigger() {
+    const visible = node => node && !node.disabled && node.getClientRects().length > 0 && getComputedStyle(node).visibility !== 'hidden';
+    const action = $('project-import-legacy'), menu = $('project-menu-toggle');
+    if (visible(action)) action.focus();
+    else if (visible(menu)) menu.focus();
+  }
   function money(value) { return value === undefined || value === null ? 'offen' : new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 2 }).format(value); }
   function sharesPreview(settings) {
     const entries = Object.entries(settings.shares || {}).filter(([ticker]) => settings.excluded?.[ticker] !== true);
@@ -131,7 +137,7 @@
     try {
       await config.applySettings(settings, { projectId: 'floyd', isCurrent: () => token === generation && canImport() });
       if (token !== generation || !canImport()) return;
-      reset(); $('project-import-legacy').focus();
+      reset(); focusImportTrigger();
     } catch (_) {
       if (token === generation && canImport()) { status = 'error'; message('Übernehmen gerade nicht möglich. Bitte erneut versuchen.'); }
     } finally {
@@ -147,9 +153,9 @@
     $('project-import-legacy').textContent = 'Depot-Eingaben übernehmen';
     $('project-import-legacy').addEventListener('click', open);
     $('project-import-file').addEventListener('change', readFile);
-    $('project-import-cancel').addEventListener('click', () => { reset(); $('project-import-legacy').focus(); });
+    $('project-import-cancel').addEventListener('click', () => { reset(); focusImportTrigger(); });
     $('project-import-apply').addEventListener('click', apply);
-    $('project-import-dialog').addEventListener('cancel', event => { event.preventDefault(); if (!applying) { reset(); $('project-import-legacy').focus(); } });
+    $('project-import-dialog').addEventListener('cancel', event => { event.preventDefault(); if (!applying) { reset(); focusImportTrigger(); } });
     $('project-import-dialog').addEventListener('close', () => { if (!$('project-import-dialog').open) reset(); });
     reset(); return api;
   }
