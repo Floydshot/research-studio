@@ -614,6 +614,7 @@
   <script src="client/overview-model.js"></script>
   <script src="client/project-import.js"></script>
   <script src="client/project-removal.js"></script>
+  <script src="client/stock-requests.js"></script>
   <script>
   'use strict';
   (() => {
@@ -1967,9 +1968,8 @@ const PortfolioInput = (() => {
           button.disabled=contained.has(stock.ticker);button.setAttribute('aria-label',stock.name+' ('+stock.ticker+') '+(button.disabled?'bereits im Szenario':'hinzufügen'));button.addEventListener('click',()=>addFutureCatalogStock(stock.ticker));item.append(button);list.append(item);
         }
       }else{
-        const item=el('li','future-catalog-request'),text=el('span','','Noch nicht im System.'),link=el('a','future-request-button','stonk request');
-        const url=new URL('https://github.com/Floydshot/research-studio/issues/new');url.searchParams.set('title','Stonk request: '+query.slice(0,160));url.searchParams.set('body','Angefragte Position: '+query+'\n\nBitte die Gesellschaft und Börsennotierung prüfen und die relevanten Daten für Research Studio recherchieren. Bei mehrdeutiger Zuordnung bitte rückfragen.');
-        link.href=url.href;link.target='_blank';link.rel='noopener noreferrer';item.append(text,link,el('small','','Anfrage bei GitHub absenden.'));list.append(item);
+        const item=el('li','future-catalog-request'),text=el('span','','Noch nicht im System.'),button=el('button','future-request-button','stonk request');
+        button.type='button';button.addEventListener('click',()=>window.StockRequests?.open(query,button));item.append(text,button);list.append(item);
       }
     }
     function initFutureCatalogSearch() {
@@ -2285,6 +2285,7 @@ const PortfolioInput = (() => {
 
         const overviewState={charts:[],request:0};
     function resetProjectView() {
+      window.StockRequests?.reset();
       renderCards.resetExpansion?.();
       window.ProjectImport?.reset();
       window.ProjectRemoval?.reset();
@@ -2306,6 +2307,7 @@ const PortfolioInput = (() => {
       for(const pair of [['overview-chart-wrap','overview-dividends-wrap'],['overview-chart-fallback','overview-dividends-fallback']])for(const[sourceId,targetId]of[pair,[...pair].reverse()])$(sourceId).addEventListener('scroll',()=>{const source=$(sourceId),target=$(targetId);if(Math.abs(source.scrollLeft-target.scrollLeft)>.5)target.scrollLeft=source.scrollLeft;},{passive:true});
       $('overview-years').addEventListener('click',event=>{const button=event.target.closest('[data-years]');if(!button)return;futureStudio.overviewYears=Number(button.dataset.years);saveFutureSettings();renderOverview();});
       if(!window.ProjectWorkspaces){$('loading').hidden=true;$('error').hidden=false;$('error').textContent='Die Projektauswahl konnte nicht geladen werden.';return;}
+      window.StockRequests?.init({getContext:()=>({projectId:window.ProjectWorkspaces.id,ready:state.projectReady&&(!window.ProjectWorkspaces.private||window.ProjectWorkspaces.unlocked)})});
       window.ProjectRemoval?.init({getContext:()=>({projectId:window.ProjectWorkspaces.id,portfolioId:state.portfolio,ready:state.projectReady&&state.view==='future'&&!state.overview&&(!window.ProjectWorkspaces.private||window.ProjectWorkspaces.unlocked)}),onRemove:removeFutureStock});
       await window.ProjectWorkspaces.init({
         getSettings:projectSettingsSnapshot,
