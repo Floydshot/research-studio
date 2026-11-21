@@ -160,12 +160,13 @@ function sanitizeScenario(input) {
   for (const key of ['extend', 'reinvest', 'migrated']) if (input[key] !== undefined) {
     if (typeof input[key] !== 'boolean') inputError(); result[key] = input[key];
   }
-  for (const key of ['excluded', 'removed', 'weights', 'shares']) if (input[key] !== undefined) {
+  for (const key of ['excluded', 'removed', 'weights', 'shares', 'returnOverrides']) if (input[key] !== undefined) {
     if (!plainObject(input[key]) || Object.keys(input[key]).length > 100) inputError();
     result[key] = {};
     for (const [ticker, value] of Object.entries(input[key])) {
       if (!TICKER.test(ticker) || FORBIDDEN_KEYS.has(ticker)) inputError();
       if (key === 'excluded' || key === 'removed') { if (typeof value !== 'boolean') inputError(); if (value || key === 'removed') result[key][ticker] = value; }
+      else if (key === 'returnOverrides') { if (!numeric(value, -99, 1000)) inputError(); result[key][ticker] = value; }
       else { if (!numeric(value, 0, key === 'shares' ? 1e9 : 100)) inputError(); result[key][ticker] = value; }
     }
   }
@@ -334,12 +335,14 @@ export async function handleProjectApi(request, env) {
     const body = await readJson(request);
     if (!plainObject(body)) inputError();
     const settings = sanitizeProjectSettings(body.settings);
-    // Missing removed maps identify an older client. Preserve the current maps
+    // Missing persisted maps identify an older client. Preserve the current maps
     // inside the same CAS UPDATE rather than reading then merging in JavaScript.
-    // An explicitly supplied map (including {}) is a deliberate membership edit.
+    // An explicitly supplied map (including {}) deliberately replaces its map.
     const techRemovedProvided = plainObject(body.settings.tech) && Object.prototype.hasOwnProperty.call(body.settings.tech, 'removed');
     const valueRemovedProvided = plainObject(body.settings.value) && Object.prototype.hasOwnProperty.call(body.settings.value, 'removed');
-    const update = await env.DB.prepare("UPDATE project_states SET settings=json_set(?, '$.tech.removed',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.tech.removed'),'{}') END), '$.value.removed',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.value.removed'),'{}') END)),revision=revision+1,updated_at=? WHERE project=? AND revision=? RETURNING revision,settings").bind(JSON.stringify(settings), techRemovedProvided ? 1 : 0, JSON.stringify(settings.tech.removed || {}), valueRemovedProvided ? 1 : 0, JSON.stringify(settings.value.removed || {}), Date.now(), project, expected).first();
+    const techReturnsProvided = plainObject(body.settings.tech) && Object.prototype.hasOwnProperty.call(body.settings.tech, 'returnOverrides');
+    const valueReturnsProvided = plainObject(body.settings.value) && Object.prototype.hasOwnProperty.call(body.settings.value, 'returnOverrides');
+    const update = await env.DB.prepare("UPDATE project_states SET settings=json_set(?, '$.tech.removed',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.tech.removed'),'{}') END), '$.value.removed',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.value.removed'),'{}') END), '$.tech.returnOverrides',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.tech.returnOverrides'),'{}') END), '$.value.returnOverrides',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.value.returnOverrides'),'{}') END)),revision=revision+1,updated_at=? WHERE project=? AND revision=? RETURNING revision,settings").bind(JSON.stringify(settings), techRemovedProvided ? 1 : 0, JSON.stringify(settings.tech.removed || {}), valueRemovedProvided ? 1 : 0, JSON.stringify(settings.value.removed || {}), techReturnsProvided ? 1 : 0, JSON.stringify(settings.tech.returnOverrides || {}), valueReturnsProvided ? 1 : 0, JSON.stringify(settings.value.returnOverrides || {}), Date.now(), project, expected).first();
     if (!update) throw new ApiError(409, 'Projekt wurde inzwischen geändert. Bitte neu laden.');
     return json({ project, revision: update.revision, settings: JSON.parse(update.settings) }, 200, { ETag: '"' + update.revision + '"' });
   } catch (error) {
