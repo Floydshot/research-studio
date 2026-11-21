@@ -2,6 +2,7 @@
   'use strict';
 
   const $ = id => document.getElementById(id);
+  const enabled=document.querySelector('meta[name="stock-requests-enabled"]')?.content!=='false';
   let config = null, initialized = false, pending = null, generation = 0, status = 'idle';
 
   function context() {
@@ -98,7 +99,7 @@
     dialog.addEventListener('close', () => { if (!dialog.open && pending) cancel(); });
   }
   function open(name, trigger) {
-    if (!initialized || typeof name !== 'string') return false;
+    if (!enabled || !initialized || typeof name !== 'string') return false;
     const current = context(); if (!current) return false;
     reset(); pending = { context: current, trigger, token: generation, requestName: null, requestId: null, controller: null }; status = 'editing';
     $('stock-request-name').value = name.trim().slice(0, 160); $('stock-request-dialog').showModal(); $('stock-request-name').focus(); $('stock-request-name').select(); return true;
@@ -108,6 +109,6 @@
     if (typeof options?.getContext !== 'function') throw new Error('Aktienanfragen sind nicht eingerichtet.');
     config = options; build(); initialized = true; return api;
   }
-  const api = Object.freeze({ init, open, reset, get status() { return status; } });
+  const api = Object.freeze({ init, open, reset, enabled, get status() { return status; } });
   window.StockRequests = api;
 })();
