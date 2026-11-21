@@ -458,7 +458,8 @@
   .stock-cluster-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .stock-card .stock-stale-status{flex:none;white-space:nowrap}
   .stock-card .metrics{flex:1;align-content:start}
-  .stock-card .metric-cell{display:grid;grid-template-rows:12px 26px 24px;align-content:start}
+  .stock-card .metric-cell{display:grid;grid-template-rows:12px 26px 24px;align-content:start;border-right:0}
+  .stock-card .metric-cell:not(:last-child)>:is(.metric-label,.metric-value){border-right:1px solid var(--line-soft)}
   .stock-card .metric-label{overflow:hidden;text-overflow:ellipsis}
   .stock-card .metric-source{max-height:24px;overflow:auto;overflow-wrap:anywhere}
   .stock-card .valuation-row{flex:none}
@@ -474,6 +475,7 @@
   .future-cards>.future-card.excluded>.future-card-status{opacity:1}
   .future-card.excluded .future-card-warning{opacity:.58}
   @media(max-width:700px){.stock-card .metric-cell{grid-template-rows:12px 27px 24px}.future-card .future-readonly>span{height:34px}}
+  @media(min-width:361px) and (max-width:700px){.stock-card .metric-cell:nth-child(2)>:is(.metric-label,.metric-value){border-right:0}}
 </style>
 <style>
   /* Keep one copyright line at the end of every project and studio view. */
