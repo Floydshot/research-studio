@@ -1908,10 +1908,21 @@ const PortfolioInput = (() => {
     }
     function projectSettingsSnapshot() { futureStudio.hydrating=true;try{if(state.data)for(const id of ['tech','value'])futureSettings(id);}finally{futureStudio.hydrating=false;}const settings={};for(const id of ['tech','value'])if(futureStudio.settings[id])settings[id]=structuredClone(futureStudio.settings[id]);settings.overview={years:futureStudio.overviewYears||20};return settings; }
     function saveFutureSettings() { if(!state.projectReady||futureStudio.hydrating)return;const settings=projectSettingsSnapshot();if(window.ProjectWorkspaces?.private){window.ProjectWorkspaces.save(settings);return;}try { localStorage.setItem(FUTURE_STORAGE, JSON.stringify(settings)); } catch (_) {} }
+    function setFutureHorizon(years, persist = true) {
+      if (![5,10,15,20,30].includes(years)) return false;
+      futureStudio.overviewYears = years;
+      for (const id of ['tech','value']) {
+        if (!futureStudio.settings[id]) futureStudio.settings[id] = futureDefaults();
+        futureStudio.settings[id].years = years;
+      }
+      if (persist) saveFutureSettings();
+      return true;
+    }
     function loadFutureSettings(provided) {
+      let years = window.ProjectWorkspaces?.private ? 5 : 20;
       try {
         const saved = provided===undefined?JSON.parse(localStorage.getItem(FUTURE_STORAGE) || '{}'):(provided||{});
-        futureStudio.overviewYears=[5,10,15,20,30].includes(saved.overview?.years)?saved.overview.years:(window.ProjectWorkspaces?.private?5:20);
+        years = [saved?.overview?.years,saved?.tech?.years,saved?.value?.years].find(value=>[5,10,15,20,30].includes(value)) ?? years;
         for (const id of ['tech','value']) {
           const value = saved && saved[id]; if (!value || typeof value !== 'object') continue;
           const settings = futureDefaults(); settings.schemaVersion = value.schemaVersion === 2 || Object.keys(value).length === 0 ? 2 : 1;
@@ -1930,6 +1941,7 @@ const PortfolioInput = (() => {
           futureStudio.settings[id] = settings;
         }
       } catch (_) {}
+      setFutureHorizon(years, false);
     }
     function futureCatalog() {
       const catalog=new Map(),groups=state.data?.portfolios||[];
@@ -2057,7 +2069,7 @@ const PortfolioInput = (() => {
       $('future-source').addEventListener('change', event => { futureSettings().source = event.target.value; saveFutureSettings(); renderFutureStudio(); });
       $('future-allocation').addEventListener('change', event => { futureSettings().allocationMode = event.target.value; saveFutureSettings(); renderFutureStudio(); });
       $('future-reinvest').addEventListener('change', event => { futureSettings().reinvest = event.target.checked; saveFutureSettings(); renderFutureStudio(); });
-      $('future-years').querySelectorAll('button[data-years]').forEach(button => button.addEventListener('click', () => { futureSettings().years = Number(button.dataset.years); saveFutureSettings(); renderFutureStudio(); }));
+      $('future-years').querySelectorAll('button[data-years]').forEach(button => button.addEventListener('click', () => { setFutureHorizon(Number(button.dataset.years)); renderFutureStudio(); }));
       $('future-include-all').addEventListener('click', () => { const settings = futureSettings(); for (const stock of futureFilteredStocks()) delete settings.excluded[stock.ticker]; saveFutureSettings(); renderFutureStudio(); });
       $('future-equal-weights').addEventListener('click', () => { const settings = futureSettings(), stocks = futureFilteredStocks().filter(stock => settings.excluded[stock.ticker] !== true); if (!stocks.length) return; settings.allocationMode = 'weights'; for (const stock of stocks) settings.weights[stock.ticker] = 100 / stocks.length; saveFutureSettings(); renderFutureStudio(); });
       $('future-input-open').addEventListener('click', () => { $('future-input-title').textContent = 'Portfolio input · ' + portfolio().name; $('future-input-text').value = ''; $('future-input-mode').value = 'auto'; futureStudio.importResult = null; updatePortfolioInput(); $('future-input-dialog').showModal(); $('future-input-text').focus(); });
@@ -2360,7 +2372,7 @@ const PortfolioInput = (() => {
     }
     async function initProjects() {
       for(const pair of [['overview-chart-wrap','overview-dividends-wrap'],['overview-chart-fallback','overview-dividends-fallback']])for(const[sourceId,targetId]of[pair,[...pair].reverse()])$(sourceId).addEventListener('scroll',()=>{const source=$(sourceId),target=$(targetId);if(Math.abs(source.scrollLeft-target.scrollLeft)>.5)target.scrollLeft=source.scrollLeft;},{passive:true});
-      $('overview-years').addEventListener('click',event=>{const button=event.target.closest('[data-years]');if(!button)return;futureStudio.overviewYears=Number(button.dataset.years);saveFutureSettings();renderOverview();});
+      $('overview-years').addEventListener('click',event=>{const button=event.target.closest('[data-years]');if(!button)return;setFutureHorizon(Number(button.dataset.years));renderOverview();});
       if(!window.ProjectWorkspaces){$('loading').hidden=true;$('error').hidden=false;$('error').textContent='Die Projektauswahl konnte nicht geladen werden.';return;}
       window.StockRequests?.init({getContext:()=>({projectId:window.ProjectWorkspaces.id,ready:state.projectReady&&(!window.ProjectWorkspaces.private||window.ProjectWorkspaces.unlocked)})});
       window.ProjectRemoval?.init({getContext:()=>({projectId:window.ProjectWorkspaces.id,portfolioId:state.portfolio,ready:state.projectReady&&state.view==='future'&&!state.overview&&(!window.ProjectWorkspaces.private||window.ProjectWorkspaces.unlocked)}),onRemove:removeFutureStock});
@@ -2369,7 +2381,7 @@ const PortfolioInput = (() => {
         onLock:id=>{resetProjectView();syncProjectIdentity(id);},
         onActivate:async(id,settings)=>{resetProjectView();syncProjectIdentity(id);loadFutureSettings(id==='open'?undefined:settings);state.projectReady=true;syncStudioView();syncProjectPanels();if(state.data){$('app').hidden=false;renderFilters();render();}else $('loading').hidden=false;window.ProjectImport?.refresh();}
       });
-      window.ProjectImport?.init({applySettings:async(settings,context)=>{if(!context.isCurrent()||window.ProjectWorkspaces.id!=='floyd'||!state.projectReady)throw new Error('Bitte erneut anmelden.');window.ProjectRemoval?.reset();const incoming={...settings,overview:settings.overview||{years:futureStudio.overviewYears||5}};for(const id of ['tech','value'])for(const key of ['removed','returnOverrides'])if(!Object.prototype.hasOwnProperty.call(settings[id]||{},key))incoming[id]={...incoming[id],[key]:{...futureSettings(id)[key]}};futureStudio.settings={};loadFutureSettings(incoming);state.overview=false;state.portfolio='tech';state.cluster='Alle';syncStudioView();renderFilters();render();saveFutureSettings();await window.ProjectWorkspaces.flush();}});
+      window.ProjectImport?.init({applySettings:async(settings,context)=>{if(!context.isCurrent()||window.ProjectWorkspaces.id!=='floyd'||!state.projectReady)throw new Error('Bitte erneut anmelden.');window.ProjectRemoval?.reset();const incoming={...settings};for(const id of ['tech','value'])for(const key of ['removed','returnOverrides'])if(!Object.prototype.hasOwnProperty.call(settings[id]||{},key))incoming[id]={...incoming[id],[key]:{...futureSettings(id)[key]}};futureStudio.settings={};loadFutureSettings(incoming);state.overview=false;state.portfolio='tech';state.cluster='Alle';syncStudioView();renderFilters();render();saveFutureSettings();await window.ProjectWorkspaces.flush();}});
     }
     function calculateProjectDepot(id, years) {
       const settings={...futureSettings(id),years},rows=futureScenarioStocks(settings,id).map(stock=>futureStockAssumptions(stock,settings,id)),included=rows.filter(row=>row.included);
