@@ -10,6 +10,8 @@ on:
     branches: [main]
     paths:
       - index.html
+      - public-redirect.html
+      - legacy.html
       - data.json
       - update_data.py
       - requirements.txt
@@ -80,12 +82,13 @@ jobs:
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Stage only public dashboard files
+      - name: Stage public redirect, market data and legacy export
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p _site
-          cp -- index.html data.json _site/
+          cp -- public-redirect.html _site/index.html
+          cp -- data.json legacy.html _site/
           touch _site/.nojekyll
 
       - name: Upload GitHub Pages artifact
