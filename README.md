@@ -30,3 +30,11 @@ The Overview sums both independent monthly projections for a common selected hor
 ## Market updates
 
 `.github/workflows/daily_update.yml` refreshes `data.json` every day at 06:30 UTC and on manual workflow dispatch. The Worker proxies that public JSON with a short cache. New researched universe entries participate through `RESERVE_REFERENCES`; private holdings and login configuration never belong in this dataset or the public GitHub repository.
+
+## Stock requests
+
+The Outlook catalog opens an in-app request form instead of redirecting to GitHub. `POST /api/projects/{open|floyd|ts}/stock-requests` only accepts a bounded stock name, a client-generated UUID and an empty honeypot. Private routes require the existing profile session. Same-origin checks, transactional limits of five requests per source IP per UTC day and thirty globally, and a 24-hour name duplicate check bound notification volume. D1 stores only requests and delivery state in separate tables; this endpoint cannot alter holdings, the researched catalog or source code.
+
+Set `STOCK_REQUEST_FROM`, `STOCK_REQUEST_TO` and `RESEND_API_KEY` as Worker secrets before enabling production requests. The recipient is a single fixed server-side address. The Resend bootstrap sender `onboarding@resend.dev` can send only to that Resend account's own registered email; another recipient requires a verified sending domain. Alternatively a server-side `STOCK_REQUEST_EMAIL.send()` binding can supply the same transport contract. Never put recipient addresses, keys, hashes or provider credentials in browser assets or checked-in configuration.
+
+Only a confirmed provider acceptance produces `sent`; it does not guarantee inbox delivery. Failed or uncertain sends remain `pending` with their original request UUID and never retry automatically. Duplicate submissions do not generate additional mail. Provision the mail transport before deploying the new form. The backend persists no private portfolio amounts and never runs submitted text as instructions.
