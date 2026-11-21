@@ -1,3 +1,5 @@
+import { handleStockRequests } from './stock-requests.mjs';
+
 /**
  * Private project API for the Research Studio Cloudflare Worker.
  *
@@ -301,6 +303,14 @@ export async function handleProjectApi(request, env) {
     if (pathname === '/api/projects' || pathname === '/api/projects/') {
       if (request.method !== 'GET') throw new ApiError(405, 'Diese Methode ist nicht erlaubt.', { Allow: 'GET' });
       return json({ projects: PROJECT_CATALOG });
+    }
+    const stockRequestRoute = /^\/api\/projects\/(open|floyd|ts)\/stock-requests$/.exec(pathname);
+    if (stockRequestRoute) {
+      const project = stockRequestRoute[1];
+      if (request.method !== 'POST') throw new ApiError(405, 'Diese Methode ist nicht erlaubt.', { Allow: 'POST' });
+      assertSameOrigin(request);
+      if (project !== 'open') { await ensureSchema(env.DB); await requireSession(request, env, project); }
+      return await handleStockRequests(request, env, { project });
     }
     const route = /^\/api\/projects\/(floyd|ts)\/(login|session|state|logout)$/.exec(pathname);
     if (!route || !PRIVATE_PROJECTS.has(route[1])) throw new ApiError(404, 'Projekt nicht gefunden.');
