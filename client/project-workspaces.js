@@ -47,8 +47,8 @@
       if (button.dataset.project === project) button.setAttribute('aria-current', 'true');
       else button.removeAttribute('aria-current');
     }
-    $('project-cloud-controls').hidden = !isPrivate();
-    $('project-logout').hidden = !isPrivate() || !unlocked;
+    $('project-cloud-controls').hidden = true;
+    $('project-logout').hidden = true;
     $('project-logout').disabled = loggingOut;
   }
   function setPhase(value) {
