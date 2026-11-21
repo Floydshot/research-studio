@@ -24,11 +24,20 @@ const FORBIDDEN_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 const PRIVATE_PROJECTS = new Set(['floyd', 'ts']);
 const INITIAL_SETTINGS = '{"tech":{},"value":{}}';
 const schemaPromises = new WeakMap();
+const MEMBERSHIP_MIGRATION = 'project-membership-2026-11-21-v1';
+const FLOYD_VALUE_MEMBERSHIP = Object.freeze(['ALV.DE', 'CS.PA', 'MUV2.DE', 'HNR1.DE', 'D05.SI']);
+const MEMBERSHIP_REMOVALS = Object.freeze({
+  floyd: Object.freeze({
+    tech: Object.freeze({ AVGO: true, TSM: true }),
+    value: Object.freeze({ '8630.T': true, 'ZURN.SW': true, 'SREN.SW': true, '8725.T': true, '8766.T': true, 'SLHN.SW': true, GS: true, JPM: true, MS: true, AFL: true, JEPQ: true })
+  }),
+  ts: Object.freeze({ tech: Object.freeze({ NET: true, NOW: true }) })
+});
 
 export const PROJECT_CATALOG = Object.freeze([
   Object.freeze({ id: 'open', name: 'Open Projects', emoji: '🌐', protected: false }),
   Object.freeze({ id: 'floyd', name: 'Floyd Projects', emoji: '🏛️', protected: true }),
-  Object.freeze({ id: 'ts', name: 'TS Projects', emoji: '🧭', protected: true })
+  Object.freeze({ id: 'ts', name: 'TS Projects', emoji: '🏛️', protected: true })
 ]);
 
 class ApiError extends Error {
@@ -149,12 +158,12 @@ function sanitizeScenario(input) {
   for (const key of ['extend', 'reinvest', 'migrated']) if (input[key] !== undefined) {
     if (typeof input[key] !== 'boolean') inputError(); result[key] = input[key];
   }
-  for (const key of ['excluded', 'weights', 'shares']) if (input[key] !== undefined) {
+  for (const key of ['excluded', 'removed', 'weights', 'shares']) if (input[key] !== undefined) {
     if (!plainObject(input[key]) || Object.keys(input[key]).length > 100) inputError();
     result[key] = {};
     for (const [ticker, value] of Object.entries(input[key])) {
       if (!TICKER.test(ticker) || FORBIDDEN_KEYS.has(ticker)) inputError();
-      if (key === 'excluded') { if (typeof value !== 'boolean') inputError(); if (value) result[key][ticker] = true; }
+      if (key === 'excluded' || key === 'removed') { if (typeof value !== 'boolean') inputError(); if (value || key === 'removed') result[key][ticker] = value; }
       else { if (!numeric(value, 0, key === 'shares' ? 1e9 : 100)) inputError(); result[key][ticker] = value; }
     }
   }
@@ -186,12 +195,40 @@ async function ensureSchema(db) {
       db.prepare("CREATE TABLE IF NOT EXISTS project_sessions (session_hash TEXT PRIMARY KEY, project TEXT NOT NULL CHECK(project IN ('floyd','ts')), credential_version TEXT NOT NULL, expires_at INTEGER NOT NULL)"),
       db.prepare('CREATE INDEX IF NOT EXISTS project_sessions_expiry ON project_sessions(expires_at)'),
       db.prepare("CREATE TABLE IF NOT EXISTS project_login_attempts (project TEXT NOT NULL CHECK(project IN ('floyd','ts')), ip_hash TEXT NOT NULL, failures INTEGER NOT NULL, window_start INTEGER NOT NULL, PRIMARY KEY(project,ip_hash))"),
+      db.prepare("CREATE TABLE IF NOT EXISTS project_state_migrations (project TEXT NOT NULL CHECK(project IN ('floyd','ts')), migration TEXT NOT NULL, applied_at INTEGER NOT NULL, PRIMARY KEY(project,migration))"),
       db.prepare('INSERT OR IGNORE INTO project_states(project,revision,settings,updated_at) VALUES(?,0,?,?)').bind('floyd', INITIAL_SETTINGS, Date.now()),
       db.prepare('INSERT OR IGNORE INTO project_states(project,revision,settings,updated_at) VALUES(?,0,?,?)').bind('ts', INITIAL_SETTINGS, Date.now())
     ]).catch(error => { schemaPromises.delete(db); throw error; });
     schemaPromises.set(db, promise);
   }
   await schemaPromises.get(db);
+}
+
+async function ensureProfileMembershipMigration(db, project) {
+  const applied = await db.prepare('SELECT 1 AS applied FROM project_state_migrations WHERE project=? AND migration=?').bind(project, MEMBERSHIP_MIGRATION).first();
+  if (applied) return;
+  const entries = Object.entries(MEMBERSHIP_REMOVALS[project]), now = Date.now();
+  // Depot names are fixed literals from MEMBERSHIP_REMOVALS, never client input.
+  // The conditional UPDATE and marker INSERT share one D1 transaction. A
+  // concurrent request either observes the marker or skips the UPDATE, so a
+  // later catalog restoration is never overwritten by a second migration.
+  const parameters = [];
+  const paths = entries.map(([depot, removed]) => {
+    parameters.push(JSON.stringify(removed));
+    let removals = 'json(?)';
+    if (project === 'floyd' && depot === 'value') {
+      // Existing catalog additions also leave this depot during this one-time
+      // reset. Read them inside the UPDATE so a concurrent write cannot be lost.
+      // Keep their saved shares/weights and list intact for a later restoration.
+      removals = `json_patch(json(?),(SELECT json_group_object(value,json('true')) FROM json_each(CASE WHEN json_type(settings,'$.value.extraTickers')='array' THEN json_extract(settings,'$.value.extraTickers') ELSE '[]' END) WHERE type='text' AND value NOT IN (${FLOYD_VALUE_MEMBERSHIP.map(() => '?').join(',')})))`;
+      parameters.push(...FLOYD_VALUE_MEMBERSHIP);
+    }
+    return ` '$.${depot}.removed', json_patch(CASE WHEN json_type(settings,'$.${depot}.removed')='object' THEN json_extract(settings,'$.${depot}.removed') ELSE '{}' END,${removals})`;
+  }).join(',');
+  await db.batch([
+    db.prepare(`UPDATE project_states SET settings=json_set(settings,${paths}),revision=revision+1,updated_at=? WHERE project=? AND NOT EXISTS(SELECT 1 FROM project_state_migrations WHERE project=? AND migration=?)`).bind(...parameters, now, project, project, MEMBERSHIP_MIGRATION),
+    db.prepare('INSERT OR IGNORE INTO project_state_migrations(project,migration,applied_at) SELECT project,?,? FROM project_states WHERE project=?').bind(MEMBERSHIP_MIGRATION, now, project)
+  ]);
 }
 
 function cookieName(project) { return '__Secure-research-' + project; }
@@ -279,6 +316,7 @@ export async function handleProjectApi(request, env) {
       await env.DB.prepare('DELETE FROM project_sessions WHERE session_hash=? AND project=?').bind(session.sessionHash, project).run();
       return json({ authenticated: false, project }, 200, { 'Set-Cookie': sessionCookie(project, '', 0) });
     }
+    await ensureProfileMembershipMigration(env.DB, project);
     if (request.method === 'GET') return await stateResponse(env, project);
     const match = /^(?:"(\d+)"|(\d+))$/.exec(request.headers.get('If-Match') || '');
     const expected = match ? Number(match[1] ?? match[2]) : NaN;
@@ -286,9 +324,14 @@ export async function handleProjectApi(request, env) {
     const body = await readJson(request);
     if (!plainObject(body)) inputError();
     const settings = sanitizeProjectSettings(body.settings);
-    const update = await env.DB.prepare('UPDATE project_states SET settings=?,revision=revision+1,updated_at=? WHERE project=? AND revision=? RETURNING revision').bind(JSON.stringify(settings), Date.now(), project, expected).first();
+    // Missing removed maps identify an older client. Preserve the current maps
+    // inside the same CAS UPDATE rather than reading then merging in JavaScript.
+    // An explicitly supplied map (including {}) is a deliberate membership edit.
+    const techRemovedProvided = plainObject(body.settings.tech) && Object.prototype.hasOwnProperty.call(body.settings.tech, 'removed');
+    const valueRemovedProvided = plainObject(body.settings.value) && Object.prototype.hasOwnProperty.call(body.settings.value, 'removed');
+    const update = await env.DB.prepare("UPDATE project_states SET settings=json_set(?, '$.tech.removed',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.tech.removed'),'{}') END), '$.value.removed',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.value.removed'),'{}') END)),revision=revision+1,updated_at=? WHERE project=? AND revision=? RETURNING revision,settings").bind(JSON.stringify(settings), techRemovedProvided ? 1 : 0, JSON.stringify(settings.tech.removed || {}), valueRemovedProvided ? 1 : 0, JSON.stringify(settings.value.removed || {}), Date.now(), project, expected).first();
     if (!update) throw new ApiError(409, 'Projekt wurde inzwischen geändert. Bitte neu laden.');
-    return json({ project, revision: update.revision, settings }, 200, { ETag: '"' + update.revision + '"' });
+    return json({ project, revision: update.revision, settings: JSON.parse(update.settings) }, 200, { ETag: '"' + update.revision + '"' });
   } catch (error) {
     if (error instanceof ApiError) return json({ error: error.message }, error.status, error.headers);
     // Do not send database errors, runtime secrets, passwords or session tokens.
