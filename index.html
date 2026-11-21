@@ -443,6 +443,8 @@
 <style id="shopping-card-layout">
   .stock-card{display:flex;flex-direction:column;align-self:start}
   .stock-card .metrics{margin-bottom:0}
+  .stock-card .valuation-row{margin:15px 0 0}
+  @media(max-width:700px){.stock-card .valuation-row{margin-top:12px}}
   .stock-card .stock-stale-status{color:#d3636d}
   html[data-theme="light"] .stock-card .stock-stale-status{color:#b83243}
 </style>
@@ -1275,10 +1277,10 @@
       $('returns-scroll').hidden = !rows.length; $('returns-empty').hidden = !!rows.length;
     }
 
-    function chartLabel(stock, series) { const meta = issuerMetric(stock, series.field); if (meta && meta.label) return meta.label + (meta.period ? ' · ' + meta.period : ''); if (series.field === 'current_pe' && !isETF(stock)) return 'KGV (TTM)'; if (series.field === 'div_yield' && dividendForecast(stock)) return 'Dividendenrendite (Prognose FY' + dividendForecast(stock).fiscal_year + ')'; return isETF(stock) && series.field === 'div_yield' ? 'Ausschüttungsrendite (12M)' : isETF(stock) && series.field === 'current_pe' ? 'Fonds-KGV' : series.label; }
+    function chartLabel(stock, series) { if (['current_pe','hist_pe','forward_pe'].includes(series.field)) return series.label; const meta = issuerMetric(stock, series.field); if (meta && meta.label) return meta.label + (meta.period ? ' · ' + meta.period : ''); if (series.field === 'div_yield' && dividendForecast(stock)) return 'Dividendenrendite (Prognose FY' + dividendForecast(stock).fiscal_year + ')'; return isETF(stock) && series.field === 'div_yield' ? 'Ausschüttungsrendite (12M)' : series.label; }
     function chartText(stock, field) { const raw = metricValue(stock, field); return field.includes('pe') ? peText(raw) : state.portfolio !== 'tech' && state.metric === 'secondary' ? percent(raw) : fmt(raw) + (number(raw) === null ? '' : '×'); }
     function chartSeries(colors = chartPalette()) {
-      if (state.metric === 'pe') return [ { label: 'Rückblickendes KGV', field: 'current_pe', color: colors.current, reference: false }, { label: 'Hist. KGV · Referenz', field: 'hist_pe', color: colors.reference, reference: true }, { label: 'Forward P/E', field: 'forward_pe', color: colors.forward, reference: false } ];
+      if (state.metric === 'pe') return [ { label: 'P/E', field: 'current_pe', color: colors.current, reference: false }, { label: 'Hist. P/E', field: 'hist_pe', color: colors.reference, reference: true }, { label: 'Forward P/E', field: 'forward_pe', color: colors.forward, reference: false } ];
       return state.portfolio === 'tech' ? [ { label: 'Aktuelles P/S', field: 'ps_ratio', color: colors.current, reference: false }, { label: 'Hist. P/S · Referenz', field: 'hist_ps', color: colors.reference, reference: true } ] : [ { label: 'Dividende / Ausschüttung', field: 'div_yield', color: colors.current, reference: false }, { label: 'Hist. Div.-Rendite · Referenz', field: 'hist_div', color: colors.reference, reference: true } ];
     }
     function chartValue(stock, field) {
@@ -2074,7 +2076,7 @@ const PortfolioInput = (() => {
       const good = result && !result.error, start = good ? result.initial : initial;
       const values = [
         ['Startkapital', futureMoney(start)],
-        [futureUsesDividends() ? 'Ausschüttung netto heute' : 'Weitere Einzahlungen gesamt', good ? futureMoney(futureUsesDividends() ? result.initialDividendNetAnnual : result.final.contributions - result.initial, false) : '—'],
+        [futureUsesDividends() ? 'Ausschüttung netto heute' : 'Einzahlungen gesamt', good ? futureMoney(futureUsesDividends() ? result.initialDividendNetAnnual : result.final.contributions - result.initial, false) : '—'],
         ['Depotwert nach ' + settings.years + ' Jahren', good ? futureMoney(result.final.portfolio) : '—'],
         [futureUsesDividends() ? 'Ausschüttung netto Jahr ' + settings.years : 'Rendite nach ' + settings.years + ' Jahren', good ? futureMoney(futureUsesDividends() ? result.final.last12MonthsDividendsNet : result.final.portfolio-result.final.contributions, false) : '—']
       ];
