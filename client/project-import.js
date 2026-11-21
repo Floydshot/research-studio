@@ -2,7 +2,7 @@
   'use strict';
   const LIMIT = 65536, TICKER = /^[A-Za-z0-9.^=-]{1,24}$/;
   const FORBIDDEN = new Set(['__proto__', 'prototype', 'constructor']);
-  const FIELDS = new Set(['schemaVersion', 'allocationMode', 'initial', 'monthly', 'source', 'manual', 'years', 'extend', 'reinvest', 'excluded', 'weights', 'shares', 'extraTickers', 'migrated']);
+  const FIELDS = new Set(['schemaVersion', 'allocationMode', 'initial', 'monthly', 'source', 'manual', 'years', 'extend', 'reinvest', 'excluded', 'removed', 'weights', 'shares', 'extraTickers', 'migrated']);
   const $ = id => document.getElementById(id);
   let config = null, pending = null, generation = 0, initialized = false, applying = false, status = 'idle';
   function invalid() { throw new Error('Bitte eine gültige Depot-Datei auswählen.'); }
@@ -25,12 +25,12 @@
       if (!allowed.includes(value[key])) invalid(); result[key] = value[key];
     }
     for (const key of ['extend', 'reinvest', 'migrated']) if (value[key] !== undefined) { if (typeof value[key] !== 'boolean') invalid(); result[key] = value[key]; }
-    for (const key of ['excluded', 'weights', 'shares']) if (value[key] !== undefined) {
+    for (const key of ['excluded', 'removed', 'weights', 'shares']) if (value[key] !== undefined) {
       if (!plain(value[key]) || Object.keys(value[key]).length > 100) invalid();
       result[key] = {};
       for (const [ticker, amount] of Object.entries(value[key])) {
         if (!TICKER.test(ticker) || FORBIDDEN.has(ticker)) invalid();
-        if (key === 'excluded') { if (typeof amount !== 'boolean') invalid(); if (amount) result[key][ticker] = true; }
+        if (key === 'excluded' || key === 'removed') { if (typeof amount !== 'boolean') invalid(); if (amount) result[key][ticker] = true; }
         else { if (!allowedNumber(amount, 0, key === 'shares' ? 1e9 : 100)) invalid(); result[key][ticker] = amount; }
       }
     }
@@ -88,7 +88,7 @@
   }
   function money(value) { return value === undefined || value === null ? 'offen' : new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 2 }).format(value); }
   function sharesPreview(settings) {
-    const entries = Object.entries(settings.shares || {}).filter(([ticker]) => settings.excluded?.[ticker] !== true);
+    const entries = Object.entries(settings.shares || {}).filter(([ticker]) => settings.excluded?.[ticker] !== true && settings.removed?.[ticker] !== true);
     const sum = entries.reduce((total, [, count]) => total + (typeof count === 'number' ? count : 0), 0);
     return 'aus Shares · ' + new Intl.NumberFormat('de-DE', { maximumFractionDigits: 6 }).format(sum) + ' Shares' + (entries.some(([, count]) => count === null) ? ' · offen' : '');
   }
