@@ -15,7 +15,7 @@ Provision secrets through a protected JSON file or stdin to Wrangler. Do not pas
 
 ## Private state
 
-Each private workspace has independent Tech/Value scenario settings and an Overview horizon. Authentication is enforced on the server for every read and write. Session cookies are HttpOnly, Secure, SameSite=Strict and scoped to the selected profile API path. Login attempts are limited to five per fifteen minutes per profile and pseudonymized source IP. Responses containing private settings are not cached.
+Each private workspace has independent Tech/Value scenario inputs and one shared Outlook horizon for Tech, Value and Overview. The horizon is mirrored into the existing depot and Overview settings when changed; older saved settings use the first valid Overview, Tech or Value horizon in that order. Authentication is enforced on the server for every read and write. Session cookies are HttpOnly, Secure, SameSite=Strict and scoped to the selected profile API path. Login attempts are limited to five per fifteen minutes per profile and pseudonymized source IP. Responses containing private settings are not cached.
 
 Updates use `If-Match` revisions; stale updates return HTTP 409 instead of overwriting another device. Only the public sandbox uses browser-local scenario storage. No existing browser-local personal input is silently copied into the public sandbox or uploaded to a private workspace.
 
@@ -27,7 +27,7 @@ The one-time `project-membership-2026-11-21-v1` database migration runs on the f
 
 The old GitHub Pages address redirects to the Cloudflare application. `legacy.html` retains the previous browser-local view and can export Tech/Value inputs as a JSON file. The import action in the unlocked Floyd Projects menu validates and previews that file, and saves it only after explicit confirmation. A24 is excluded from this migration.
 
-The Overview sums both independent monthly projections for a common selected horizon. It preserves each depot's capital, monthly purchases, saved exclusions and extra positions without changing its individual saved horizon. Tech uses the selected total-return basis directly for growth in every workspace and has no separate dividend model. Overview dividends and the reinvestment control come exclusively from Value Stonks. Its charts follow the individual depot presentation: consolidated portfolio value and annual net distributions by the origin of Value's invested capital. Historical rates remain assumptions rather than predictions.
+The Overview sums both independent monthly projections for the shared selected horizon. Changing the horizon in any Outlook view updates all three views while preserving each depot's capital, monthly purchases, saved exclusions and extra positions. Tech uses the selected total-return basis directly for growth in every workspace and has no separate dividend model. Overview dividends and the reinvestment control come exclusively from Value Stonks. Its charts follow the individual depot presentation: consolidated portfolio value and annual net distributions by the origin of Value's invested capital. Historical rates remain assumptions rather than predictions.
 
 ## Market updates
 
