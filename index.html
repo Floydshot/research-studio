@@ -862,11 +862,13 @@
             ['Forward P/E','Kurs geteilt durch den erwarteten Gewinn je Aktie.'],
             ['P/S · KUV','Kurs geteilt durch den Umsatz je Aktie.'],
             ['Div.-Rendite','Jährliche Dividende oder ETF-Ausschüttung im Verhältnis zum Kurs.'],
+            ['ETF · 12M','ETF = börsengehandelter Fonds; 12M = zwölf Monate.'],
             ['TTM vs. Referenz','Prozentuale Abweichung des aktuellen KGV von der historischen Referenz; + bedeutet höher, − niedriger.'],
             ['ROE','Eigenkapitalrendite: Jahresgewinn im Verhältnis zum durchschnittlichen Eigenkapital.'],
             ['RSI (14)','Relative-Stärke-Index der letzten 14 Handelstage auf einer Skala von 0 bis 100.'],
             ['SMA 100/200','Einfacher Durchschnitt der letzten 100/200 Tages-Schlusskurse; der Prozentwert zeigt den Abstand zum aktuellen Kurs.'],
-            ['IR · GAAP · IFRS · ADS','IR = Investor Relations; US-/J-GAAP und IFRS = Rechnungslegungsstandards; ADS = US-Hinterlegungsschein auf ausländische Aktien.']
+            ['IR · GAAP · IFRS · ADS','IR = Investor Relations; US-/J-GAAP und IFRS/TIFRS = Rechnungslegungsstandards; ADS = US-Hinterlegungsschein auf ausländische Aktien.'],
+            ['FY · n. a.','FY = Geschäftsjahr; n. a. = keine anwendbare oder bestätigte Angabe verfügbar.']
           ]){const row=el('div');row.append(el('dt','',term),el('dd','',definition));glossary.append(row);}
           copy.append(glossary);
         }else copy.append(el('p','',shortSectionInfo(button)));
