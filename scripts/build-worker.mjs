@@ -2,15 +2,15 @@ import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const assets={};
-for(const [path,type]of [['/index.html','text/html; charset=utf-8'],['/client/project-workspaces.js','text/javascript; charset=utf-8'],['/client/overview-model.js','text/javascript; charset=utf-8'],['/client/project-import.js','text/javascript; charset=utf-8'],['/client/project-removal.js','text/javascript; charset=utf-8'],['/vendor/chart.umd.min.js','text/javascript; charset=utf-8']])assets[path]={type,body:await readFile(root+path,'utf8')};
-const api="import {handleProjectApi} from '../server/project-api.mjs';\nexport {ProjectPasswordVerifier} from '../server/password-verifier.mjs';\n";
+for(const [path,type]of [['/index.html','text/html; charset=utf-8'],['/client/project-workspaces.js','text/javascript; charset=utf-8'],['/client/overview-model.js','text/javascript; charset=utf-8'],['/client/project-import.js','text/javascript; charset=utf-8'],['/client/project-removal.js','text/javascript; charset=utf-8'],['/client/stock-requests.js','text/javascript; charset=utf-8'],['/vendor/chart.umd.min.js','text/javascript; charset=utf-8']])assets[path]={type,body:await readFile(root+path,'utf8')};
+const api="import {handleProjectApi} from '../server/project-api.mjs';\nimport {withStockRequestMailer} from '../server/stock-request-mail.mjs';\nexport {ProjectPasswordVerifier} from '../server/password-verifier.mjs';\n";
 const code=api+'\nconst PUBLIC_ASSETS='+JSON.stringify(assets)+';\n'+String.raw`
 function publicHeaders(type,cache='no-cache') {return {'Content-Type':type,'Cache-Control':cache,'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"};}
 export default {
  async fetch(request,env) {
   const url=new URL(request.url);
   try {
-   if(url.pathname.startsWith('/api/'))return await handleProjectApi(request,env)||new Response('Nicht gefunden',{status:404});
+   if(url.pathname.startsWith('/api/'))return await handleProjectApi(request,withStockRequestMailer(env))||new Response('Nicht gefunden',{status:404});
    if(request.method!=='GET'&&request.method!=='HEAD')return new Response('Methode nicht erlaubt',{status:405,headers:{Allow:'GET, HEAD'}});
    if(url.pathname==='/data.json') {
     const source='https://floydshot.github.io/research-studio/data.json';
