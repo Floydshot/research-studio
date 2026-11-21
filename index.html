@@ -320,6 +320,11 @@
     .future-reinvest-switch:checked{background:var(--outlook-value-blue,var(--teal))}
     .future-reinvest-switch:checked::before{transform:translateX(14px);background:#fff}
     .future-reinvest-switch:focus-visible{outline:2px solid var(--sky);outline-offset:3px}
+    #future-panel{--input-error:#f18c91;--input-error-bg:#f18c9110}
+    html[data-theme="light"] #future-panel{--input-error:#b73542;--input-error-bg:#b7354208}
+    #future-panel .future-input-invalid{box-shadow:inset 0 0 0 1.5px var(--input-error);background:var(--input-error-bg)}
+    #future-panel [aria-invalid="true"]:focus-visible{outline-color:var(--input-error)}
+    #future-panel .future-error.field-error{border:0;background:transparent;color:var(--input-error);padding:0;margin:12px 19px;font-size:11px}
     #future-title,#future-dividends-title,#future-year-title{font-family:var(--font);font-size:13px;font-weight:600;letter-spacing:-.1px;line-height:1.5;color:var(--text)}
     .outlook-photo{grid-column:2;grid-row:1;justify-self:end;display:flex;justify-content:flex-end;align-items:center;width:100%;max-width:460px;margin:0}
     .outlook-photo img{display:block;width:min(100%,360px);height:auto;max-height:180px;object-fit:contain;border-radius:3px}
@@ -1665,6 +1670,25 @@ const PortfolioInput = (() => {
     const futureAxisMoney = value => futureNumber(value) === null ? '—' : new Intl.NumberFormat('de-DE',{notation:Math.abs(value)>=1e12?'scientific':'compact',maximumFractionDigits:1}).format(value)+' €';
     const futurePercent = value => futureNumber(value) === null ? '—' : fmt(value, 2) + '%';
     function futureUsesDividends() { return state.portfolio !== 'tech'; }
+    function futureValidInput(value, min, max) { return futureNumber(value) !== null && value >= min && value <= max; }
+    function futureInputIssues(settings, initial, rows) {
+      const issues=[];
+      if(settings.allocationMode!=='shares'&&!futureValidInput(initial,0,1e9))issues.push({id:'future-initial',label:'Startkapital'});
+      if(!futureValidInput(settings.monthly,0,1e7))issues.push({id:'future-monthly',label:'Monatliche Einzahlung'});
+      if(settings.source==='manual'&&!futureValidInput(settings.manual,-99,1000))issues.push({id:'future-rate',label:'Gesamtrendite'});
+      for(const row of rows.filter(item=>item.selected))if(!futureValidInput(row.quantity,0,settings.allocationMode==='shares'?1e9:100))issues.push({id:'future-quantity-'+row.id,label:settings.allocationMode==='shares'?'Anzahl Shares':'Gewichtung'});
+      if(rows.some(row=>row.included&&row.problemField==='source'))issues.push({id:'future-source',label:'Renditebasis'});
+      return issues;
+    }
+    function futureInputMessage(issues) {
+      const labels=[...new Set(issues.map(issue=>issue.label))];
+      return 'Bitte '+(labels.length>1?labels.slice(0,-1).join(', ')+' und '+labels.at(-1):labels[0])+' anpassen';
+    }
+    function syncFutureInputErrors(issues) {
+      for(const input of $('future-panel').querySelectorAll('[aria-invalid="true"]')){input.removeAttribute('aria-invalid');input.removeAttribute('aria-describedby');input.classList.remove('future-input-invalid');}
+      for(const wrap of $('future-panel').querySelectorAll('.future-input-invalid'))wrap.classList.remove('future-input-invalid');
+      for(const issue of issues){const input=$(issue.id);if(!input||input.disabled)continue;input.setAttribute('aria-invalid','true');input.setAttribute('aria-describedby','future-error');(input.closest('.future-input-unit,.future-small-input')||input).classList.add('future-input-invalid');}
+    }
     function futureDefaults() { return { schemaVersion: 2, allocationMode: 'weights', initial: 10000, monthly: 0, source: 'manual', manual: 7, years: 20, extend: true, reinvest: true, excluded: {}, weights: {}, shares: {}, extraTickers: [], migrated: false }; }
     function futureSettings() {
       if (!futureStudio.settings[state.portfolio]) futureStudio.settings[state.portfolio] = futureDefaults();
@@ -1794,15 +1818,16 @@ const PortfolioInput = (() => {
       const weight = settings.allocationMode === 'shares' ? valueEUR : weightPct;
       const quantity = settings.allocationMode === 'shares' ? shares : weightPct, selected = settings.excluded[stock.ticker] !== true;
       const included = selected && (futureNumber(quantity) === null || quantity > 0);
-      let problem = null;
-      if (settings.allocationMode === 'shares' && (futureNumber(shares) === null || shares < 0 || shares > 1e9)) problem = 'Bitte eine gültige, nicht negative Stückzahl eingeben.';
+      let problem = null, problemField = null;
+      if (settings.allocationMode === 'shares' && (futureNumber(shares) === null || shares < 0 || shares > 1e9)) { problem = 'Bitte Anzahl Shares anpassen'; problemField = 'quantity'; }
       else if (settings.allocationMode === 'shares' && (price === null || !fx)) problem = 'Für die Stückzahlbewertung fehlen ein bestätigter Kurs oder EUR-Wechselkurs.';
-      else if (futureNumber(weight) === null || weight < 0 || settings.allocationMode === 'weights' && weight > 100) problem = 'Gewichtung muss zwischen 0 und 100% liegen.';
-      else if (futureNumber(totalReturnPct) === null) problem = 'Keine bestätigte ' + ({'5y':'5-Jahres-','10y':'10-Jahres-',all:'All-Time-'}[settings.source] || '') + 'Rendite verfügbar.';
-      else if (totalReturnPct <= -100) problem = 'Gesamtrendite muss über −100% liegen.';
+      else if (futureNumber(weight) === null || weight < 0 || settings.allocationMode === 'weights' && weight > 100) { problem = 'Bitte Gewichtung anpassen'; problemField = 'quantity'; }
+      else if (settings.source === 'manual' && !futureValidInput(settings.manual,-99,1000)) problem = null;
+      else if (futureNumber(totalReturnPct) === null) { problem = 'Keine bestätigte ' + ({'5y':'5-Jahres-','10y':'10-Jahres-',all:'All-Time-'}[settings.source] || '') + 'Rendite verfügbar.'; problemField = 'source'; }
+      else if (totalReturnPct <= -100) { problem = 'Gesamtrendite muss über −100% liegen.'; problemField = 'source'; }
       else if (futureNumber(dividendYieldPct) === null || dividendYieldPct < 0) problem = 'Keine bestätigte Dividendenbasis verfügbar.';
       else if (dividendGrowthPct === null || dividendGrowthPct < -100) problem = 'Keine verwendbare Dividendenwachstumsbasis verfügbar.';
-      return { stock, id: stock.ticker, weight, weightPct, shares, valueEUR, fx, quantity, totalReturnPct, dividendYieldPct, annualDividend, dividendGrowthPct, growth, yieldField, yieldSource, period, details, estimated: !!(details && details.estimated), problem, selected, included };
+      return { stock, id: stock.ticker, weight, weightPct, shares, valueEUR, fx, quantity, totalReturnPct, dividendYieldPct, annualDividend, dividendGrowthPct, growth, yieldField, yieldSource, period, details, estimated: !!(details && details.estimated), problem, problemField, selected, included };
     }
     function initFutureStudio() {
       if (futureStudio.initialized) return; futureStudio.initialized = true; loadFutureSettings();initFutureCatalogSearch();
@@ -1893,12 +1918,12 @@ const PortfolioInput = (() => {
       growth.firstChild.append(sectionInfoButton('Dividendenwachstum · '+stock.name,futureGrowthProvenance(row.growth)+(row.growth?.warning?' '+row.growth.warning:''))); dividend.firstChild.append(sectionInfoButton('Ausschüttungsrendite · '+stock.name,'Pauschale Netto-Rendite: Brutto-Rendite '+futurePercent(row.dividendYieldPct)+' × 73,625 %. Abzug 25 % Kapitalertragsteuer zuzüglich 5,5 % Solidaritätszuschlag auf die Steuer; ohne Kirchensteuer, Freibeträge, Quellensteueranrechnung oder Fonds-Teilfreistellung. '+dividend.title));
       }
       const fields = el('div','future-card-fields future-allocation-fields'), sharesMode = settings.allocationMode === 'shares';
-      const quantityLabel = el('label','',sharesMode ? 'Anzahl Shares' : 'Gewichtung'), quantityWrap = el('span','future-small-input'), quantity = el('input'); quantity.type = 'number'; quantity.min = '0'; quantity.max = sharesMode ? '1000000000' : '100'; quantity.step = sharesMode ? 'any' : '0.1'; quantity.value = futureNumber(row.quantity) === null ? '' : String(Math.round(row.quantity * 1e8) / 1e8); quantity.setAttribute('aria-label',stock.name + (sharesMode ? ' Anzahl Shares' : ' Gewichtung in Prozent')); quantityWrap.append(quantity,el('span','',sharesMode ? 'Shares' : '%')); quantityLabel.append(quantityWrap);
+      const quantityLabel = el('label','',sharesMode ? 'Anzahl Shares' : 'Gewichtung'), quantityWrap = el('span','future-small-input'), quantity = el('input'); quantity.id='future-quantity-'+stock.ticker; quantity.type = 'number'; quantity.min = '0'; quantity.max = sharesMode ? '1000000000' : '100'; quantity.step = sharesMode ? 'any' : '0.1'; quantity.value = futureNumber(row.quantity) === null ? '' : String(Math.round(row.quantity * 1e8) / 1e8); quantity.setAttribute('aria-label',stock.name + (sharesMode ? ' Anzahl Shares' : ' Gewichtung in Prozent')); quantityWrap.append(quantity,el('span','',sharesMode ? 'Shares' : '%')); quantityLabel.append(quantityWrap);
       quantity.addEventListener('change',event => { const value = event.target.value.trim() === '' ? null : Number(event.target.value); (sharesMode ? settings.shares : settings.weights)[stock.ticker] = value; if (value > 0) delete settings.excluded[stock.ticker]; else if (value === 0) settings.excluded[stock.ticker] = true; saveFutureSettings(); renderFutureStudio(); });
       const effective = el('div','future-allocation-value'); effective.append(el('span','',sharesMode ? 'Positionswert' : 'Effektive Gewichtung'), el('strong','',sharesMode ? futureMoney(row.valueEUR,false) : row.included && weightTotal > 0 && row.weight > 0 ? fmt(row.weight / weightTotal * 100,2) + '%' : '0%'));
       fields.append(quantityLabel,effective); card.append(fields);
       if (sharesMode) { const price = positive(stock.price), note = el('p','future-card-input-note', (price === null ? 'Kurs fehlt' : fmt(price,2) + ' ' + stock.currency + ' / Share') + (row.included && weightTotal > 0 && row.weight > 0 ? ' · Gewicht ' + fmt(row.weight / weightTotal * 100,2) + '%' : '')); note.title = provenance(stock,'price') + (row.fx && row.fx.as_of ? ' · EUR-Wechselkurs: ' + row.fx.as_of : ''); card.append(note); }
-      if (row.problem && (row.included || row.quantity > 0)) card.append(el('p','future-card-warning',row.problem));
+      if (row.problem && row.problemField !== 'quantity' && (row.included || row.quantity > 0)) card.append(el('p','future-card-warning',row.problem));
       return card;
     }
     function futureChartGeometry(settings) {
@@ -2012,11 +2037,14 @@ const PortfolioInput = (() => {
       if(!futureStudio.initialized||!state.data||state.view!=='future')return;
       const settings=futureSettings(),rows=futureFilteredStocks().map(stock=>futureStockAssumptions(stock,settings)),included=rows.filter(row=>row.included),problems=included.filter(row=>row.problem);
       const initial=settings.allocationMode==='shares'?included.reduce((total,row)=>total+(futureNumber(row.valueEUR)!==null?row.valueEUR:0),0):settings.initial;
+      const inputIssues=futureInputIssues(settings,initial,rows);
       let result=null;
-      if(!included.length)result={error:settings.allocationMode==='shares'?'Trage die Anzahl Shares deiner Positionen ein oder nutze „Portfolio input“.':'Schließe mindestens eine Position mit einer positiven Gewichtung ein.'};
+      if(inputIssues.length)result={error:futureInputMessage(inputIssues)};
+      else if(!included.length)result={error:settings.allocationMode==='shares'?'Trage die Anzahl Shares deiner Positionen ein oder nutze „Portfolio input“.':'Schließe mindestens eine Position mit einer positiven Gewichtung ein.'};
       else if(problems.length)result={error:'Für dieses Szenario fehlen passende Eingangsdaten.'};
       else if(futureNumber(initial)===null||initial<0||initial>1e9||futureNumber(settings.monthly)===null||settings.monthly<0||settings.monthly>1e7)result={error:'Bitte gültige Werte für Startkapital und monatliche Einzahlung eingeben.'};
       else result=FutureModel.project({positions:included.map(row=>({id:row.id,weight:row.weight,totalReturnPct:row.totalReturnPct,dividendYieldPct:row.dividendYieldPct,dividendGrowthPct:row.dividendGrowthPct})),initial,monthly:settings.monthly,years:settings.years,reinvest:futureUsesDividends()&&settings.reinvest,dividendTaxRate:futureUsesDividends()?FutureModel.DIVIDEND_TAX_RATE:0});
+      if(result.code==='decomposition'){inputIssues.push({id:settings.source==='manual'?'future-rate':'future-source',label:settings.source==='manual'?'Gesamtrendite':'Renditebasis'});result.error=futureInputMessage(inputIssues);}
       syncFutureControls(settings,result,rows,initial);futureSummary(rows,settings,result,initial);
       const estimates=included.filter(row=>row.estimated||futureUsesDividends()&&row.growth&&!['confirmed','no_dividend'].includes(row.growth.status)),estimateNote=$('future-estimate-note');estimateNote.hidden=true;estimateNote.textContent=estimates.length?'≈ '+estimates.length+' Position'+(estimates.length===1?'':'en')+' mit kürzerer Historie oder Ersatzannahme: '+estimates.map(row=>row.stock.name).join(', ')+'. Verwendete Zeiträume und Quellen stehen an den Kennzahlen.':'';
       const extremeNote=$('future-extreme-note'),extreme=!!(result&&!result.error&&result.final.contributions>0&&result.final.wealth>result.final.contributions*1000);extremeNote.hidden=true;extremeNote.textContent='';
@@ -2024,10 +2052,11 @@ const PortfolioInput = (() => {
       $('future-chart-subtitle').textContent=portfolio().name+' · '+(state.cluster==='Alle'?'alle Kategorien':state.cluster)+' · '+settings.years+' Jahre'+(futureUsesDividends()?' · '+(settings.reinvest?'Dividenden reinvestiert':'Dividenden ausgeschüttet'):'');
       const weightedGrowth=result&&!result.error?result.final.positions.reduce((sum,position)=>sum+position.weight*position.dividendGrowthPct,0):null;
       $('future-initial-rates').textContent=result&&!result.error?'Renditebasis: '+futurePercent(result.weightedReturnPct)+' p. a.'+(futureUsesDividends()&&settings.reinvest?' · Ausschüttungsrendite netto zu Beginn: '+futurePercent(result.weightedYieldPct*(1-result.dividendTaxRate))+' · Dividendenwachstum: '+futurePercent(weightedGrowth)+' p. a.':''):'';
-      const error=$('future-error');error.hidden=!result.error;error.replaceChildren();if(result.error){error.append(el('strong','',result.error));if(problems.length){error.append(el('p','','Prüfe die Datenhinweise, wähle eine andere Renditebasis oder schließe die betroffenen Positionen aus.'));const list=el('ul');problems.forEach(row=>list.append(el('li','',row.stock.name+': '+row.problem)));error.append(list);}}
+      const error=$('future-error');error.hidden=!result.error;error.classList.toggle('field-error',inputIssues.length>0);error.replaceChildren();if(result.error){error.append(el('strong','',result.error));if(!inputIssues.length&&problems.length){error.append(el('p','','Prüfe die Datenhinweise, wähle eine andere Renditebasis oder schließe die betroffenen Positionen aus.'));const list=el('ul');problems.forEach(row=>list.append(el('li','',row.stock.name+': '+row.problem)));error.append(list);}}
       $('future-chart-caption').textContent=result.error?'Das Szenario wird mit vollständigen Annahmen berechnet.':!futureUsesDividends()?'Wertentwicklung auf Basis der gewählten Gesamtrendite, vor Steuern.':settings.reinvest?'Reinvestierte Netto-Dividenden sind im Depotwert enthalten. Summe der Netto-Reinvestitionen: '+futureMoney(result.final.dividendsNetCumulative)+'.':'Depotwert + unverzinstes Cash = '+futureMoney(result.final.wealth)+' Gesamtvermögen. Ausgezahlte Netto-Dividenden gesamt: '+futureMoney(result.final.cash)+'.';
       futureChart(result,settings);futureDividendChart(result,settings);futureYearTable(result,settings);
       const cards=$('future-cards');cards.replaceChildren();const total=included.reduce((sum,row)=>sum+(futureNumber(row.weight)!==null&&row.weight>0?row.weight:0),0);for(const row of rows)cards.append(futureCard(row,settings,total));$('future-no-cards').hidden=!!rows.length;
+      syncFutureInputErrors(inputIssues);
       $('future-selection-copy').textContent='Kachel anklicken: grau = ausgeschlossen. '+included.length+' von '+rows.length+' sichtbaren Positionen enthalten. '+(settings.allocationMode==='shares'?'Startwert und Gewichte folgen deinen Shares.':'Gewichte gelten für diese Auswahl.');
       futureMethod(rows,settings);renderFutureCatalogSearch();
     }
