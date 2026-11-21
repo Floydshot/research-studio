@@ -448,6 +448,30 @@
   .stock-card .stock-stale-status{color:#d3636d}
   html[data-theme="light"] .stock-card .stock-stale-status{color:#b83243}
 </style>
+<style id="uniform-position-cards">
+  .cards,.future-cards{grid-auto-rows:1fr;align-items:stretch}
+  .cards>.stock-card{align-self:stretch;min-width:0}
+  .stock-card .stock-cluster{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:14px}
+  .stock-cluster-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .stock-card .stock-stale-status{flex:none;white-space:nowrap}
+  .stock-card .metrics{flex:1;align-content:start}
+  .stock-card .metric-cell{display:grid;grid-template-rows:12px 26px 24px;align-content:start}
+  .stock-card .metric-label{overflow:hidden;text-overflow:ellipsis}
+  .stock-card .metric-source{max-height:24px;overflow:auto;overflow-wrap:anywhere}
+  .stock-card .valuation-row{flex:none}
+  .future-cards>.future-card{min-width:0}
+  .future-card .future-card-category{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .future-card .future-card-return{display:grid;grid-template-columns:minmax(0,1fr) 18px;align-items:start;gap:3px}
+  .future-card .future-readonly>span{display:block;height:34px;overflow:hidden;overflow-wrap:anywhere;line-height:1.4}
+  .future-card .future-readonly>strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .future-card .future-card-fields{margin-top:auto}
+  .future-card-status{display:flex;align-items:flex-end;gap:8px;flex:none;height:28px;min-height:28px;margin-top:6px}
+  .future-card-status .future-card-warning{flex:1;min-width:0;max-height:28px;margin:0;overflow:auto;overflow-wrap:anywhere}
+  .future-card-status .future-card-removal{flex:none;margin:0 0 0 auto;padding:0}
+  .future-cards>.future-card.excluded>.future-card-status{opacity:1}
+  .future-card.excluded .future-card-warning{opacity:.58}
+  @media(max-width:700px){.stock-card .metric-cell{grid-template-rows:12px 27px 24px}.future-card .future-readonly>span{height:34px}}
+</style>
 <style>
   /* Keep one copyright line at the end of every project and studio view. */
   body>.shell{min-height:100vh;min-height:100svh;display:flex;flex-direction:column}
@@ -873,18 +897,34 @@
         event.preventDefault();event.stopPropagation();trigger=button;$('section-info-title').textContent=button.dataset.infoTitle;copy.replaceChildren();
         if(button.dataset.infoTitle==='Werte im Detail'){
           const glossary=el('dl','metrics-glossary');
-          for(const [term,definition] of [
-            ['P/E · KGV','Kurs geteilt durch den Gewinn je Aktie der letzten zwölf Monate.'],
-            ['Hist. P/E','Historisches KGV als Bewertungsreferenz; 5J/10J = fünf/zehn Jahre, JE = Jahresende, Ø = Durchschnitt, Median = mittlerer Wert.'],
-            ['Forward P/E','Kurs geteilt durch den erwarteten Gewinn je Aktie.'],
-            ['P/S · KUV','Kurs geteilt durch den Umsatz je Aktie.'],
-            ['Div.-Rendite','Jährliche Dividende oder ETF-Ausschüttung im Verhältnis zum Kurs.'],
-            ['ETF · 12M','ETF = börsengehandelter Fonds; 12M = zwölf Monate.'],
-            ['P/E vs Hist. P/E','Prozentuale Abweichung des aktuellen KGV von der historischen Referenz; + bedeutet höher, − niedriger.'],
-            ['ROE','Eigenkapitalrendite: Jahresgewinn im Verhältnis zum durchschnittlichen Eigenkapital.'],
-            ['IR · GAAP · IFRS · ADS','IR = Investor Relations; US-/J-GAAP und IFRS/TIFRS = Rechnungslegungsstandards; ADS = US-Hinterlegungsschein auf ausländische Aktien.'],
-            ['FY · n. a.','FY = Geschäftsjahr; n. a. = keine anwendbare oder bestätigte Angabe verfügbar.']
-          ]){const row=el('div');row.append(el('dt','',term),el('dd','',definition));glossary.append(row);}
+          const visible=$('cards').innerText;
+          for(const [used,term,definition] of [
+            [/(?:^|\n)P\/E(?:\n|$)/,'P/E','Kurs geteilt durch den Gewinn je Aktie der letzten zwölf Monate.'],
+            [/Hist\. P\/E/,'Hist. P/E','Historisches P/E als Bewertungsreferenz.'],
+            [/Forward P\/E/,'Forward P/E','Kurs geteilt durch den erwarteten Gewinn je Aktie.'],
+            [/P\/E vs Hist\. P\/E/,'P/E vs Hist. P/E','Prozentualer Abstand zur historischen Referenz: minus = niedriger, plus = höher.'],
+            [/(?:^|\n)P\/S(?:\n|$)/,'P/S','Kurs geteilt durch den Umsatz je Aktie.'],
+            [/Hist\. P\/S/,'Hist. P/S','Historisches Kurs-Umsatz-Verhältnis als Bewertungsreferenz.'],
+            [/Div\.-Rendite/,'Div.-Rendite','Jährliche Dividende im Verhältnis zum Kurs.'],
+            [/Div\. \(Prognose\)/,'Div. (Prognose)','Erwartete jährliche Dividende im Verhältnis zum Kurs.'],
+            [/\bROE\b/,'ROE','Eigenkapitalrendite: Jahresgewinn geteilt durch das durchschnittliche Eigenkapital.'],
+            [/Fonds-KGV/,'Fonds-KGV','Bewertung der im ETF enthaltenen Aktien anhand ihrer Gewinne.'],
+            [/\bETF\b/,'ETF','Börsengehandelter Fonds.'],
+            [/12M/,'12M','Die letzten zwölf Monate.'],
+            [/Auszahl\.\/Anteil/,'Auszahl./Anteil','Summe der Ausschüttungen pro Fondsanteil in den letzten zwölf Monaten.'],
+            [/\b5J\b/,'5J','Zeitraum von fünf Jahren.'],
+            [/\b10J\b/,'10J','Zeitraum von zehn Jahren.'],
+            [/\bJE\b/,'JE','Jahresende.'],
+            [/Median/,'Median','Mittlerer Wert der zugrunde liegenden Beobachtungen.'],
+            [/\bIR\b/,'IR','Investor Relations: Unternehmensinformationen für Anleger.'],
+            [/US-GAAP/,'US-GAAP','US-amerikanische Rechnungslegungsstandards.'],
+            [/J-GAAP/,'J-GAAP','Japanische Rechnungslegungsstandards.'],
+            [/\bIFRS\b/,'IFRS','Internationale Rechnungslegungsstandards.'],
+            [/\bTIFRS\b/,'TIFRS','Taiwanische Fassung der internationalen Rechnungslegungsstandards.'],
+            [/\bFX\b/,'FX','Fremdwährungsumrechnung.'],
+            [/\bFY\d*/,'FY','Geschäftsjahr.'],
+            [/n\. a\./,'n. a.','Keine anwendbare oder bestätigte Angabe verfügbar.']
+          ]){if(!used.test(visible))continue;const row=el('div');row.append(el('dt','',term),el('dd','',definition));glossary.append(row);}
           copy.append(glossary);
         }else copy.append(el('p','',shortSectionInfo(button)));
         dialog.showModal();$('section-info-close').focus();
@@ -1116,7 +1156,7 @@
     }
     function metricCell(stock, label, value, field, reference = false, highlight = false) {
       const meta = issuerMetric(stock, field), issuer = meta && !meta.unavailable_reason, missingReference = reference && !meta && number(stock[field]) === null;
-      const cell = el('div', 'metric-cell'); cell.append(el('span', 'metric-label', metricLabel(stock, field, label)));
+      const cell = el('div', 'metric-cell'), labelNodeText = metricLabel(stock, field, label), metricName = el('span', 'metric-label', labelNodeText); metricName.title = labelNodeText; cell.append(metricName);
       const val = el('span', 'metric-value' + (highlight ? ' highlight' : ''), meta && meta.unavailable_reason ? '—' : value);
       val.title = missingReference ? 'Noch keine verifizierte historische Referenz hinterlegt.' : meta || !reference ? provenance(stock, field) : 'Feste Nutzervorgabe (5J/10J); Zeitraum nicht unabhängig verifiziert.';
       cell.append(val);
@@ -1146,8 +1186,9 @@
         card.tabIndex = 0; card.setAttribute('role', 'button'); card.setAttribute('aria-pressed', String(state.selected === stock.ticker)); card.setAttribute('aria-label', stock.name + ' (' + stock.ticker + ') im Diagramm auswählen'); card.dataset.ticker = stock.ticker;
         card.addEventListener('click', event => { if (!event.target.closest('button,a,input,select,textarea,summary')) select(stock.ticker); }); card.addEventListener('keydown', event => { if (event.target === card && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); select(stock.ticker); } });
         const head = el('div', 'stock-head'); head.append(companyLogo(stock.ticker, 'stock-symbol')); const names = el('div', 'stock-names'), name = el('h3', 'stock-title', etf ? stock.ticker + ' · Income ETF' : stock.name); name.title = stock.name; names.append(name, el('div', 'stock-ticker', stock.ticker + (etf ? ' · ETF · US' : ''))); head.append(names);
-        const price = el('div', 'stock-price'); price.title = provenance(stock, 'price'); price.append(el('div', 'price-value', number(stock.price) === null ? '—' : moneyAmount(stock.price) + (stock.currency ? ' ' + stock.currency : ''))); head.append(price); card.append(head, el('div', 'stock-cluster', stock.cluster));
-        if (!shoppingStockFresh(stock)) { const stale = el('div', 'tranche-row'); stale.append(el('span', 'source-status stock-stale-status', 'not up to date')); card.append(stale); }
+        const price = el('div', 'stock-price'); price.title = provenance(stock, 'price'); price.append(el('div', 'price-value', number(stock.price) === null ? '—' : moneyAmount(stock.price) + (stock.currency ? ' ' + stock.currency : ''))); head.append(price); card.append(head);
+        const cluster = el('div', 'stock-cluster'), clusterName = el('span', 'stock-cluster-name', stock.cluster); clusterName.title = stock.cluster; cluster.append(clusterName);
+        if (!shoppingStockFresh(stock)) cluster.append(el('span', 'source-status stock-stale-status', 'not up to date')); card.append(cluster);
         const metrics = el('div', 'metrics');
         if (etf) {
           metrics.append(metricCell(stock, 'Fonds-KGV', peText(stock.current_pe), 'current_pe'), metricCell(stock, 'Rendite 12M', percent(stock.distribution_yield_ttm), 'distribution_yield_ttm', false, true), metricCell(stock, 'Auszahl./Anteil', number(stock.distributions_per_share_ttm) === null ? '—' : moneyAmount(stock.distributions_per_share_ttm) + (stock.currency ? ' ' + stock.currency : ''), 'distributions_per_share_ttm'), metricCell(stock, 'Kurs', number(stock.price) === null ? '—' : moneyAmount(stock.price), 'price'));
@@ -2086,7 +2127,7 @@ const PortfolioInput = (() => {
     function futureCard(row, settings, weightTotal) {
       const stock = row.stock, card = el('article','future-card' + (row.included ? '' : ' excluded') + (row.included && row.problem ? ' problem' : '')); card.dataset.futureTicker = stock.ticker;
       const toggle = el('button','future-card-toggle'); toggle.type = 'button'; toggle.setAttribute('aria-pressed',String(row.included)); toggle.setAttribute('aria-label',stock.name + (row.included ? ' aus Projektion ausschließen' : ' in Projektion einschließen'));
-      const names = el('span','future-card-names'); names.append(el('span','future-card-name',stock.name),el('span','future-card-category',stock.cluster)); toggle.append(companyLogo(stock.ticker,'future-logo'),names,el('span','future-inclusion',row.included ? '✓' : '+')); card.append(toggle);
+      const names = el('span','future-card-names'); const category = el('span','future-card-category',stock.cluster); category.title = stock.cluster; names.append(el('span','future-card-name',stock.name),category); toggle.append(companyLogo(stock.ticker,'future-logo'),names,el('span','future-inclusion',row.included ? '✓' : '+')); card.append(toggle);
       const flip = () => { if (row.included) settings.excluded[stock.ticker] = true; else { if (!(row.quantity > 0)) { card.querySelector('.future-allocation-fields input')?.focus(); return; } delete settings.excluded[stock.ticker]; } saveFutureSettings(); renderFutureStudio(); };
       toggle.addEventListener('click',flip); card.addEventListener('click',event => { if (!event.target.closest('button,input,label,a')) flip(); });
       const rate = el('div','future-card-rate'), basis = el('span','future-card-return'), returnUnit = el('label','future-return-unit'), returnInput = el('input','future-card-return-input');
@@ -2112,8 +2153,10 @@ const PortfolioInput = (() => {
       quantity.addEventListener('change',event => { const value = event.target.value.trim() === '' ? null : Number(event.target.value); (sharesMode ? settings.shares : settings.weights)[stock.ticker] = value; if (value > 0) delete settings.excluded[stock.ticker]; else if (value === 0) settings.excluded[stock.ticker] = true; saveFutureSettings(); renderFutureStudio(); });
       fields.append(quantityLabel); card.append(fields);
       if (sharesMode) { const price = positive(stock.price); quantity.title = (price === null ? 'Kurs fehlt' : moneyAmount(price) + ' ' + stock.currency + ' / Share') + ' · ' + provenance(stock,'price') + (row.fx && row.fx.as_of ? ' · EUR-Wechselkurs: ' + row.fx.as_of : ''); }
-      if (row.problem && !['quantity','return'].includes(row.problemField) && (row.included || row.quantity > 0)) card.append(el('p','future-card-warning',row.problem));
-      if (!row.included) { const footer=el('div','future-card-removal'),remove=el('button','future-card-remove','Entfernen');remove.type='button';remove.setAttribute('aria-label',stock.name+' entfernen');remove.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();window.ProjectRemoval?.open(stock.ticker,remove);});footer.addEventListener('click',event=>event.stopPropagation());footer.append(remove);card.append(footer); }
+      const status = el('div','future-card-status'); status.addEventListener('click',event=>event.stopPropagation());
+      if (row.problem && !['quantity','return'].includes(row.problemField) && (row.included || row.quantity > 0)) { const warning = el('p','future-card-warning',row.problem); warning.title = row.problem; warning.tabIndex = 0; status.append(warning); }
+      if (!row.included) { const footer=el('div','future-card-removal'),remove=el('button','future-card-remove','Entfernen');remove.type='button';remove.setAttribute('aria-label',stock.name+' entfernen');remove.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();window.ProjectRemoval?.open(stock.ticker,remove);});footer.addEventListener('click',event=>event.stopPropagation());footer.append(remove);status.append(footer); }
+      card.append(status);
       return card;
     }
     function futureChartGeometry(settings) {
