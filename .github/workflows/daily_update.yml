@@ -2,9 +2,9 @@ name: Update stocks and deploy dashboard
 
 on:
   schedule:
-    # Fixed UTC: 08:30 CEST in summer, 07:30 CET in winter (Europe/Berlin).
+    # Every day at fixed UTC: 08:30 CEST / 07:30 CET (Europe/Berlin).
     # GitHub schedules are best effort and may start later than scheduled.
-    - cron: '30 6 * * 1-5'
+    - cron: '30 6 * * *'
   workflow_dispatch:
   push:
     branches: [main]
