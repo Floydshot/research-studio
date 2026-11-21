@@ -229,6 +229,39 @@
     .future-dividends-wrap{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:var(--line) transparent}.future-dividends-inner{position:relative;height:100%}.section-info-copy>p,.section-info-copy>div{font-size:inherit;color:inherit}.section-info-copy .future-estimate-note{padding:8px 10px}
     @media(max-width:700px){.future-rate-pill{max-width:100%;text-align:left}.section-info-dialog{padding:17px}.section-info-copy{font-size:11px}.future-card-rate .section-info{width:14px;height:14px}.future-card-metrics .section-info{margin-left:3px}}
   </style>
+
+  <style>
+    /* Compact Outlook inputs and position controls. */
+    .future-settings{background:transparent;border:0;border-radius:0;padding:0 0 14px;margin-bottom:8px}
+    .future-settings-heading{margin-bottom:10px}.future-settings-heading h2{font-size:12px}
+    .future-input-grid{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 12px}
+    .future-settings .future-field{flex:0 1 140px;gap:4px;font-size:9px}
+    .future-settings .future-field:has(#future-source){flex-basis:200px}
+    .future-settings #future-rate-field{flex-basis:166px}
+    .future-settings .future-field:has(#future-allocation){flex-basis:148px}
+    .future-settings .future-input-unit,.future-settings .future-field select{height:31px;background:var(--surface);font-size:11px}
+    .future-settings .future-field select{padding-left:8px;padding-right:22px}
+    .future-settings .future-input-unit input{font-size:11px;padding-left:9px}
+    .future-options-row{justify-content:flex-start;align-items:center;flex-direction:row;flex-wrap:wrap;gap:12px 22px;margin-top:11px;padding-top:0;border:0}
+    .future-horizon{gap:7px 10px}.future-horizon legend{float:left;width:auto;padding:3px 0;font-size:9px;margin-right:0}
+    .future-year-buttons{gap:3px}.future-year-buttons button{padding:4px 8px;font-size:9px}.future-check{font-size:10px}
+    .future-positions-heading{display:flex;flex-direction:row;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:12px;margin-bottom:11px}
+    .future-positions-heading>div:first-child{min-width:0}.future-positions-heading h2{font-size:13px}
+    .future-positions-heading .future-selection-actions{flex:none}
+    .future-positions-heading #future-input-open{color:var(--text);font-weight:400;background:var(--surface);white-space:nowrap}
+    .future-position-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px 13px;margin-bottom:14px}
+    #future-cluster-slot{min-width:0}.future-position-controls .future-selection-actions{justify-content:flex-start;flex-shrink:1}
+    .future-position-controls .future-selection-actions button{font-weight:400}
+    .future-year-details>h3{font-size:11px;font-weight:500;color:var(--muted);margin:0}
+    body[data-studio="future"] .toolbar{justify-content:flex-end;margin-bottom:8px}
+    @media(max-width:700px){
+      .future-settings{padding:0 0 10px}.future-input-grid{display:grid;grid-template-columns:repeat(2,minmax(0,148px));gap:9px 12px}
+      .future-settings .future-field{font-size:9px}.future-settings #future-rate-field{font-size:8px}
+      .future-options-row{gap:10px 14px;margin-top:10px}.future-horizon{gap:7px 9px}.future-check{font-size:9px}
+      .future-positions-heading h2{font-size:12px}.future-positions-heading #future-input-open{font-size:10px;padding:6px 8px}
+      .future-position-controls{gap:8px;margin-bottom:12px}.future-position-controls .clusters{gap:2px}.future-position-controls .cluster{padding:5px 7px}
+    }
+  </style>
 </head>
 <body>
   <div class="shell">
@@ -274,14 +307,15 @@
           <div class="toolbar"><div id="clusters" class="clusters" role="group" aria-label="Nach Cluster filtern"></div><div class="table-controls"><div class="search-wrap"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="m13 13 4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><label for="search" class="sr-only">Werte nach Name oder Ticker suchen</label><input id="search" class="search" type="search" autocomplete="off" placeholder="Name oder Ticker suchen"></div><div class="sort-wrap"><label for="sort">Sortieren</label><select id="sort" class="sort"><option value="forward">Forward P/E aufsteigend</option><option id="secondary-sort" value="secondary">P/S aufsteigend</option><option value="name">Name A–Z</option></select></div></div></div>
           <section id="future-panel" class="future-panel" aria-labelledby="future-title" hidden>
   <div class="future-settings" aria-label="Annahmen für die Depotprojektion">
-    <div class="future-settings-heading"><h2 class="title-with-info">Szenario einstellen<button type="button" class="section-info" data-info-title="Szenario einstellen" data-info-sources="future-allocation-note future-dividend-mode-copy future-assumption-note future-estimate-note future-extreme-note future-method-copy" aria-label="Informationen zu Szenario einstellen" title="Informationen zu Szenario einstellen"><span aria-hidden="true">i</span></button></h2></div>
+    <div class="future-settings-heading"><h2 class="title-with-info">Inputs<button type="button" class="section-info" data-info-title="Inputs" data-info-sources="future-allocation-note future-dividend-mode-copy future-assumption-note future-estimate-note future-extreme-note future-method-copy" aria-label="Informationen zu Inputs" title="Informationen zu Inputs"><span aria-hidden="true">i</span></button></h2></div>
     <div class="future-input-grid">
       <label id="future-initial-label" class="future-field" for="future-initial">Startkapital <span class="future-input-unit"><input id="future-initial" type="number" min="0" max="1000000000" step="100" inputmode="decimal" value="10000"><span>€</span></span></label>
       <label class="future-field" for="future-monthly">Monatliche Einzahlung <span class="future-input-unit"><input id="future-monthly" type="number" min="0" max="10000000" step="50" inputmode="decimal" value="0"><span>€</span></span></label>
       <label class="future-field" for="future-source">Rendite als Szenario <select id="future-source"><option value="manual">Manuell festlegen</option><option value="5y">Historische Basis · 5 Jahre</option><option value="10y">Historische Basis · 10 Jahre</option><option value="all">Historische Basis · All Time</option></select></label>
       <label id="future-rate-field" class="future-field" for="future-rate">Gesamtrendite pro Jahr <span class="future-input-unit"><input id="future-rate" type="number" min="-99" max="1000" step="0.5" inputmode="decimal" value="7"><span>%</span></span></label>
+      <label class="future-field" for="future-allocation">Positionen erfassen <select id="future-allocation"><option value="weights">Gewichtung in %</option><option value="shares">Anzahl Shares</option></select></label>
     </div>
-    <div class="future-allocation-row"><label class="future-field" for="future-allocation">Positionen erfassen <select id="future-allocation"><option value="weights">Gewichtung in %</option><option value="shares">Anzahl Shares</option></select></label><p id="future-allocation-note" hidden class="future-allocation-note"></p></div>
+    <p id="future-allocation-note" hidden class="future-allocation-note"></p>
     <div class="future-options-row"><fieldset class="future-horizon"><legend>Zeitraum</legend><div id="future-years" class="future-year-buttons"><button type="button" data-years="5">5 J</button><button type="button" data-years="10">10 J</button><button type="button" data-years="15">15 J</button><button type="button" data-years="20" aria-pressed="true">20 J</button><button type="button" id="future-years-30" data-years="30" hidden>30 J</button></div><label class="future-check"><input id="future-extend" type="checkbox"> Auf 30 Jahre erweitern</label></fieldset><div class="future-dividend-mode"><label class="future-check future-reinvest-label"><input id="future-reinvest" type="checkbox" checked> Dividenden reinvestieren</label><p id="future-dividend-mode-copy" hidden>Ausschüttungen bleiben im Depot und wachsen mit.</p></div></div>
     <p id="future-assumption-note" hidden class="future-assumption-note"></p>
     <p id="future-estimate-note" class="future-estimate-note" hidden></p>
@@ -294,9 +328,10 @@
     <div id="future-chart-fallback" class="future-chart-fallback" hidden></div>
     <section id="future-dividends-panel" class="future-dividends-panel" aria-labelledby="future-dividends-title"><h3 id="future-dividends-title" class="title-with-info">Dividenden pro Jahr<button type="button" class="section-info" data-info-title="Dividenden pro Jahr" data-info-sources="future-dividends-copy" data-info-text="Jeder Balken zeigt die Ausschüttungen eines einzelnen Jahres. Die Farben trennen Dividenden aus Startkapital, zusätzlichen Einzahlungen und wiederangelegten Ausschüttungen. Komponenten ohne Betrag werden ausgeblendet. Die Summe entspricht „Dividenden im Jahr“ in der Jahrestabelle." aria-label="Informationen zu Dividenden pro Jahr" title="Informationen zu Dividenden pro Jahr"><span aria-hidden="true">i</span></button></h3><p id="future-dividends-copy" hidden></p><div id="future-dividends-wrap" class="future-dividends-wrap" role="region" aria-label="Jahresdividenden, horizontal scrollbar" tabindex="0"><div id="future-dividends-inner" class="future-dividends-inner"><canvas id="future-dividends-chart" role="img" aria-label="Jährliche Dividenden aus Startkapital, Einzahlungen und Wiederanlage. Die Jahressummen stehen in der Tabelle darunter."></canvas></div></div><div id="future-dividends-fallback" class="future-chart-fallback" hidden></div></section>
     <div class="future-chart-caption" hidden><span id="future-chart-caption"></span><span>Nominal · vor Steuern und Gebühren</span></div>
-    <details class="future-year-details"><summary>Jahreswerte ansehen <button type="button" class="section-info" data-info-title="Jahreswerte" data-info-sources="future-year-note" aria-label="Informationen zu Jahreswerte" title="Informationen zu Jahreswerte"><span aria-hidden="true">i</span></button></summary><p id="future-year-note" hidden></p><div class="future-year-scroll"><table class="future-year-table" aria-describedby="future-year-note"><caption class="sr-only">Modellierte Entwicklung nach Jahren mit Dividenden je einzelnem Jahr</caption><thead><tr><th>Jahr</th><th>Einzahlungen gesamt</th><th>Depotwert</th><th>Dividenden im Jahr</th><th>Cashbestand gesamt</th><th>Gesamtvermögen</th></tr></thead><tbody id="future-year-body"></tbody></table></div></details>
+    <section class="future-year-details" aria-labelledby="future-year-title"><h3 id="future-year-title" class="title-with-info">Jahreswerte <button type="button" class="section-info" data-info-title="Jahreswerte" data-info-sources="future-year-note" aria-label="Informationen zu Jahreswerte" title="Informationen zu Jahreswerte"><span aria-hidden="true">i</span></button></h3><p id="future-year-note" hidden></p><div class="future-year-scroll"><table class="future-year-table" aria-describedby="future-year-note"><caption class="sr-only">Modellierte Entwicklung nach Jahren mit Dividenden je einzelnem Jahr</caption><thead><tr><th>Jahr</th><th>Einzahlungen gesamt</th><th>Depotwert</th><th>Dividenden im Jahr</th><th>Cashbestand gesamt</th><th>Gesamtvermögen</th></tr></thead><tbody id="future-year-body"></tbody></table></div></section>
   </section>
-  <div class="future-positions-heading"><div><h2 class="title-with-info">Positionen im Szenario<button type="button" class="section-info" data-info-title="Positionen im Szenario" data-info-sources="future-selection-copy" aria-label="Informationen zu Positionen im Szenario" title="Informationen zu Positionen im Szenario"><span aria-hidden="true">i</span></button></h2><p id="future-selection-copy" hidden>Kachel anklicken, um eine Position aus- oder einzuschließen.</p></div><div class="future-selection-actions"><button type="button" id="future-input-open">Portfolio input</button><button type="button" id="future-include-all">Alle einschließen</button><button type="button" id="future-equal-weights">Gleich gewichten</button></div></div>
+  <div class="future-positions-heading"><div><h2 class="title-with-info">Positionen im Szenario<button type="button" class="section-info" data-info-title="Positionen im Szenario" data-info-sources="future-selection-copy" aria-label="Informationen zu Positionen im Szenario" title="Informationen zu Positionen im Szenario"><span aria-hidden="true">i</span></button></h2><p id="future-selection-copy" hidden>Kachel anklicken, um eine Position aus- oder einzuschließen.</p></div><div class="future-selection-actions"><button type="button" id="future-input-open">Portfolio input</button></div></div>
+  <div class="future-position-controls"><div id="future-cluster-slot"></div><div class="future-selection-actions"><button type="button" id="future-include-all">Alle einschließen</button><button type="button" id="future-equal-weights">Gleich gewichten</button></div></div>
   <div id="future-cards" class="future-cards" aria-label="Positionen für die Depotprojektion"></div>
   <p id="future-no-cards" class="future-no-cards" hidden>Für die gewählten Filter gibt es keine Positionen.</p>
   <dialog id="future-input-dialog" class="future-input-dialog" aria-labelledby="future-input-title" aria-describedby="future-input-help"><div class="title-with-info"><h2 id="future-input-title">Portfolio input</h2><button type="button" class="section-info" data-info-title="Portfolio input" data-info-sources="future-input-help" data-info-text="Füge eine Position pro Zeile ein, z. B. Microsoft 40% oder MSFT 12 Shares. Nicht genannte Positionen werden im aktuellen Depot aus dem Szenario ausgeschlossen. Beim Übernehmen werden Suche und Kategorienfilter zurückgesetzt." aria-label="Informationen zu Portfolio input" title="Informationen zu Portfolio input"><span aria-hidden="true">i</span></button></div><p id="future-input-help" hidden>Füge deine Positionen mit Stückzahl oder Prozentgewicht ein, eine pro Zeile. Es werden ausschließlich Werte des ausgewählten Depots zugeordnet.</p><label class="future-field" for="future-input-mode">Eingabeformat <select id="future-input-mode"><option value="auto">Automatisch erkennen</option><option value="weights">Gewichtung in %</option><option value="shares">Anzahl Shares</option></select></label><label for="future-input-text" class="future-import-label">Deine Positionen</label><textarea id="future-input-text" rows="7" maxlength="20000" spellcheck="false" placeholder="Microsoft 40%&#10;Apple 30%&#10;Alphabet 30%&#10;&#10;oder: MSFT 12 Shares"></textarea><div id="future-input-preview" class="future-input-preview" role="status" aria-live="polite"></div><div class="future-import-actions"><button type="button" id="future-input-cancel">Abbrechen</button><button type="button" id="future-input-apply" disabled>Übernehmen</button></div></dialog>
@@ -1002,6 +1037,8 @@
       $('studio-toggle').setAttribute('aria-label', action); $('studio-toggle').title = action;
       $('research-content').hidden = future; $('future-panel').hidden = !future; $('research-footer').hidden = future;
       document.querySelector('.toolbar .sort-wrap').hidden = future;
+      const clusters=$('clusters'),clusterParent=future?$('future-cluster-slot'):document.querySelector('.toolbar');
+      if(future)clusterParent.append(clusters);else clusterParent.insertBefore(clusters,clusterParent.firstChild);
       document.body.dataset.studio = state.view;
     }
     function render() {
@@ -1751,7 +1788,7 @@ const PortfolioInput = (() => {
             type:'bar',
             data:{labels:years.map(row => String(row.year)),datasets:fields.map(([label,key,shade]) => ({label,data:years.map(row => row[key]),backgroundColor:color(shade),borderWidth:0,borderRadius:2,maxBarThickness:34}))},
             options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},
-              plugins:{legend:{position:'bottom',align:'start',labels:{color:color('--muted'),boxWidth:9,boxHeight:9,font:{size:10},padding:15}},
+              plugins:{legend:{display:false},
                 tooltip:{backgroundColor:color('--surface'),titleColor:color('--text'),bodyColor:color('--text'),borderColor:color('--line'),borderWidth:1,padding:10,titleFont:{weight:'bold',size:12},filter:context => context.parsed.y > 1e-8,callbacks:{title:items => items.length ? heading(years[items[0].dataIndex]) : '',label:context => context.dataset.label+': '+futureMoney(context.parsed.y,false)}}},
               scales:{x:{stacked:true,grid:{display:false},border:{color:color('--line')},ticks:{color:color('--muted'),font:{size:9},minRotation:0,maxRotation:0,autoSkip:false}},
                 y:{stacked:true,beginAtZero:true,border:{display:false},grid:{color:color('--line-soft')},ticks:{color:color('--muted'),font:{size:9},maxTicksLimit:5,callback:value => futureAxisMoney(value)}}}}
@@ -1767,7 +1804,6 @@ const PortfolioInput = (() => {
         svg.append(group);const text=document.createElementNS(ns,'text');text.setAttribute('x',String(x+width/2));text.setAttribute('y','278');text.setAttribute('text-anchor','middle');text.setAttribute('class','future-svg-text');text.textContent=String(row.year);svg.append(text);
       }
       fallback.append(svg);
-      if (fields.length) { const legend=el('ul','legend');for(const [label,,shade] of fields){const item=el('li'),swatch=el('span','legend-swatch');swatch.style.backgroundColor=color(shade);item.append(swatch,document.createTextNode(label));legend.append(item);}fallback.append(legend); }
     }
     function futureYearTable(result, settings) {
       const body=$('future-year-body'),note=$('future-year-note');body.replaceChildren();note.textContent='';if(!result||result.error)return;
