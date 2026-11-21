@@ -423,6 +423,19 @@
     :is(.future-horizon-controls,.overview-inputs) .future-horizon legend{display:flex;align-items:center;padding:0}
     @media(max-width:700px){.tabs{gap:8px}.tabs .tab{flex-basis:90px}body[data-studio="future"] :is(#summary,#overview-summary) .summary-value{font-size:19px}}
   </style>
+<style id="shopping-card-layout">
+  .stock-card{display:flex;flex-direction:column;align-self:start}
+  .stock-card .metrics{margin-bottom:0}
+  .stock-card-details{margin-top:10px}
+  .stock-card-footer{display:flex;justify-content:flex-end;margin-top:auto;padding-top:8px}
+  .stock-card-expand{display:grid;place-items:center;width:24px;height:20px;padding:0;border:0;background:transparent;color:var(--faint)}
+  .stock-card-expand:hover{color:var(--text)}
+  .stock-card-expand svg{width:15px;height:15px;transition:transform .15s}
+  .stock-card-expand[aria-expanded="true"] svg{transform:rotate(180deg)}
+  .stock-card .stock-stale-status{color:#d3636d}
+  html[data-theme="light"] .stock-card .stock-stale-status{color:#b83243}
+  @media(prefers-reduced-motion:reduce){.stock-card-expand svg{transition:none}}
+</style>
 <style>
   /* Keep one copyright line at the end of every project and studio view. */
   body>.shell{min-height:100vh;min-height:100svh;display:flex;flex-direction:column}
@@ -430,6 +443,15 @@
   body>.shell>main{flex:1 0 auto;min-width:0}
   #research-footer{padding-bottom:0}
   .site-footer{flex:none;margin:40px 0 0;padding:0 0 24px;color:var(--faint);font-size:10px;line-height:1.5;text-align:right}
+</style>
+<style>
+  /* Shopping keeps the depot comparison controls beside its categories. */
+  body[data-studio="research"] #summary,
+  body[data-studio="research"] #tab-overview,
+  body[data-studio="research"] #portfolio-panel>.toolbar .search-wrap,
+  #chart-title>.section-info,#returns-title>.section-info{display:none}
+  body[data-studio="research"] #portfolio-panel>.toolbar .table-controls{width:auto;flex:none;margin-left:auto}
+  body[data-studio="research"] #portfolio-panel>.toolbar .sort-wrap>label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 </style>
 </head>
 <body>
@@ -586,6 +608,7 @@
   </form>
 </dialog>
   <dialog id="section-info-dialog" class="section-info-dialog" aria-labelledby="section-info-title"><div class="section-info-heading"><h2 id="section-info-title"></h2><button type="button" id="section-info-close" class="section-info-close" aria-label="Information schließen">×</button></div><div id="section-info-copy" class="section-info-copy"></div></dialog>
+  <style>.metrics-glossary{display:grid;gap:10px;margin:0}.metrics-glossary dt{font-weight:600;color:var(--text)}.metrics-glossary dd{margin:1px 0 0;line-height:1.5}</style>
   <div id="refresh-toast" class="refresh-toast" role="status" aria-live="polite" aria-atomic="true" data-tone="success" hidden><span id="toast-icon" class="toast-icon" aria-hidden="true">✓</span><div><strong id="toast-title" class="toast-title"></strong><p id="toast-message" class="toast-message"></p></div><button type="button" id="toast-close" class="toast-close" aria-label="Meldung schließen">×</button></div>
   <script src="client/project-workspaces.js"></script>
   <script src="client/overview-model.js"></script>
@@ -790,7 +813,7 @@
       button.setAttribute('aria-label', busy ? 'Bewertungsdaten werden geladen' : 'Daten erneut laden'); $('fear-greed').setAttribute('aria-busy', String(busy)); $('reload-label').textContent = busy ? 'Wird geladen …' : 'Aktualisieren';
     }
     function refreshNotice(changed) {
-      const stamp = state.data.last_updated || 'Zeitpunkt unbekannt', current = mode();
+      const stamp = dateText(state.data.refresh_batch?.completed_at)||state.data.last_updated||'Zeitpunkt unbekannt', current = mode();
       if (current === 'initial') return ['Initialwerte geladen', 'Es sind noch keine aktuellen Marktdaten veröffentlicht.', 'info'];
       if (current === 'stale') return ['Letzten Datenstand geladen', 'Stand: ' + stamp + '. Die Daten sind als veraltet gekennzeichnet.', 'warning'];
       if (!$('status-dot').classList.contains('live')) return ['Letzten Datenstand geladen', 'Veröffentlichter Marktdatenstand: ' + stamp + '. ' + $('status-text').title, 'warning'];
@@ -812,7 +835,7 @@
       const title=button.dataset.infoTitle||'';
       const fixed={
         'Bewertung im Vergleich':'Aktuelle Bewertung, historische Referenz und Schätzungen im Vergleich.',
-        'Werte im Detail':'Kennzahlen und individuelle Nachkauf-Indikatoren der ausgewählten Positionen.',
+        'Werte im Detail':'Kurze Definitionen der Kennzahlen und Abkürzungen auf den Kacheln.',
         'Rendite':'Gesamtrendite inklusive wiederangelegter Ausschüttungen; mehrjährige Zeiträume pro Jahr.',
         'Jahreswerte':futureUsesDividends()?'Jährlicher Depotwert und Ausschüttungen; netto nach pauschal 26,375 % Steuer ohne Kirchensteuer.':'Einzahlung je Jahr ohne Startkapital; Rendite = Wertzuwachs abzüglich Einzahlungen, vor Steuern.',
         'Portfolio input':'Eine Position pro Zeile mit Prozentgewicht oder Shares; nicht genannte Werte werden ausgeschlossen.'
@@ -831,7 +854,22 @@
       document.addEventListener('click',event=>{
         const button=event.target.closest('button[data-info-title]');if(!button)return;
         event.preventDefault();event.stopPropagation();trigger=button;$('section-info-title').textContent=button.dataset.infoTitle;copy.replaceChildren();
-        copy.append(el('p','',shortSectionInfo(button)));
+        if(button.dataset.infoTitle==='Werte im Detail'){
+          const glossary=el('dl','metrics-glossary');
+          for(const [term,definition] of [
+            ['TTM P/E · KGV','Kurs geteilt durch den Gewinn je Aktie der letzten zwölf Monate.'],
+            ['Hist. P/E','Historisches KGV als Bewertungsreferenz; 5J/10J = fünf/zehn Jahre, JE = Jahresende, Ø = Durchschnitt, Median = mittlerer Wert.'],
+            ['Forward P/E','Kurs geteilt durch den erwarteten Gewinn je Aktie.'],
+            ['P/S · KUV','Kurs geteilt durch den Umsatz je Aktie.'],
+            ['Div.-Rendite','Jährliche Dividende oder ETF-Ausschüttung im Verhältnis zum Kurs.'],
+            ['TTM vs. Referenz','Prozentuale Abweichung des aktuellen KGV von der historischen Referenz; + bedeutet höher, − niedriger.'],
+            ['ROE','Eigenkapitalrendite: Jahresgewinn im Verhältnis zum durchschnittlichen Eigenkapital.'],
+            ['RSI (14)','Relative-Stärke-Index der letzten 14 Handelstage auf einer Skala von 0 bis 100.'],
+            ['SMA 100/200','Einfacher Durchschnitt der letzten 100/200 Tages-Schlusskurse; der Prozentwert zeigt den Abstand zum aktuellen Kurs.'],
+            ['IR · GAAP · IFRS · ADS','IR = Investor Relations; US-/J-GAAP und IFRS = Rechnungslegungsstandards; ADS = US-Hinterlegungsschein auf ausländische Aktien.']
+          ]){const row=el('div');row.append(el('dt','',term),el('dd','',definition));glossary.append(row);}
+          copy.append(glossary);
+        }else copy.append(el('p','',shortSectionInfo(button)));
         dialog.showModal();$('section-info-close').focus();
       },true);
       $('section-info-close').addEventListener('click',()=>dialog.close());
@@ -870,7 +908,7 @@
       if (number(stock[field]) === null) return 'unavailable';
       return stock.source_status === 'live' ? 'live' : stock.source_status === 'initial' ? 'initial' : 'previous';
     }
-    const sourceText = { live: 'Yahoo-Abruf', initial: 'Initialwert', previous: 'Vorwert', unavailable: 'nicht verfügbar' };
+    const sourceText = { live: '', initial: 'Initialwert', previous: 'Vorwert', unavailable: 'nicht verfügbar' };
     function dividendForecast(stock) {
       const forecast = stock.dividend_forecast;
       const urls = ['https://www.tokiomarinehd.com/ir/stock/return.html', 'https://www.tokiomarinehd.com/en/ir/stock/return.html'];
@@ -923,7 +961,7 @@
       const forecast = field === 'div_yield' ? dividendForecast(stock) : null;
       const calculationPrice = forecast && positive(forecast.calculation_price) !== null ? forecast.calculation_price : stock.price;
       const detail = forecast ? ' · Prognose FY' + forecast.fiscal_year + ': ' + fmt(forecast.annual_rate, 2) + ' JPY je Aktie/Jahr ÷ Kurs ' + fmt(calculationPrice, 2) + ' JPY × 100' + (forecast.price_as_of && dateText(forecast.price_as_of) ? ' (Kursstand: ' + dateText(forecast.price_as_of) + ')' : '') + ' · Quelle: ' + forecast.source_url : '';
-      return fieldSourceText(stock, field) + (time && status !== 'initial' && dateText(time) ? ' · ' + dateText(time) + ' (Berlin)' : '') + detail;
+      return (fieldSourceText(stock, field) || 'Yahoo Finance') + (time && status !== 'initial' && dateText(time) ? ' · ' + dateText(time) + ' (Berlin)' : '') + detail;
     }
     function mode() {
       const given = state.data.data_mode;
@@ -986,19 +1024,14 @@
     }
     function status() {
       const current = mode();
-      // Matches the weekday 06:30 UTC publication schedule, including weekends.
-      const now = Date.now(), due = new Date(now); due.setUTCHours(6,30,0,0);
-      while (due.getTime() > now || due.getUTCDay() === 0 || due.getUTCDay() === 6) due.setUTCDate(due.getUTCDate() - 1);
-      const updated = cnnTime(state.data.updated_at), sentiment = state.data.fear_and_greed;
-      const marketFresh = ['live','partial'].includes(current) && Number.isFinite(updated) && updated >= due.getTime() && updated <= now + 300000;
-      const cnnFresh = validCnnSnapshot(sentiment) && sentiment.source_status === 'live' && cnnTime(sentiment.retrieved_at) >= due.getTime() && now - cnnTime(sentiment.as_of) <= 4 * 86400000;
-      const fresh = marketFresh && cnnFresh && !state.refreshFailed;
-      $('status-text').textContent = state.refreshFailed ? 'Aktualisierung fehlgeschlagen' : fresh ? 'Updated' : !marketFresh ? current === 'initial' ? 'Noch keine aktuellen Daten' : 'Update ausstehend' : 'CNN-Update ausstehend';
+      const batch=state.data.refresh_batch, stamp=batch?.completed_at||state.data.updated_at;
+      const fresh=batchCurrent(batch)&&batch.status==='live'&&!state.refreshFailed;
+      $('status-text').textContent = state.refreshFailed ? 'Aktualisierung fehlgeschlagen' : fresh ? 'Updated' : batchCurrent(batch) ? 'Teilweise aktualisiert' : current === 'initial' ? 'Noch keine aktuellen Daten' : 'Update ausstehend';
       $('status-dot').className = 'status-dot' + (fresh ? ' live' : '');
-      const details = [marketFresh ? 'Der planmäßige Marktdatenstand liegt vor.' : 'Der erwartete Marktdatenstand seit ' + dateText(due.toISOString()) + ' (Berlin) liegt noch nicht vor.', cnnFresh ? 'CNN-Abruf bestätigt.' : 'CNN-Abruf nicht aktuell bestätigt.', current === 'partial' ? 'Einzelne Kennzahlen verwenden weiterhin die am Wert gekennzeichneten Vorwerte.' : '', state.refreshFailed ? 'Der letzte Abruf ist fehlgeschlagen; vorhandene Daten bleiben sichtbar.' : ''].filter(Boolean).join(' ');
+      const details = state.refreshFailed?'Der letzte Seitenabruf ist fehlgeschlagen; vorhandene Daten bleiben sichtbar.':fresh?'Alle Quellen wurden im gemeinsamen Tageslauf bestätigt.':batchCurrent(batch)?'Einzelne Daten fehlen oder stammen aus einem früheren Abruf.':'Der gemeinsame Tageslauf steht noch aus.';
       $('status-text').title = details;
-      $('timestamp').textContent = Number.isFinite(updated) && dateText(state.data.updated_at) ? dateText(state.data.updated_at) : state.data.last_updated || 'Zeitpunkt unbekannt';
-      $('timestamp').title = ['Marktdaten: ' + (dateText(state.data.updated_at) || 'unbekannt'), validCnnSnapshot(sentiment) ? 'CNN-Stand: ' + dateText(sentiment.as_of) + ' · Abruf: ' + dateText(sentiment.retrieved_at) : 'CNN derzeit nicht bestätigt'].join(' · ');
+      $('timestamp').textContent = dateText(stamp)||state.data.last_updated||'Zeitpunkt unbekannt';
+      $('timestamp').title = batch?'Gemeinsamer Datenlauf abgeschlossen: '+(dateText(stamp)||'unbekannt'):'Letzter veröffentlichter Marktdatenstand';
       const notice = $('data-notice'); notice.replaceChildren();
       if (current === 'live' || current === 'partial') { notice.hidden = true; return; }
       const warnings = Array.isArray(state.data.warnings) ? state.data.warnings.filter(item => typeof item === 'string') : [];
@@ -1006,6 +1039,17 @@
       if (notes[current]) notice.append(el('span', '', notes[current]));
       if (warnings.length) { const details = el('details'); const summary = el('summary', '', warnings.length + ' Datenhinweis' + (warnings.length === 1 ? '' : 'e')); details.append(summary); const list = el('ul'); warnings.forEach(w => list.append(el('li', '', w))); details.append(list); notice.append(details); }
       notice.hidden = !notes[current] && !warnings.length;
+    }
+    function dailyRefreshDue(now=Date.now()){
+      const due=new Date(now);due.setUTCHours(6,30,0,0);if(due.getTime()>now)due.setUTCDate(due.getUTCDate()-1);return due.getTime();
+    }
+    function batchCurrent(batch){
+      const start=cnnTime(batch?.started_at),end=cnnTime(batch?.completed_at),now=Date.now();
+      return batch?.version===1&&batch.id===batch.started_at&&Number.isFinite(start)&&Number.isFinite(end)&&start>=dailyRefreshDue(now)&&end>=start&&end<=now+300000;
+    }
+    function shoppingStockFresh(stock){
+      const batch=state.data?.refresh_batch,refresh=stock.refresh;
+      return batchCurrent(batch)&&refresh?.version===1&&refresh.batch_id===batch.id&&refresh.status==='live'&&Array.isArray(refresh.missing_fields)&&refresh.missing_fields.length===0;
     }
     function stocks() {
       const query = state.search.trim().toLocaleLowerCase('de-DE');
@@ -1048,7 +1092,9 @@
       cell.append(val);
       const status = reference && (!meta || meta.verified_at) ? 'reference' : source(stock, field), forecast = !reference && field === 'div_yield' ? dividendForecast(stock) : null;
       const url = httpsSource(issuer ? meta.source_url : forecast ? forecast.source_url : null);
-      const labelNode = el(url ? 'a' : 'span', 'metric-source ' + (status === 'reference' ? 'reference' : status === 'live' ? 'fresh' : status === 'unavailable' ? '' : 'fallback'), missingReference ? 'Keine Referenz' : reference && !meta ? 'Vorgabe (5J/10J)' : fieldSourceText(stock, field));
+      const sourceLabel = missingReference ? 'Keine Referenz' : reference && !meta ? 'Vorgabe (5J/10J)' : fieldSourceText(stock, field);
+      if (!sourceLabel) return cell;
+      const labelNode = el(url ? 'a' : 'span', 'metric-source ' + (status === 'reference' ? 'reference' : status === 'live' ? 'fresh' : status === 'unavailable' ? '' : 'fallback'), sourceLabel);
       if (url) { labelNode.href = url; labelNode.target = '_blank'; labelNode.rel = 'noopener noreferrer'; labelNode.addEventListener('click', event => event.stopPropagation()); labelNode.addEventListener('keydown', event => event.stopPropagation()); }
       labelNode.title = val.title; cell.append(labelNode); return cell;
     }
@@ -1114,30 +1160,42 @@
       trigger.append(details); return true;
     }
     function renderCards() {
+      const projectId = window.ProjectWorkspaces?.id || 'open';
+      if (!renderCards.expanded || renderCards.projectId !== projectId) renderCards.expanded = new Set();
+      renderCards.projectId = projectId;
+      renderCards.resetExpansion = () => { renderCards.expanded?.clear(); };
       const container = $('cards'); container.replaceChildren();
       state.visible.forEach(stock => {
         const etf = isETF(stock), key = trancheKey(stock), card = el('article', 'stock-card' + (etf ? ' fund-card' : '') + (state.selected === stock.ticker ? ' selected' : ''));
         card.tabIndex = 0; card.setAttribute('role', 'button'); card.setAttribute('aria-pressed', String(state.selected === stock.ticker)); card.setAttribute('aria-label', stock.name + ' (' + stock.ticker + ') im Diagramm auswählen'); card.dataset.ticker = stock.ticker;
-        card.addEventListener('click', () => select(stock.ticker)); card.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select(stock.ticker); } });
+        card.addEventListener('click', event => { if (!event.target.closest('button,a,input,select,textarea,summary')) select(stock.ticker); }); card.addEventListener('keydown', event => { if (event.target === card && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); select(stock.ticker); } });
         const head = el('div', 'stock-head'); head.append(companyLogo(stock.ticker, 'stock-symbol')); const names = el('div', 'stock-names'), name = el('h3', 'stock-title', etf ? stock.ticker + ' · Income ETF' : stock.name); name.title = stock.name; names.append(name, el('div', 'stock-ticker', stock.ticker + (etf ? ' · ETF · US' : ''))); head.append(names);
-        const price = el('div', 'stock-price'); price.append(el('div', 'price-value', number(stock.price) === null ? '—' : fmt(stock.price, 2) + (stock.currency ? ' ' + stock.currency : '')), el('div', 'price-label', number(stock.price) === null ? 'Kurs nicht verfügbar' : provenance(stock, 'price'))); head.append(price); card.append(head, el('div', 'stock-cluster', stock.cluster));
+        const price = el('div', 'stock-price'); price.title = provenance(stock, 'price'); price.append(el('div', 'price-value', number(stock.price) === null ? '—' : fmt(stock.price, 2) + (stock.currency ? ' ' + stock.currency : ''))); head.append(price); card.append(head, el('div', 'stock-cluster', stock.cluster));
         const tranche = el('div', 'tranche-row'); const colors = { buy: 'emerald', dip: 'sky', watch: 'amber', unavailable: 'slate' }; const labels = { buy: 'Tranche 1 (Sofortkauf)', dip: 'Tranche 2 (Rücksetzer kaufen)', watch: 'Hold / Watchlist', unavailable: 'Keine Tranche · Forward P/E fehlt' };
         if (!individualOnlyPortfolio()) { const badge = el('span', 'tranche ' + colors[key], etf ? 'ETF · separat bewerten' : stock.ticker === '8766.T' && key === 'unavailable' ? 'IFRS-Prognose nicht bestätigt' : labels[key]); badge.title = etf ? 'Für ETFs wird keine Unternehmens-KGV-Tranche berechnet.' : 'Nur feste Forward-P/E-Regel; individueller Nachkauf-Indikator wird nicht geprüft. Forward P/E: ' + provenance(stock, 'forward_pe'); tranche.append(badge); }
-        const stockStatus = mode() === 'stale' && stock.source_status === 'live' ? 'stale' : ['live', 'initial', 'partial', 'stale'].includes(stock.source_status) ? stock.source_status : 'initial'; const statusLabel = { live: 'Abruf aktuell', initial: 'Initialwerte', partial: 'Gemischte Quellen', stale: 'Vorwerte' }[stockStatus]; const sourceBadge = el('span', 'source-status' + (stockStatus === 'live' ? ' live' : ''), statusLabel); sourceBadge.title = stock.as_of && dateText(stock.as_of) ? 'Aktien-Datenstand: ' + dateText(stock.as_of) + ' (Berlin)' : 'Kein bestätigter Live-Datenstand'; tranche.append(sourceBadge); card.append(tranche);
+        if (!shoppingStockFresh(stock)) tranche.append(el('span', 'source-status stock-stale-status', 'not up to date')); card.append(tranche);
+        const detailsKey = projectId + ':' + state.portfolio + ':' + stock.ticker;
+        const details = el('div', 'stock-card-details'); details.id = 'shopping-details-' + state.portfolio + '-' + encodeURIComponent(stock.ticker); details.hidden = !renderCards.expanded.has(detailsKey);
         const metrics = el('div', 'metrics');
         if (etf) {
           metrics.append(metricCell(stock, 'Fonds-KGV', peText(stock.current_pe), 'current_pe'), metricCell(stock, 'Rendite 12M', percent(stock.distribution_yield_ttm), 'distribution_yield_ttm', false, true), metricCell(stock, 'Auszahl./Anteil', number(stock.distributions_per_share_ttm) === null ? '—' : fmt(stock.distributions_per_share_ttm, 2) + (stock.currency ? ' ' + stock.currency : ''), 'distributions_per_share_ttm'), metricCell(stock, 'Kurs', number(stock.price) === null ? '—' : fmt(stock.price, 2), 'price'));
-          card.append(metrics); name.append(sectionInfoButton(stock.name, 'Ausschüttungen der letzten 12 Monate ÷ aktueller Kurs. Fonds-KGV: Bewertung der enthaltenen Aktien; keine historische Referenz hinterlegt.'));
+          card.append(metrics); const fundNote = el('div', 'fund-note'); fundNote.append(sectionInfoButton(stock.name, 'Ausschüttungen der letzten 12 Monate ÷ aktueller Kurs. Fonds-KGV: Bewertung der enthaltenen Aktien; keine historische Referenz hinterlegt.')); details.append(fundNote);
         } else {
           metrics.append(metricCell(stock, 'TTM P/E', peText(stock.current_pe), 'current_pe'), metricCell(stock, 'Hist. P/E', peText(stock.hist_pe), 'hist_pe', true), metricCell(stock, 'Forward P/E', peText(stock.forward_pe), 'forward_pe', false, true), state.portfolio === 'tech' ? metricCell(stock, 'P/S', number(stock.ps_ratio) === null ? '—' : fmt(stock.ps_ratio) + '×', 'ps_ratio') : metricCell(stock, dividendForecast(stock) ? 'Div. (Prognose)' : 'Div.-Rendite', percent(stock.div_yield), 'div_yield')); card.append(metrics);
           const valuation = el('div', 'valuation-row'), historical = issuerMetric(stock, 'hist_pe'); const spread = comparableHistoricalPE(stock) ? (Number(stock.current_pe) / Number(stock.hist_pe) - 1) * 100 : null; const methodsDiffer = historical && historical.comparable_to_current === false; const spreadNode = el('span', 'spread' + (spread === null ? '' : spread < 0 ? ' discount' : ' premium'), methodsDiffer ? stock.ticker === '8766.T' ? 'IFRS / J-GAAP' : 'KGV-Basis abweichend' : spread === null ? 'P/E-Abstand nicht verfügbar' : signedPercent(spread) + ' TTM vs. Referenz'); spreadNode.title = methodsDiffer ? historical.comparison_note || 'Aktuelles und historisches KGV haben unterschiedliche Berechnungsgrundlagen; kein direkter Bewertungsabstand ableitbar.' : historical ? 'Vergleich des TTM-KGV mit ' + (historical.label || 'der belegten historischen Referenz') + (historical.period ? ' (' + historical.period + ')' : '') + '. ' + (historical.comparison_note || '') + ' Kein Kurspotenzial.' : 'Vergleich des TTM-P/E mit der festen historischen Nutzervorgabe; kein Kurspotenzial.'; valuation.append(spreadNode);
-          const companion = state.portfolio === 'tech' ? metricLabel(stock, 'hist_ps', 'Hist. P/S') + ' ' + (number(stock.hist_ps) === null ? '—' : fmt(stock.hist_ps) + '×') : metricLabel(stock, 'roe', 'ROE') + ' ' + percent(stock.roe); const companionNode = el('span', '', companion); companionNode.title = state.portfolio === 'tech' ? issuerMetric(stock, 'hist_ps') ? provenance(stock, 'hist_ps') : number(stock.hist_ps) === null ? 'Keine historische KUV-Referenz hinterlegt.' : 'Feste Nutzervorgabe (5J/10J)' : provenance(stock, 'roe'); if (state.portfolio !== 'tech') companionNode.append(el('span', 'technical-source', '· ' + fieldSourceText(stock, 'roe'))); valuation.append(companionNode); card.append(valuation);
+          const companion = state.portfolio === 'tech' ? metricLabel(stock, 'hist_ps', 'Hist. P/S') + ' ' + (number(stock.hist_ps) === null ? '—' : fmt(stock.hist_ps) + '×') : metricLabel(stock, 'roe', 'ROE') + ' ' + percent(stock.roe); const companionNode = el('span', '', companion); companionNode.title = state.portfolio === 'tech' ? issuerMetric(stock, 'hist_ps') ? provenance(stock, 'hist_ps') : number(stock.hist_ps) === null ? 'Keine historische KUV-Referenz hinterlegt.' : 'Feste Nutzervorgabe (5J/10J)' : provenance(stock, 'roe'); const companionSource = state.portfolio !== 'tech' ? fieldSourceText(stock, 'roe') : ''; if (companionSource) companionNode.append(el('span', 'technical-source', '· ' + companionSource)); valuation.append(companionNode); details.append(valuation);
         }
-        const trigger = el('div', 'trigger'); trigger.append(el('span', 'trigger-label', etf ? 'ETF-Einordnung' : 'Persönlicher Nachkauf-Indikator')); if (!renderBuyIndicator(stock, trigger)) trigger.append(el('span', 'trigger-text', stock.buy_trigger || 'Kein individueller Indikator hinterlegt')); card.append(trigger);
-        const technicals = el('div', 'technicals'); const rsi = el('span', '', 'RSI (14)'); const rsiValue = el('span', 'technical-value', fmt(stock.rsi14)); rsiValue.title = provenance(stock, 'rsi14'); rsi.append(rsiValue); if (source(stock, 'rsi14') !== 'live' && number(stock.rsi14) !== null) rsi.append(el('span', 'technical-source', '(' + sourceText[source(stock, 'rsi14')] + ')'));
+        const trigger = el('div', 'trigger'); trigger.append(el('span', 'trigger-label', etf ? 'ETF-Einordnung' : 'Persönlicher Nachkauf-Indikator')); if (!renderBuyIndicator(stock, trigger)) trigger.append(el('span', 'trigger-text', stock.buy_trigger || 'Kein individueller Indikator hinterlegt')); details.append(trigger);
+        const technicals = el('div', 'technicals'); const rsi = el('span', '', 'RSI (14)'); const rsiValue = el('span', 'technical-value', fmt(stock.rsi14)); rsiValue.title = provenance(stock, 'rsi14'); rsi.append(rsiValue); const rsiSource = sourceText[source(stock, 'rsi14')]; if (source(stock, 'rsi14') !== 'live' && number(stock.rsi14) !== null && rsiSource) rsi.append(el('span', 'technical-source', '(' + rsiSource + ')'));
         let distance = number(stock.sma200_distance_pct); if (distance === null && positive(stock.sma200) !== null && positive(stock.price) !== null) distance = (Number(stock.price) / Number(stock.sma200) - 1) * 100;
-        const sma = el('span', '', 'SMA 200'); const smaValue = el('span', 'technical-value', signedPercent(distance)); smaValue.title = 'SMA 200: ' + fmt(stock.sma200, 2) + (stock.currency ? ' ' + stock.currency : '') + ' · ' + provenance(stock, 'sma200') + '; Kurs: ' + provenance(stock, 'price'); sma.append(smaValue); if (number(stock.sma200) !== null && (source(stock, 'sma200') !== 'live' || source(stock, 'price') !== 'live')) sma.append(el('span', 'technical-source', '(Fallback)')); technicals.append(rsi, sma); card.append(technicals);
-        if (Array.isArray(stock.warnings) && stock.warnings.length) { const warning = el('p', 'stock-warning', stock.warnings.length + ' Datenhinweis' + (stock.warnings.length === 1 ? '' : 'e') + ' ⓘ'); warning.title = stock.warnings.filter(item => typeof item === 'string').join('\n'); card.append(warning); }
+        const sma = el('span', '', 'SMA 200'); const smaValue = el('span', 'technical-value', signedPercent(distance)); smaValue.title = 'SMA 200: ' + fmt(stock.sma200, 2) + (stock.currency ? ' ' + stock.currency : '') + ' · ' + provenance(stock, 'sma200') + '; Kurs: ' + provenance(stock, 'price'); sma.append(smaValue); if (number(stock.sma200) !== null && (source(stock, 'sma200') !== 'live' || source(stock, 'price') !== 'live')) sma.append(el('span', 'technical-source', '(Fallback)')); technicals.append(rsi, sma); details.append(technicals);
+        if (Array.isArray(stock.warnings) && stock.warnings.length) { const warning = el('p', 'stock-warning', stock.warnings.length + ' Datenhinweis' + (stock.warnings.length === 1 ? '' : 'e') + ' ⓘ'); warning.title = stock.warnings.filter(item => typeof item === 'string').join('\n'); details.append(warning); }
+        card.append(details);
+        const footer = el('div', 'stock-card-footer'), expand = el('button', 'stock-card-expand'); expand.type = 'button'; expand.setAttribute('aria-controls', details.id);
+        const chevron = document.createElementNS('http://www.w3.org/2000/svg', 'svg'), path = document.createElementNS('http://www.w3.org/2000/svg', 'path'); chevron.setAttribute('viewBox', '0 0 16 16'); chevron.setAttribute('fill', 'none'); chevron.setAttribute('aria-hidden', 'true'); path.setAttribute('d', 'm4 6 4 4 4-4'); path.setAttribute('stroke', 'currentColor'); path.setAttribute('stroke-width', '1.5'); path.setAttribute('stroke-linecap', 'round'); path.setAttribute('stroke-linejoin', 'round'); chevron.append(path); expand.append(chevron);
+        const syncExpanded = () => { const open = !details.hidden; expand.setAttribute('aria-expanded', String(open)); expand.setAttribute('aria-label', stock.name + ': Details ' + (open ? 'einklappen' : 'anzeigen')); card.classList.toggle('expanded', open); }; syncExpanded();
+        expand.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); details.hidden = !details.hidden; if (details.hidden) renderCards.expanded.delete(detailsKey); else renderCards.expanded.add(detailsKey); syncExpanded(); }); expand.addEventListener('keydown', event => event.stopPropagation());
+        footer.append(expand); card.append(footer);
         container.append(card);
       });
       $('empty').hidden = !!state.visible.length;
@@ -1285,6 +1343,7 @@
     }
     function syncStudioView() {
       const future = state.view === 'future';
+      if(!future){state.overview=false;state.search='';$('search').value='';}
       $('studio-title').textContent = future ? 'outlook' : 'shopping';
       $('studio-subtitle').textContent = future ? 'magic glass bowl' : 'buy, hold & butter';
       $('studio-toggle').setAttribute('aria-pressed', String(future));
@@ -1309,11 +1368,11 @@
       renderSummary(); renderCards(); renderSelection(); renderChart(); renderReturns();
       $('announcer').textContent = state.visible.length + ' Werte angezeigt.';
     }
-    function visiblePortfolioIds() { return window.ProjectWorkspaces?.private?['overview','tech','value']:['tech','value']; }
+    function visiblePortfolioIds() { return window.ProjectWorkspaces?.private&&state.view==='future'?['overview','tech','value']:['tech','value']; }
     function syncProjectPanels() {
-      const overview=state.overview&&window.ProjectWorkspaces?.private;
+      const overview=state.view==='future'&&state.overview&&window.ProjectWorkspaces?.private;
       $('portfolio-panel').hidden=overview;$('overview-panel').hidden=!overview;
-      $('tab-classic').hidden=true;$('tab-overview').hidden=!window.ProjectWorkspaces?.private;
+      $('tab-classic').hidden=true;$('tab-overview').hidden=!window.ProjectWorkspaces?.private||state.view!=='future';
       document.querySelectorAll('[data-portfolio]').forEach(tab=>{const active=overview?tab.dataset.portfolio==='overview':tab.dataset.portfolio===state.portfolio;tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;});
     }
     function changePortfolio(id) {
@@ -1350,10 +1409,6 @@
       if (state.data) panel.append(el('p', '', 'Der zuletzt geladene Datenstand bleibt zur Ansicht erhalten.'));
       $('status-text').textContent = state.data ? 'Ladefehler · vorheriger Stand' : 'Keine Daten geladen'; $('status-dot').className = 'status-dot stale';
     }
-    const CNN_FEAR_GREED_ENDPOINT = 'https://production.dataviz.cnn.io/index/fearandgreed/graphdata';
-    const CNN_FEAR_GREED_SOURCE = 'https://edition.cnn.com/markets/fear-and-greed';
-    const CNN_SNAPSHOT_STORAGE = 'floyd-projects-cnn-snapshot-v1';
-    const cnnComparisonKeys = { previous_close: 'previous_close', previous_week: 'previous_1_week', previous_month: 'previous_1_month', previous_year: 'previous_1_year' };
     const cnnScore = value => typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 100;
     const cnnRating = score => score <= 25 ? 'extreme fear' : score < 45 ? 'fear' : score <= 55 ? 'neutral' : score < 75 ? 'greed' : 'extreme greed';
     const cnnTime = value => typeof value === 'string' && /(?:Z|[+-]\d{2}:\d{2})$/.test(value) ? new Date(value).getTime() : NaN;
@@ -1362,49 +1417,11 @@
       const asOf = cnnTime(value.as_of), retrieved = cnnTime(value.retrieved_at), now = Date.now();
       return Number.isFinite(asOf) && Number.isFinite(retrieved) && asOf <= now + 300000 && retrieved <= now + 300000 && asOf <= retrieved + 300000;
     }
-    function cachedCnnSnapshot() {
-      try { const raw = localStorage.getItem(CNN_SNAPSHOT_STORAGE); if (!raw || raw.length > 20000) return null; const value = JSON.parse(raw); return validCnnSnapshot(value) ? value : null; } catch (_) { return null; }
-    }
-    function saveCnnSnapshot(value) { try { if (validCnnSnapshot(value)) localStorage.setItem(CNN_SNAPSHOT_STORAGE, JSON.stringify(value)); } catch (_) {} }
-    function newestCnnSnapshot(...values) { return values.filter(validCnnSnapshot).sort((a,b) => cnnTime(b.as_of) - cnnTime(a.as_of) || cnnTime(b.retrieved_at) - cnnTime(a.retrieved_at))[0] || null; }
-    function normalizeCnnFearGreed(payload) {
-      const value = payload && payload.fear_and_greed, now = Date.now(), asOf = value && cnnTime(value.timestamp);
-      if (!value || !cnnScore(value.score) || typeof value.rating !== 'string' || value.rating.trim().toLowerCase() !== cnnRating(value.score) || !Number.isFinite(asOf) || asOf > now + 300000 || now - asOf > 4 * 86400000) throw new Error('CNN lieferte keinen aktuellen, gültigen Gesamtindex.');
-      const stamp = new Date(now).toISOString(), comparisons = {};
-      for (const [key, rawKey] of Object.entries(cnnComparisonKeys)) { const score = value[rawKey]; comparisons[key] = cnnScore(score) ? { score, rating: cnnRating(score) } : { score: null, rating: null }; }
-      return { version: 1, provider: 'CNN', source_url: CNN_FEAR_GREED_SOURCE, source_status: 'live', score: value.score, rating: cnnRating(value.score), as_of: new Date(asOf).toISOString(), retrieved_at: stamp, last_attempted_at: stamp, comparisons };
-    }
-    async function fetchCnnFearGreed(parentSignal) {
-      const controller = new AbortController(), abort = () => controller.abort();
-      parentSignal.addEventListener('abort', abort, { once: true }); if (parentSignal.aborted) controller.abort();
-      const timeout = setTimeout(abort, 9000);
-      try {
-        const response = await fetch(CNN_FEAR_GREED_ENDPOINT, { cache: 'no-store', credentials: 'omit', signal: controller.signal });
-        if (!response.ok) throw new Error('CNN antwortete mit HTTP ' + response.status + '.');
-        const raw = await response.text(); if (raw.length > 2000000) throw new Error('CNN-Antwort ist unerwartet groß.');
-        return { value: normalizeCnnFearGreed(JSON.parse(raw)) };
-      } catch (error) { return { error: error.name === 'AbortError' ? 'CNN-Zeitlimit erreicht.' : 'CNN derzeit nicht erreichbar.' }; }
-      finally { clearTimeout(timeout); parentSignal.removeEventListener('abort', abort); }
-    }
-    function selectCnnFearGreed(snapshot, previous, attempt) {
-      const prior = newestCnnSnapshot(snapshot, previous);
-      if (attempt.value && (!prior || cnnTime(attempt.value.as_of) >= cnnTime(prior.as_of))) return attempt.value;
-      const note = attempt.error || 'CNN lieferte einen älteren Indexstand; letzter bestätigter Stand bleibt erhalten.';
-      return prior ? { ...prior, source_status: 'previous', last_attempted_at: new Date().toISOString(), note } : { version: 1, provider: 'CNN', source_url: CNN_FEAR_GREED_SOURCE, source_status: 'unavailable', score: null, rating: null, as_of: null, retrieved_at: null, last_attempted_at: new Date().toISOString(), comparisons: {}, note };
-    }
-    function cnnRefreshNotice(notice, attempt, selected, previous) {
-      const live = selected && selected.source_status === 'live' && attempt.value;
-      const detail = live ? 'CNN Fear & Greed neu abgerufen (Stand: ' + dateText(selected.as_of) + ' Berlin).' : validCnnSnapshot(selected) ? 'CNN nicht neu erreichbar; letzter bestätigter Indexstand bleibt sichtbar.' : 'CNN Fear & Greed ist derzeit nicht abrufbar.';
-      const updated = live && (!validCnnSnapshot(previous) || JSON.stringify([selected.score,selected.as_of,selected.comparisons]) !== JSON.stringify([previous.score,previous.as_of,previous.comparisons]));
-      return [updated ? 'CNN-Index aktualisiert' : notice[0], notice[1] + ' ' + detail, live ? updated && notice[2] !== 'warning' ? 'success' : notice[2] : 'warning'];
-    }
     async function load({ notify = false } = {}) {
       if (state.request) return;
       const controller = new AbortController(); state.request = controller; const started = performance.now();
-      const previous = state.data ? JSON.stringify({ ...state.data, fear_and_greed: undefined }) : null, previousSentiment = newestCnnSnapshot(state.data && state.data.fear_and_greed, cachedCnnSnapshot()); let notice = null;
-      // Automatic updates are published by the morning workflow. A direct CNN
-      // request is made only once for an explicit refresh, never on page open.
-      const sentimentAttempt = notify ? fetchCnnFearGreed(controller.signal) : Promise.resolve(null);
+      const previous = state.data ? JSON.stringify(state.data) : null; let notice = null;
+      // Stocks, CNN and exchange rates share one published daily snapshot.
       dismissToast(); setRefreshBusy(true); $('error').hidden = true; if (!state.data) $('loading').hidden = false;
       if (notify) { $('status-text').textContent = 'Daten werden geladen …'; $('status-dot').className = 'status-dot'; }
       const timeout = setTimeout(() => controller.abort(), 18000);
@@ -1413,20 +1430,14 @@
         const response = await fetch(dataUrl, { cache: 'no-store', signal: controller.signal }); if (!response.ok) throw new Error('HTTP ' + response.status + ' beim Laden von data.json.');
         let data; try { data = await response.json(); } catch (error) { if (error.name === 'AbortError') throw error; throw new Error('data.json enthält kein gültiges JSON.'); }
         const validated = validate(data); if (controller.signal.aborted) throw new DOMException('Zeitüberschreitung', 'AbortError'); if (state.request !== controller) return;
-        const changed = previous !== JSON.stringify({ ...validated, fear_and_greed: undefined }), publishedSentiment = validated.fear_and_greed;
-        validated.fear_and_greed = newestCnnSnapshot(publishedSentiment, previousSentiment) || publishedSentiment;
-        state.data = validated;
+        const changed = previous !== JSON.stringify(validated);
+        state.data = validated;state.refreshFailed=false;
         if (state.cluster !== 'Alle' && !(state.view==='future'?futureScenarioStocks():portfolio().stocks).some(stock => stock.cluster === state.cluster)) state.cluster = 'Alle';
         $('loading').hidden = true; $('app').hidden = !state.projectReady; status(); if(state.projectReady){if(!state.overview)renderFilters();render();} renderFearGreed();
-        const sentiment = await sentimentAttempt; if (controller.signal.aborted) throw new DOMException('Zeitüberschreitung', 'AbortError');
-        if (notify) state.data.fear_and_greed = selectCnnFearGreed(publishedSentiment, previousSentiment, sentiment);
-        state.refreshFailed = false; saveCnnSnapshot(state.data.fear_and_greed); renderFearGreed(); status();
-        notice = notify ? cnnRefreshNotice(refreshNotice(changed), sentiment, state.data.fear_and_greed, previousSentiment) : null;
+        notice = notify ? refreshNotice(changed) : null;
       } catch (error) {
         if (state.request !== controller) return;
-        const sentiment = await sentimentAttempt;
         state.refreshFailed = true;
-        if (state.data && notify) { state.data.fear_and_greed = selectCnnFearGreed(state.data.fear_and_greed, previousSentiment, sentiment); saveCnnSnapshot(state.data.fear_and_greed); renderFearGreed(); }
         const failure = error.name === 'AbortError' ? new Error('Zeitüberschreitung beim Laden. Bitte erneut versuchen.') : error;
         showError(failure); notice = ['Aktualisierung fehlgeschlagen', (state.data ? 'Der bisherige Datenstand bleibt sichtbar. ' : '') + failure.message, 'error'];
       } finally {
@@ -2272,6 +2283,7 @@ const PortfolioInput = (() => {
 
         const overviewState={charts:[],request:0};
     function resetProjectView() {
+      renderCards.resetExpansion?.();
       window.ProjectImport?.reset();
       window.ProjectRemoval?.reset();
       state.projectReady=false;state.overview=false;state.portfolio='tech';state.cluster='Alle';state.search='';state.selected=null;
