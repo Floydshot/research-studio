@@ -5799,7 +5799,7 @@ RESERVE_REFERENCES: list[dict[str, Any]] = [{'name': 'Rio Tinto plc',
            'mime_type': 'image/png',
            'data_uri': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAGySURBVHja1dNPSBQBHMXx725qXYSlf2xBNR0qUsgMOgZbFEV0kISCNFIiQiTYoYW9rWNUIB02Imohwks3yb11k0FDxKyWpMxtraEgTCiGivRgy+t3mIMIeQrCBx9+l8e7/VglufUzhVct4GqCbk1yST5tugCAYK85a1ImxvI8CHvIz8sGhCvRJcU7pE1npMYW5REERkuUTNG411qv9jZ5IyL/KyC3eJi0EqRUs61Vx08eq4anjugHgkGjlSzg6DMnvk7RNT7MvWcPN46FuYYvunJg4Q1EESRUT0aNSFspCW6/2N0Q+M3N+lh/MPzAuflXZPWUgoprhsL7yYrvObMOy6M2RtTONADDox5jg6p7fv0RIubhxQP617FS5OIpg5QmgV9MxCf6gkOTp3WjXDvnzzA0947H1TKf9Jb+vw2sV5aibABg58vuHZ3TezoLFfzR98zMVhhfLNOrEg7/JILzZp9JRNaapGkxG0zNkm5d1NlsYqYWQbvpMTeNa+5+g7Qga3K/4aJg4DvcEWRMnxkwHeYJgu3GiZb3m9RrSMqu2WUck5qCLYKj5nLUa5Ld//9nfwA5v/MkQ6im0wAAAABJRU5ErkJggg=='},
   'research_verified_at': '2026-11-21'}]
-RESERVE_TICKERS = frozenset({'RIO', 'MAIN', 'ARCC', 'O', 'TTE.PA'})
+RESERVE_TICKERS = frozenset(reference['ticker'] for reference in RESERVE_REFERENCES)
 
 
 def apply_classic_annual_roe(stock: dict[str, Any], previous: dict[str, Any]) -> None:
