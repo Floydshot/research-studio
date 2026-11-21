@@ -311,11 +311,20 @@
     .future-settings{margin-left:0;margin-right:0}
     .future-settings-heading,.future-horizon-controls,.future-input-grid,.future-options-row{justify-content:flex-start}
     .future-input-grid{margin-left:0;margin-right:0}
+    .future-settings{width:900px}
+    .future-rate-controls{display:flex;align-items:flex-end;gap:12px;min-width:0}
+    .future-rate-controls:has(#future-dividend-options[hidden]){display:contents}
+    .future-rate-controls #future-dividend-options{margin:0;min-height:31px;display:flex;align-items:center}
+    .future-check .future-reinvest-switch{appearance:none;-webkit-appearance:none;position:relative;width:32px;height:18px;padding:0;border:0;border-radius:12px;background:var(--line);cursor:pointer;transition:background .15s}
+    .future-reinvest-switch::before{content:'';position:absolute;width:14px;height:14px;left:2px;top:2px;border-radius:50%;background:var(--text);transition:transform .15s}
+    .future-reinvest-switch:checked{background:var(--outlook-value-blue,var(--teal))}
+    .future-reinvest-switch:checked::before{transform:translateX(14px);background:#fff}
+    .future-reinvest-switch:focus-visible{outline:2px solid var(--sky);outline-offset:3px}
     #future-title,#future-dividends-title,#future-year-title{font-family:var(--font);font-size:13px;font-weight:600;letter-spacing:-.1px;line-height:1.5;color:var(--text)}
     .outlook-photo{grid-column:2;grid-row:1;justify-self:end;display:flex;justify-content:flex-end;align-items:center;width:100%;max-width:460px;margin:0}
     .outlook-photo img{display:block;width:min(100%,360px);height:auto;max-height:180px;object-fit:contain;border-radius:3px}
     @media(max-width:850px){.outlook-photo{grid-column:1;grid-row:2}}
-    @media(max-width:700px){.future-settings{margin-left:0;margin-right:0}.future-horizon-controls{justify-content:flex-start}.future-input-grid{margin-left:0;margin-right:0}}
+    @media(max-width:700px){.future-settings{width:100%;margin-left:0;margin-right:0}.future-horizon-controls{justify-content:flex-start}.future-input-grid{margin-left:0;margin-right:0}.future-rate-controls{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}.future-input-grid:has(#future-dividend-options:not([hidden]))>.future-field:has(#future-source){grid-column:1/-1}.future-rate-controls #future-dividend-options{min-width:0}.future-rate-controls .future-dividend-mode,.future-rate-controls .future-reinvest-label{max-width:100%}}
   </style>
 
   <style>
@@ -373,11 +382,10 @@
       <label id="future-initial-label" class="future-field" for="future-initial">Startkapital <span class="future-input-unit"><input id="future-initial" type="number" min="0" max="1000000000" step="100" inputmode="decimal" value="10000"><span>€</span></span></label>
       <label class="future-field" for="future-monthly">Monatliche Einzahlung <span class="future-input-unit"><input id="future-monthly" type="number" min="0" max="10000000" step="50" inputmode="decimal" value="0"><span>€</span></span></label>
       <label class="future-field" for="future-source">Rendite als Szenario <select id="future-source"><option value="manual">Manuell festlegen</option><option value="5y">Historische Basis · 5 Jahre</option><option value="10y">Historische Basis · 10 Jahre</option><option value="all">Historische Basis · All Time</option></select></label>
-      <label id="future-rate-field" class="future-field" for="future-rate">Gesamtrendite pro Jahr <span class="future-input-unit"><input id="future-rate" type="number" min="-99" max="1000" step="0.5" inputmode="decimal" value="7"><span>%</span></span></label>
+      <div class="future-rate-controls"><label id="future-rate-field" class="future-field" for="future-rate">Gesamtrendite pro Jahr <span class="future-input-unit"><input id="future-rate" type="number" min="-99" max="1000" step="0.5" inputmode="decimal" value="7"><span>%</span></span></label><div id="future-dividend-options" class="future-options-row"><div class="future-dividend-mode"><label class="future-check future-reinvest-label"><input id="future-reinvest" class="future-reinvest-switch" type="checkbox" role="switch" checked> Dividenden reinvestieren</label><p id="future-dividend-mode-copy" hidden>Ausschüttungen bleiben im Depot und wachsen mit.</p></div></div></div>
       <label class="future-field" for="future-allocation" hidden>Positionen erfassen <select id="future-allocation"><option value="weights">Gewichtung in %</option><option value="shares">Anzahl Shares</option></select></label>
     </div>
     <p id="future-allocation-note" hidden class="future-allocation-note"></p>
-    <div id="future-dividend-options" class="future-options-row"><div class="future-dividend-mode"><label class="future-check future-reinvest-label"><input id="future-reinvest" type="checkbox" checked> Dividenden reinvestieren</label><p id="future-dividend-mode-copy" hidden>Ausschüttungen bleiben im Depot und wachsen mit.</p></div></div>
     <p id="future-assumption-note" hidden class="future-assumption-note"></p>
     <p id="future-estimate-note" class="future-estimate-note" hidden></p>
     <p id="future-extreme-note" class="future-estimate-note future-extreme-note" hidden></p>
@@ -1921,7 +1929,7 @@ const PortfolioInput = (() => {
       if(futureStudio.chart){futureStudio.chart.destroy();futureStudio.chart=null;}
       if(!result||result.error){wrap.hidden=true;fallback.hidden=true;return;}
       const geometry=futureChartGeometry(settings),style=getComputedStyle($('future-panel')),color=key=>style.getPropertyValue(key).trim();
-      const years=result.series.filter(row=>row.month>0&&row.month%12===0);
+      const years=result.series.filter(row=>row.month%12===0);
       const sets=[{label:'Depotwert',key:'portfolio',color:color('--teal'),width:2.5}];
       if((!futureUsesDividends()||settings.reinvest)&&settings.monthly>0)sets.push({label:'Einzahlungen',key:'contributions',color:color('--muted'),width:1.5,dash:[5,4]});
       if(window.Chart){
@@ -1931,7 +1939,7 @@ const PortfolioInput = (() => {
             type:'line',data:{datasets:sets.map(set=>({label:set.label,data:years.map(row=>({x:row.year,y:row[set.key]})),borderColor:set.color,backgroundColor:set.color,borderWidth:set.width,borderDash:set.dash||[],pointRadius:0,pointHitRadius:8,tension:.15,fill:false}))},
             options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},layout:{autoPadding:false,padding:{top:5,left:0,right:geometry.right,bottom:0}},
               plugins:{legend:{display:sets.length>1,position:'bottom',align:'start',labels:{color:color('--muted'),boxWidth:13,boxHeight:2,padding:17,font:{size:10}}},
-                tooltip:{backgroundColor:color('--surface'),titleColor:color('--text'),bodyColor:color('--text'),borderColor:color('--line'),borderWidth:1,padding:11,titleFont:{size:11,weight:'bold'},bodyFont:{size:10},callbacks:{title:items=>items.length?('Jahr '+items[0].parsed.x):'',label:context=>context.dataset.label+': '+futureMoney(context.parsed.y,false)}}},
+                tooltip:{backgroundColor:color('--surface'),titleColor:color('--text'),bodyColor:color('--text'),borderColor:color('--line'),borderWidth:1,padding:11,titleFont:{size:11,weight:'bold'},bodyFont:{size:10},callbacks:{title:items=>items.length?(items[0].parsed.x===0?'Start':'Jahr '+items[0].parsed.x):'',label:context=>context.dataset.label+': '+futureMoney(context.parsed.y,false)}}},
               scales:{x:futureYearScale(settings,color),y:{beginAtZero:true,afterFit:scale=>{scale.width=geometry.left;},border:{display:false},grid:{color:color('--line-soft')},ticks:{color:color('--muted'),font:{size:10},maxTicksLimit:6,callback:value=>futureAxisMoney(value)}}}}
           });
           requestAnimationFrame(()=>{if(futureStudio.chart&&state.view==='future')futureStudio.chart.resize();});return;
