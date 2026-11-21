@@ -149,9 +149,9 @@
     .fear-greed { --fg-inactive: #29343f; --fg-fear: #e6b4a0; --fg-extreme-fear: #e5a9b2; --fg-neutral: #d7c69e; --fg-greed: #b9d0a6; --fg-extreme-greed: #8bc8b2; width: 100%; max-width: 460px; min-width: 0; justify-self: end; }
     .fear-greed { display: flex; flex-direction: column; justify-content: center; }
     [data-theme=light] .fear-greed { --fg-inactive: #e4e8ec; --fg-fear: #e9b69b; --fg-extreme-fear: #e8aab2; --fg-neutral: #ded0a7; --fg-greed: #bdd0a5; --fg-extreme-greed: #97cbb7; }
-    .fg-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+    .fg-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; min-height: 18px; }
     .fg-heading { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: -.1px; }
-    .fg-source { color: var(--faint); text-decoration: none; font-size: 9px; white-space: nowrap; }
+    .fg-source { color: var(--faint); text-decoration: none; font-size: 9px; white-space: nowrap; margin-left: auto; }
     .fg-source:hover { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
     .fg-content { display: grid; grid-template-columns: minmax(0,220px) minmax(0,1fr); align-items: center; gap: 18px; }
     .fg-gauge { display: block; width: 100%; height: auto; overflow: visible; }
@@ -423,6 +423,14 @@
     :is(.future-horizon-controls,.overview-inputs) .future-horizon legend{display:flex;align-items:center;padding:0}
     @media(max-width:700px){.tabs{gap:8px}.tabs .tab{flex-basis:90px}body[data-studio="future"] :is(#summary,#overview-summary) .summary-value{font-size:19px}}
   </style>
+<style>
+  /* Keep one copyright line at the end of every project and studio view. */
+  body>.shell{min-height:100vh;min-height:100svh;display:flex;flex-direction:column}
+  body>.shell>.topbar{flex-shrink:0}
+  body>.shell>main{flex:1 0 auto;min-width:0}
+  #research-footer{padding-bottom:0}
+  .site-footer{flex:none;margin:40px 0 0;padding:0 0 24px;color:var(--faint);font-size:10px;line-height:1.5;text-align:right}
+</style>
 </head>
 <body>
   <div class="shell">
@@ -436,7 +444,7 @@
   <div id="project-menu" class="project-menu" role="menu" aria-label="Projekt auswählen" hidden>
     <button type="button" role="menuitem" data-project="open" aria-current="true"><span aria-hidden="true">🌐</span><span>Open Projects</span></button>
     <button type="button" role="menuitem" data-project="floyd"><span aria-hidden="true">🏛️</span><span>Floyd Projects</span><span class="project-menu-lock" aria-label="Passwortgeschützt">🔒</span></button>
-    <button type="button" role="menuitem" data-project="ts"><span aria-hidden="true">🧭</span><span>TS Projects</span><span class="project-menu-lock" aria-label="Passwortgeschützt">🔒</span></button>
+    <button type="button" role="menuitem" data-project="ts"><span aria-hidden="true">🏛️</span><span>TS Projects</span><span class="project-menu-lock" aria-label="Passwortgeschützt">🔒</span></button>
     <button id="project-import-legacy" class="project-import-menu-item" role="menuitem" type="button" hidden>Depot-Eingaben übernehmen</button>
   </div>
 </div>
@@ -459,7 +467,7 @@
       <div class="page-heading">
         <div class="page-title"><div class="heading-line"><h1 id="studio-title">shopping</h1><button type="button" id="studio-toggle" class="studio-toggle" aria-label="Zu outlook wechseln" aria-pressed="false" title="Zu outlook wechseln"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><p id="studio-subtitle" class="subtitle">buy, hold &amp; butter</p></div>
         <section id="fear-greed" class="fear-greed studio-visual" aria-labelledby="fg-heading" data-status="unavailable">
-          <div class="fg-top"><h2 id="fg-heading" class="fg-heading">Fear &amp; Greed</h2><a class="fg-source" href="https://www.cnn.com/markets/fear-and-greed" target="_blank" rel="noopener noreferrer">CNN ↗</a></div>
+          <div class="fg-top"><h2 id="fg-heading" class="fg-heading sr-only">Fear &amp; Greed</h2><a class="fg-source" href="https://www.cnn.com/markets/fear-and-greed" target="_blank" rel="noopener noreferrer">CNN ↗</a></div>
           <div class="fg-content">
             <svg id="fg-gauge" class="fg-gauge" viewBox="0 0 226 122" role="img" aria-labelledby="fg-gauge-title fg-gauge-description">
               <title id="fg-gauge-title">CNN Fear &amp; Greed Index</title><desc id="fg-gauge-description">Noch keine bestätigten Indexdaten verfügbar. Skala von 0, Extreme Fear, bis 100, Extreme Greed.</desc>
@@ -550,6 +558,7 @@
       </div>
       <p id="announcer" class="sr-only" aria-live="polite"></p>
     </main>
+    <footer class="site-footer">©Floyd Vantures 2026</footer>
   </div>
 <dialog id="project-import-dialog" class="project-import-dialog" aria-labelledby="project-import-title" aria-describedby="project-import-help">
   <h2 id="project-import-title">Depot-Eingaben übernehmen</h2>
@@ -581,6 +590,7 @@
   <script src="client/project-workspaces.js"></script>
   <script src="client/overview-model.js"></script>
   <script src="client/project-import.js"></script>
+  <script src="client/project-removal.js"></script>
   <script>
   'use strict';
   (() => {
@@ -844,7 +854,12 @@
       }
       return logo;
     }
-    function portfolio(id=state.portfolio) { return state.data.portfolios.find(item => item.id === id); }
+    function portfolio(id=state.portfolio) {
+      const group=state.data.portfolios.find(item=>item.id===id);
+      if(!group||!['tech','value'].includes(id))return group;
+      const removed=futureSettings(id).removed;
+      return {...group,stocks:group.stocks.filter(stock=>removed[stock.ticker]!==true)};
+    }
     function individualOnlyPortfolio() { return portfolio().tranche_policy === 'individual_only'; }
     function isETF(stock) { return stock.asset_type === 'etf'; }
     function metricValue(stock, field) { return isETF(stock) && field === 'div_yield' ? stock.distribution_yield_ttm : stock[field]; }
@@ -1303,6 +1318,7 @@
     }
     function changePortfolio(id) {
       if(!state.projectReady||!visiblePortfolioIds().includes(id))return;
+      window.ProjectRemoval?.reset();
       if(id==='overview'){state.overview=true;state.view='future';syncStudioView();syncProjectPanels();renderOverview();return;}
       state.overview=false;state.portfolio=id;state.cluster='Alle';state.selected=null;
       $('portfolio-panel').setAttribute('aria-labelledby','tab-'+id);syncProjectPanels();syncStudioView();renderFilters();render();
@@ -1419,7 +1435,7 @@
         if (state.request === controller) { state.request = null; $('loading').hidden = true; setRefreshBusy(false); if (notify && notice) showToast(...notice); }
       }
     }
-    $('studio-toggle').addEventListener('click', () => { state.overview=false; state.view = state.view === 'research' ? 'future' : 'research'; syncStudioView(); if(state.data){const available=state.view==='future'?futureScenarioStocks():portfolio().stocks;if(state.cluster!=='Alle'&&!available.some(stock=>stock.cluster===state.cluster))state.cluster='Alle';renderFilters();} render(); });
+    $('studio-toggle').addEventListener('click', () => { window.ProjectRemoval?.reset();state.overview=false; state.view = state.view === 'research' ? 'future' : 'research'; syncStudioView(); if(state.data){const available=state.view==='future'?futureScenarioStocks():portfolio().stocks;if(state.cluster!=='Alle'&&!available.some(stock=>stock.cluster===state.cluster))state.cluster='Alle';renderFilters();} render(); });
     $('reload').addEventListener('click', () => load({ notify: true }));
     window.addEventListener('focus', () => { if (state.data && !state.request) status(); });
     $('toast-close').addEventListener('click', dismissToast);
@@ -1847,7 +1863,7 @@ const PortfolioInput = (() => {
       for(const wrap of $('future-panel').querySelectorAll('.future-input-invalid'))wrap.classList.remove('future-input-invalid');
       for(const issue of issues){const input=$(issue.id);if(!input||input.disabled)continue;input.setAttribute('aria-invalid','true');input.setAttribute('aria-describedby','future-error');(input.closest('.future-input-unit,.future-small-input')||input).classList.add('future-input-invalid');}
     }
-    function futureDefaults() { return { schemaVersion: 2, allocationMode: 'weights', initial: 10000, monthly: 0, source: 'manual', manual: 7, years: window.ProjectWorkspaces?.private?5:20, extend: true, reinvest: true, excluded: {}, weights: {}, shares: {}, extraTickers: [], migrated: false }; }
+    function futureDefaults() { return { schemaVersion: 2, allocationMode: 'weights', initial: 10000, monthly: 0, source: 'manual', manual: 7, years: window.ProjectWorkspaces?.private?5:20, extend: true, reinvest: true, excluded: {}, removed: {}, weights: {}, shares: {}, extraTickers: [], migrated: false }; }
     function futureSettings(id=state.portfolio) {
       if (!futureStudio.settings[id]) futureStudio.settings[id] = futureDefaults();
       const settings = futureStudio.settings[id], group = state.data && state.data.portfolios.find(item => item.id === id);
@@ -1876,10 +1892,10 @@ const PortfolioInput = (() => {
           if ([5,10,15,20,30].includes(value.years)) settings.years = value.years;
           settings.extend = true; settings.reinvest = value.reinvest !== false;
           if(Array.isArray(value.extraTickers))settings.extraTickers=[...new Set(value.extraTickers.filter(ticker=>typeof ticker==='string'&&/^[A-Za-z0-9.^=-]{1,24}$/.test(ticker)))].slice(0,100);
-          for (const key of ['excluded','weights','shares']) if (value[key] && typeof value[key] === 'object' && !Array.isArray(value[key])) for (const [ticker,item] of Object.entries(value[key]).slice(0,100)) {
+          for (const key of ['excluded','removed','weights','shares']) if (value[key] && typeof value[key] === 'object' && !Array.isArray(value[key])) for (const [ticker,item] of Object.entries(value[key]).slice(0,100)) {
             if (!/^[A-Za-z0-9.^=-]{1,24}$/.test(ticker)) continue;
-            if (key === 'excluded' && item === true) settings.excluded[ticker] = true;
-            if (key !== 'excluded' && (item===null || futureNumber(item) !== null && item >= 0 && item <= (key === 'shares' ? 1e9 : settings.schemaVersion === 2 ? 100 : 100000))) settings[key][ticker] = item;
+            if (['excluded','removed'].includes(key) && item === true) settings[key][ticker] = true;
+            if (!['excluded','removed'].includes(key) && (item===null || futureNumber(item) !== null && item >= 0 && item <= (key === 'shares' ? 1e9 : settings.schemaVersion === 2 ? 100 : 100000))) settings[key][ticker] = item;
           }
           settings.migrated=settings.schemaVersion===2&&value.migrated===true;
           futureStudio.settings[id] = settings;
@@ -1896,7 +1912,7 @@ const PortfolioInput = (() => {
     function futureScenarioStocks(settings=futureSettings(),portfolioId=state.portfolio) {
       const original=portfolio(portfolioId).stocks,catalog=new Map(futureCatalog().map(stock=>[stock.ticker,stock])),seen=new Set(original.map(stock=>stock.ticker)),stocks=[...original];
       for(const ticker of settings.extraTickers||[]){if(seen.has(ticker)||!catalog.has(ticker))continue;seen.add(ticker);stocks.push(catalog.get(ticker));}
-      return stocks;
+      return stocks.filter(stock=>settings.removed[stock.ticker]!==true);
     }
     function futureCatalogNormalize(value) { return String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/ß/g,'ss').toLocaleLowerCase('de-DE').replace(/[^a-z0-9]+/g,' ').trim(); }
     function futureCatalogMatches(query) {
@@ -1909,13 +1925,24 @@ const PortfolioInput = (() => {
     function addFutureCatalogStock(ticker) {
       const stock=futureCatalog().find(item=>item.ticker===ticker);if(!stock)return;
       const settings=futureSettings(),existing=futureScenarioStocks(settings);if(existing.some(item=>item.ticker===ticker))return;
-      settings.extraTickers=[...new Set([...(settings.extraTickers||[]),ticker])];
+      delete settings.removed[ticker];
+      if(!state.data.portfolios.find(group=>group.id===state.portfolio).stocks.some(item=>item.ticker===ticker))settings.extraTickers=[...new Set([...(settings.extraTickers||[]),ticker])];
       if(settings.allocationMode==='shares'){if(!Object.prototype.hasOwnProperty.call(settings.shares,ticker))settings.shares[ticker]=0;}
       else if(!(futureNumber(settings.weights[ticker])>0))settings.weights[ticker]=100/(existing.length+1);
       delete settings.excluded[ticker];state.cluster='Alle';saveFutureSettings();
       $('future-catalog-search').value='';renderFilters();renderFutureStudio();
       const copy=stock.name+' hinzugefügt'+(settings.allocationMode==='shares'?' – Anzahl Shares in der Kachel eingeben.':'.');$('future-catalog-status').textContent=copy;$('announcer').textContent=copy;
       if(settings.allocationMode==='shares')document.querySelector('[data-future-ticker="'+CSS.escape(ticker)+'"] input')?.focus();else $('future-catalog-search').focus();
+    }
+    async function removeFutureStock(ticker,context) {
+      if(!context.isCurrent())throw new Error('Bitte die Position erneut auswählen.');
+      const settings=futureSettings(context.portfolioId),stock=futureCatalog().find(item=>item.ticker===ticker);
+      if(!stock||(!settings.removed[ticker]&&!futureScenarioStocks(settings,context.portfolioId).some(item=>item.ticker===ticker)))throw new Error('Die Position ist nicht mehr verfügbar.');
+      if(futureStockAssumptions(stock,settings,context.portfolioId).included)throw new Error('Bitte die Position zuerst ausgrauen.');
+      settings.removed[ticker]=true;settings.excluded[ticker]=true;saveFutureSettings();
+      try { if(window.ProjectWorkspaces?.private)await window.ProjectWorkspaces.flush(); }
+      finally { if(context.isCurrent()){if(state.cluster!=='Alle'&&!futureScenarioStocks(settings,context.portfolioId).some(item=>item.cluster===state.cluster))state.cluster='Alle';renderFilters();render();} }
+      if(context.isCurrent())$('announcer').textContent=stock.name+' entfernt.';
     }
     function renderFutureCatalogSearch() {
       const input=$('future-catalog-search'),list=$('future-catalog-results');if(!input||!list)return;
@@ -2022,6 +2049,7 @@ const PortfolioInput = (() => {
     function applyPortfolioInput() {
       const result = futureStudio.importResult; if (!result || result.errors && result.errors.length || !Array.isArray(result.entries) || !result.entries.length || !['weights','shares'].includes(result.mode)) return;
       const settings = futureSettings(), tickers = new Set(result.entries.map(entry => entry.ticker));
+      for(const ticker of tickers)delete settings.removed[ticker];
       settings.allocationMode = result.mode;
       const baseTickers=new Set(portfolio().stocks.map(stock=>stock.ticker)),known=new Set(futureCatalog().map(stock=>stock.ticker));
       settings.extraTickers=[...new Set([...(settings.extraTickers||[]),...result.entries.filter(entry=>known.has(entry.ticker)&&!baseTickers.has(entry.ticker)).map(entry=>entry.ticker)])];
@@ -2085,6 +2113,7 @@ const PortfolioInput = (() => {
       fields.append(quantityLabel,effective); card.append(fields);
       if (sharesMode) { const price = positive(stock.price), note = el('p','future-card-input-note', (price === null ? 'Kurs fehlt' : fmt(price,2) + ' ' + stock.currency + ' / Share') + (row.included && weightTotal > 0 && row.weight > 0 ? ' · Gewicht ' + fmt(row.weight / weightTotal * 100,2) + '%' : '')); note.title = provenance(stock,'price') + (row.fx && row.fx.as_of ? ' · EUR-Wechselkurs: ' + row.fx.as_of : ''); card.append(note); }
       if (row.problem && row.problemField !== 'quantity' && (row.included || row.quantity > 0)) card.append(el('p','future-card-warning',row.problem));
+      if (!row.included) { const footer=el('div','future-card-removal'),remove=el('button','future-card-remove','Entfernen');remove.type='button';remove.setAttribute('aria-label',stock.name+' entfernen');remove.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();window.ProjectRemoval?.open(stock.ticker,remove);});footer.addEventListener('click',event=>event.stopPropagation());footer.append(remove);card.append(footer); }
       return card;
     }
     function futureChartGeometry(settings) {
@@ -2244,6 +2273,7 @@ const PortfolioInput = (() => {
         const overviewState={charts:[],request:0};
     function resetProjectView() {
       window.ProjectImport?.reset();
+      window.ProjectRemoval?.reset();
       state.projectReady=false;state.overview=false;state.portfolio='tech';state.cluster='Alle';state.search='';state.selected=null;
       futureStudio.settings={};futureStudio.overviewYears=20;futureStudio.importResult=null;
       for(const chart of [futureStudio.chart,futureStudio.dividendChart,state.chart,...overviewState.charts])if(chart)chart.destroy();
@@ -2254,7 +2284,7 @@ const PortfolioInput = (() => {
       $('app').hidden=true;$('loading').hidden=true;
     }
     function syncProjectIdentity(id) {
-      const names={open:['Open Projects','🌐'],floyd:['Floyd Projects','🏛️'],ts:['TS Projects','🧭']},item=names[id]||names.open;
+      const names={open:['Open Projects','🌐'],floyd:['Floyd Projects','🏛️'],ts:['TS Projects','🏛️']},item=names[id]||names.open;
       document.title=item[0]+' · shopping';
       const icon=document.querySelector('link[rel="icon"]');if(icon)icon.href='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><text x="32" y="51" text-anchor="middle" font-size="52">'+item[1]+'</text></svg>');
     }
@@ -2262,12 +2292,13 @@ const PortfolioInput = (() => {
       for(const pair of [['overview-chart-wrap','overview-dividends-wrap'],['overview-chart-fallback','overview-dividends-fallback']])for(const[sourceId,targetId]of[pair,[...pair].reverse()])$(sourceId).addEventListener('scroll',()=>{const source=$(sourceId),target=$(targetId);if(Math.abs(source.scrollLeft-target.scrollLeft)>.5)target.scrollLeft=source.scrollLeft;},{passive:true});
       $('overview-years').addEventListener('click',event=>{const button=event.target.closest('[data-years]');if(!button)return;futureStudio.overviewYears=Number(button.dataset.years);saveFutureSettings();renderOverview();});
       if(!window.ProjectWorkspaces){$('loading').hidden=true;$('error').hidden=false;$('error').textContent='Die Projektauswahl konnte nicht geladen werden.';return;}
+      window.ProjectRemoval?.init({getContext:()=>({projectId:window.ProjectWorkspaces.id,portfolioId:state.portfolio,ready:state.projectReady&&state.view==='future'&&!state.overview&&(!window.ProjectWorkspaces.private||window.ProjectWorkspaces.unlocked)}),onRemove:removeFutureStock});
       await window.ProjectWorkspaces.init({
         getSettings:projectSettingsSnapshot,
         onLock:id=>{resetProjectView();syncProjectIdentity(id);},
         onActivate:async(id,settings)=>{resetProjectView();syncProjectIdentity(id);loadFutureSettings(id==='open'?undefined:settings);state.projectReady=true;syncStudioView();syncProjectPanels();if(state.data){$('app').hidden=false;renderFilters();render();}else $('loading').hidden=false;window.ProjectImport?.refresh();}
       });
-      window.ProjectImport?.init({applySettings:async(settings,context)=>{if(!context.isCurrent()||window.ProjectWorkspaces.id!=='floyd'||!state.projectReady)throw new Error('Bitte erneut anmelden.');const incoming={...settings,overview:settings.overview||{years:futureStudio.overviewYears||5}};futureStudio.settings={};loadFutureSettings(incoming);state.overview=false;state.portfolio='tech';state.cluster='Alle';syncStudioView();renderFilters();render();saveFutureSettings();await window.ProjectWorkspaces.flush();}});
+      window.ProjectImport?.init({applySettings:async(settings,context)=>{if(!context.isCurrent()||window.ProjectWorkspaces.id!=='floyd'||!state.projectReady)throw new Error('Bitte erneut anmelden.');window.ProjectRemoval?.reset();const incoming={...settings,overview:settings.overview||{years:futureStudio.overviewYears||5}};for(const id of ['tech','value'])if(!Object.prototype.hasOwnProperty.call(settings[id]||{},'removed'))incoming[id]={...settings[id],removed:{...futureSettings(id).removed}};futureStudio.settings={};loadFutureSettings(incoming);state.overview=false;state.portfolio='tech';state.cluster='Alle';syncStudioView();renderFilters();render();saveFutureSettings();await window.ProjectWorkspaces.flush();}});
     }
     function calculateProjectDepot(id, years) {
       const settings={...futureSettings(id),years},rows=futureScenarioStocks(settings,id).map(stock=>futureStockAssumptions(stock,settings,id)),included=rows.filter(row=>row.included);
