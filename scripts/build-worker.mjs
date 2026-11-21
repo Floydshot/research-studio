@@ -5,7 +5,7 @@ const assets={};
 for(const [path,type]of [['/index.html','text/html; charset=utf-8'],['/client/project-workspaces.js','text/javascript; charset=utf-8'],['/client/overview-model.js','text/javascript; charset=utf-8'],['/client/project-import.js','text/javascript; charset=utf-8'],['/client/project-removal.js','text/javascript; charset=utf-8'],['/vendor/chart.umd.min.js','text/javascript; charset=utf-8']])assets[path]={type,body:await readFile(root+path,'utf8')};
 const api="import {handleProjectApi} from '../server/project-api.mjs';\nexport {ProjectPasswordVerifier} from '../server/password-verifier.mjs';\n";
 const code=api+'\nconst PUBLIC_ASSETS='+JSON.stringify(assets)+';\n'+String.raw`
-function publicHeaders(type,cache='no-cache') {return {'Content-Type':type,'Cache-Control':cache,'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://production.dataviz.cnn.io; font-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"};}
+function publicHeaders(type,cache='no-cache') {return {'Content-Type':type,'Cache-Control':cache,'X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"};}
 export default {
  async fetch(request,env) {
   const url=new URL(request.url);
