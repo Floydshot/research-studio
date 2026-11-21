@@ -424,6 +424,15 @@
     :is(.future-horizon-controls,.overview-inputs) .future-horizon legend{display:flex;align-items:center;padding:0}
     @media(max-width:700px){.tabs{gap:8px}.tabs .tab{flex-basis:90px}body[data-studio="future"] :is(#summary,#overview-summary) .summary-value{font-size:19px}}
   </style>
+<style id="outlook-card-allocation">
+  .future-allocation-control{display:inline-flex;align-items:center;max-width:100%}
+  .future-allocation-control select{height:29px;width:132px;max-width:100%;padding:3px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--text);font-size:11px;font-weight:400}
+  .future-card .future-card-rate{flex-direction:row;align-items:center;gap:6px}
+  .future-card-return{display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px;min-width:0}
+  .future-card-weight{flex:none;font-size:11px;font-weight:500;color:var(--muted);white-space:nowrap}
+  .future-card .future-allocation-fields{grid-template-columns:minmax(0,1fr)}
+  .future-card .future-allocation-fields>label{max-width:150px;width:100%}
+</style>
 <style id="shopping-card-layout">
   .stock-card{display:flex;flex-direction:column;align-self:start}
   .stock-card .metrics{margin-bottom:0}
@@ -453,6 +462,9 @@
   #chart-title>.section-info,#returns-title>.section-info{display:none}
   body[data-studio="research"] #portfolio-panel>.toolbar .table-controls{width:auto;flex:none;margin-left:auto}
   body[data-studio="research"] #portfolio-panel>.toolbar .sort-wrap>label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+</style>
+<style>
+  body[data-studio="future"] .returns-position:hover{text-decoration:none}
 </style>
 </head>
 <body>
@@ -529,7 +541,6 @@
       <label class="future-field" for="future-monthly">Monatliche Einzahlung <span class="future-input-unit"><input id="future-monthly" type="number" min="0" max="10000000" step="50" inputmode="decimal" value="0"><span>€</span></span></label>
       <label class="future-field" for="future-source">Rendite als Szenario <select id="future-source"><option value="manual">Manuell festlegen</option><option value="5y">Historische Basis · 5 Jahre</option><option value="10y">Historische Basis · 10 Jahre</option><option value="all">Historische Basis · All Time</option></select></label>
       <div class="future-rate-controls"><label id="future-rate-field" class="future-field" for="future-rate">Gesamtrendite pro Jahr <span class="future-input-unit"><input id="future-rate" type="number" min="-99" max="1000" step="0.5" inputmode="decimal" value="7"><span>%</span></span></label><div id="future-dividend-options" class="future-options-row"><div class="future-dividend-mode"><label class="future-check future-reinvest-label"><input id="future-reinvest" class="future-reinvest-switch" type="checkbox" role="switch" checked> Dividenden reinvestieren</label><p id="future-dividend-mode-copy" hidden>Ausschüttungen bleiben im Depot und wachsen mit.</p></div></div></div>
-      <label class="future-field" for="future-allocation" hidden>Positionen erfassen <select id="future-allocation"><option value="weights">Gewichtung in %</option><option value="shares">Anzahl Shares</option></select></label>
     </div>
     <p id="future-allocation-note" hidden class="future-allocation-note"></p>
     <p id="future-assumption-note" hidden class="future-assumption-note"></p>
@@ -546,12 +557,13 @@
     <section class="future-year-details" aria-labelledby="future-year-title"><h3 id="future-year-title" class="title-with-info">Jahreswerte <button type="button" class="section-info" data-info-title="Jahreswerte" data-info-sources="future-year-note" aria-label="Informationen zu Jahreswerte" title="Informationen zu Jahreswerte"><span aria-hidden="true">i</span></button></h3><p id="future-year-note" hidden></p><div class="future-year-scroll"><table class="future-year-table" aria-describedby="future-year-note"><caption class="sr-only">Depotwert und jährliche Brutto- und Netto-Ausschüttungen ab Jahr 1; monatlicher Netto-Durchschnitt als Jahres-Netto geteilt durch 12.</caption><thead><tr><th scope="col">Jahr</th><th scope="col">Depotwert</th><th scope="col">Dividenden im Jahr (brutto)</th><th scope="col">Ausschüttung im Jahr (netto)</th><th scope="col" title="Monatsdurchschnitt: Jahres-Netto geteilt durch 12, keine konkreten Zahlungstermine.">Ausschüttung im Monat (netto)</th></tr></thead><tbody id="future-year-body"></tbody></table></div></section>
   </section>
   <div class="future-positions-heading"><div><h2 class="title-with-info">Positionen im Szenario</h2><p id="future-selection-copy" hidden>Kachel anklicken, um eine Position aus- oder einzuschließen.</p></div></div>
-  <div class="future-position-controls"><div id="future-cluster-slot"></div><div class="future-selection-actions"><button type="button" id="future-include-all">Alle einschließen</button><button type="button" id="future-equal-weights">Gleich gewichten</button><button type="button" id="future-input-open">Portfolio input</button></div></div>
+  <div class="future-position-controls"><div id="future-cluster-slot"></div><div class="future-selection-actions"><label class="future-allocation-control" for="future-allocation"><span class="sr-only">Eingabeformat der Positionen</span><select id="future-allocation"><option value="weights">Gewichtung %</option><option value="shares">Shares</option></select></label><button type="button" id="future-include-all">Alle einschließen</button><button type="button" id="future-equal-weights">Gleich gewichten</button><button type="button" id="future-input-open">Portfolio input</button></div></div>
   <div id="future-cards" class="future-cards" aria-label="Positionen für die Depotprojektion"></div>
   <section class="future-catalog-search" aria-label="Weitere Aktien hinzufügen"><label for="future-catalog-search" class="sr-only">weitere aktien hinzufügen</label><input id="future-catalog-search" type="search" maxlength="160" autocomplete="off" spellcheck="false" placeholder="weitere aktien hinzufügen" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="future-catalog-results"><ul id="future-catalog-results" role="listbox" aria-label="Aktienvorschläge" hidden></ul><p id="future-catalog-status" class="future-catalog-status" role="status" aria-live="polite"></p></section>
   <p id="future-no-cards" class="future-no-cards" hidden>Für die gewählten Filter gibt es keine Positionen.</p>
   <dialog id="future-input-dialog" class="future-input-dialog" aria-labelledby="future-input-title" aria-describedby="future-input-help"><div class="title-with-info"><h2 id="future-input-title">Portfolio input</h2><button type="button" class="section-info" data-info-title="Portfolio input" data-info-sources="future-input-help" data-info-text="Füge eine Position pro Zeile ein, z. B. Microsoft 40% oder MSFT 12 Shares. Nicht genannte Positionen werden im aktuellen Depot aus dem Szenario ausgeschlossen. Beim Übernehmen werden Suche und Kategorienfilter zurückgesetzt." aria-label="Informationen zu Portfolio input" title="Informationen zu Portfolio input"><span aria-hidden="true">i</span></button></div><p id="future-input-help" hidden>Füge deine Positionen mit Stückzahl oder Prozentgewicht ein, eine pro Zeile. Es werden ausschließlich Werte des ausgewählten Depots zugeordnet.</p><label class="future-field" for="future-input-mode">Eingabeformat <select id="future-input-mode"><option value="auto">Automatisch erkennen</option><option value="weights">Gewichtung in %</option><option value="shares">Anzahl Shares</option></select></label><label for="future-input-text" class="future-import-label">Deine Positionen</label><textarea id="future-input-text" rows="7" maxlength="20000" spellcheck="false" placeholder="Microsoft 40%&#10;Apple 30%&#10;Alphabet 30%&#10;&#10;oder: MSFT 12 Shares"></textarea><div id="future-input-preview" class="future-input-preview" role="status" aria-live="polite"></div><div class="future-import-actions"><button type="button" id="future-input-cancel">Abbrechen</button><button type="button" id="future-input-apply" disabled>Übernehmen</button></div></dialog>
   <div id="future-method-copy" class="future-method" hidden></div>
+  <div id="future-returns-slot"></div>
 </section>
 
           <div id="research-content">
@@ -559,12 +571,12 @@
           <div class="details-heading"><h2 class="title-with-info">Werte im Detail<button type="button" class="section-info" data-info-title="Werte im Detail" data-info-text="Eine Auswahl verknüpft die jeweilige Kachel mit dem Bewertungsdiagramm. Quellen und Datenstand stehen an den Kennzahlen; Nachkauf-Indikatoren sind individuelle Vorschläge und keine rückgetestete Strategie." aria-label="Informationen zu Werte im Detail" title="Informationen zu Werte im Detail"><span aria-hidden="true">i</span></button></h2></div>
           <div id="cards" class="cards" aria-live="polite" aria-label="Aktien, ETFs und Nachkauf-Indikatoren"></div>
           <div id="empty" class="empty" hidden><strong>Keine passenden Werte</strong><p>Für diese Kombination aus Cluster und Suche gibt es keine Treffer.</p><button type="button" id="reset-filters">Filter zurücksetzen</button></div>
-          <section id="returns-panel" class="returns-panel" aria-labelledby="returns-title">
+          <div id="research-returns-slot"><section id="returns-panel" class="returns-panel" aria-labelledby="returns-title">
             <div class="returns-heading"><div><h2 id="returns-title" class="section-title title-with-info">Rendite<button type="button" class="section-info" data-info-title="Rendite" data-info-sources="returns-description returns-explanation" aria-label="Informationen zu Rendite" title="Informationen zu Rendite"><span aria-hidden="true">i</span></button></h2><p id="returns-description" class="section-desc" hidden>Gesamtrendite inklusive reinvestierter Dividenden und ETF-Ausschüttungen</p></div></div>
             <div id="returns-scroll" class="returns-scroll" role="region" aria-label="Renditen nach Zeitraum, horizontal scrollbar" tabindex="0"><table id="returns-table" class="returns-table"><caption class="sr-only">Gesamtrenditen der angezeigten Positionen in ihrer jeweiligen Handelswährung. Zeiträume ab drei Jahren und All Time sind annualisiert, soweit mindestens ein Jahr Historie vorliegt.</caption><thead id="returns-head"></thead><tbody id="returns-body"></tbody></table></div>
             <p id="returns-empty" class="returns-empty" hidden>Für die gewählten Filter sind keine Positionen vorhanden.</p>
             <p id="returns-explanation" class="returns-note" hidden>In jeweiliger Handelswährung, ohne Steuern und Gebühren. * 3Y, 5Y und 10Y: Rendite pro Jahr (p. a.). All Time: seit dem ersten verfügbaren Kurs, ab einem Jahr Historie ebenfalls p. a. Fehlende oder nicht bestätigte Historie: —. Die Tabelle folgt den Filtern oben; jede Position wird einzeln betrachtet.</p>
-          </section>
+          </section></div>
           </div>
         </section>
         <section id="overview-panel" role="tabpanel" aria-labelledby="tab-overview" hidden>
@@ -844,7 +856,7 @@
       };
       if(fixed[title])return fixed[title];
       if(title.startsWith('Dividendenwachstum ·'))return 'Historisches jährliches Dividendenwachstum; ≈ kennzeichnet eine kürzere Historie oder Ersatzannahme.';
-      if(title.startsWith('Ausschüttungsrendite ·'))return 'Netto-Rendite aus zwölf Monaten Ausschüttungen nach pauschal 26,375 % Steuer ohne Kirchensteuer.';
+      if(title.startsWith('Ausschüttungsrendite ·'))return 'Brutto-Ausschüttungen der letzten zwölf Monate geteilt durch den aktuellen Kurs.';
       if(title.startsWith('Renditebasis ·'))return 'Historische oder manuelle Brutto-Gesamtrendite als jährliche Szenariobasis.';
       const sources=(button.dataset.infoSources||'').split(/\s+/).map(id=>$(id)?.textContent||'').filter(Boolean);
       const full=String(button.dataset.infoText||sources[0]||title).replace(/\s+/g,' ').trim();
@@ -1262,16 +1274,24 @@
       parts.push(...returnPeriodNotes(stock, key));
       return parts.join(' · ');
     }
+    function returnsStocks() {
+      return state.view==='future'?futureFilteredStocks():state.visible;
+    }
+    function syncReturnsPanel() {
+      const panel=$('returns-panel'),slot=$(state.view==='future'?'future-returns-slot':'research-returns-slot');
+      if(panel.parentElement!==slot)slot.append(panel);
+      panel.hidden=!state.projectReady||!!state.overview;
+    }
     function sortedReturns() {
       const sort = returnsSort[state.portfolio];
       if (sort.key === 'category') {
-        const all = portfolio().stocks;
+        const all = state.view==='future'?futureScenarioStocks():portfolio().stocks;
         const categories = [...new Set([...(portfolio().cluster_order || []), ...all.map(stock => stock.cluster)])];
         const categoryOrder = new Map(categories.map((name, index) => [name, index]));
         const stockOrder = new Map(all.map((stock, index) => [stock.ticker, index]));
-        return [...state.visible].sort((a, b) => (categoryOrder.get(a.cluster) ?? categories.length) - (categoryOrder.get(b.cluster) ?? categories.length) || stockOrder.get(a.ticker) - stockOrder.get(b.ticker));
+        return [...returnsStocks()].sort((a, b) => (categoryOrder.get(a.cluster) ?? categories.length) - (categoryOrder.get(b.cluster) ?? categories.length) || stockOrder.get(a.ticker) - stockOrder.get(b.ticker));
       }
-      return [...state.visible].sort((a, b) => {
+      return [...returnsStocks()].sort((a, b) => {
         if (sort.key === 'name') return sort.direction * a.name.localeCompare(b.name, 'de');
         const av = returnNumber(a, sort.key), bv = returnNumber(b, sort.key);
         if (av === null && bv === null) return a.name.localeCompare(b.name, 'de');
@@ -1280,6 +1300,8 @@
       });
     }
     function renderReturns() {
+      syncReturnsPanel();
+      if(!state.data||!state.projectReady||state.overview)return;
       const head = $('returns-head'), body = $('returns-body'), sort = returnsSort[state.portfolio], rows = sortedReturns(); head.replaceChildren(); body.replaceChildren();
       const header = el('tr');
       [['name', 'Position'], ...returnColumns].forEach(([key, label]) => {
@@ -1292,11 +1314,12 @@
       });
       head.append(header);
       rows.forEach(stock => {
-        const row = el('tr', stock.ticker === state.selected ? 'selected' : ''); row.dataset.returnTicker = stock.ticker;
+        const interactive=state.view!=='future',row = el('tr', interactive&&stock.ticker === state.selected ? 'selected' : ''); row.dataset.returnTicker = stock.ticker;
         const position = el('th'); position.scope = 'row';
         const label = stock.name + (stock.cluster ? ' – ' + stock.cluster : '');
-        const button = el('button', 'returns-position'); button.type = 'button'; button.setAttribute('aria-pressed', String(stock.ticker === state.selected)); button.setAttribute('aria-label', label + ' im Diagramm auswählen');
-        const labels = el('span', 'returns-position-copy'); labels.append(el('span', 'returns-name', stock.name)); if (stock.cluster) labels.append(el('span', 'returns-category', stock.cluster)); button.append(companyLogo(stock.ticker, 'returns-logo'), labels); button.addEventListener('click', () => select(stock.ticker)); position.append(button);
+        const button = el(interactive?'button':'span', 'returns-position');
+        if(interactive){button.type = 'button';button.setAttribute('aria-pressed', String(stock.ticker === state.selected));button.setAttribute('aria-label', label + ' im Diagramm auswählen');button.addEventListener('click', () => select(stock.ticker));}
+        const labels = el('span', 'returns-position-copy'); labels.append(el('span', 'returns-name', stock.name)); if (stock.cluster) labels.append(el('span', 'returns-category', stock.cluster)); button.append(companyLogo(stock.ticker, 'returns-logo'), labels); position.append(button);
         row.append(position);
         returnColumns.forEach(([key]) => {
           const value = returnNumber(stock, key), cell = el('td', 'returns-cell' + (value === null ? ' unavailable' : value > 0 ? ' positive' : value < 0 ? ' negative' : ''), value === null ? '—' : (value > 0 ? '+' : '') + fmt(value, 2) + '%');
@@ -1361,6 +1384,7 @@
       const clusters=$('clusters'),clusterParent=future?$('future-cluster-slot'):document.querySelector('.toolbar');
       if(future)clusterParent.append(clusters);else clusterParent.insertBefore(clusters,clusterParent.firstChild);
       document.body.dataset.studio = state.view;
+      syncReturnsPanel();
       syncProjectPanels();
     }
     function render() {
@@ -2113,22 +2137,22 @@ const PortfolioInput = (() => {
       const names = el('span','future-card-names'); names.append(el('span','future-card-name',stock.name),el('span','future-card-category',stock.cluster)); toggle.append(companyLogo(stock.ticker,'future-logo'),names,el('span','future-inclusion',row.included ? '✓' : '+')); card.append(toggle);
       const flip = () => { if (row.included) settings.excluded[stock.ticker] = true; else { if (!(row.quantity > 0)) { card.querySelector('input')?.focus(); return; } delete settings.excluded[stock.ticker]; } saveFutureSettings(); renderFutureStudio(); };
       toggle.addEventListener('click',flip); card.addEventListener('click',event => { if (!event.target.closest('button,input,label,a')) flip(); });
-      const rate = el('div','future-card-rate', (row.estimated ? '≈ ' : '') + futurePercent(row.totalReturnPct) + ' p. a.');
-      const sourceLabel = settings.source === 'manual' ? 'Eigene Renditebasis' : row.estimated ? 'Ersatzbasis · ' + fmt(row.details.sampleYears,2) + ' J Historie' : {'5y':'5 Jahre · Gesamtrendite','10y':'10 Jahre · Gesamtrendite',all:'All Time · Gesamtrendite'}[settings.source]; rate.append(sectionInfoButton('Renditebasis · '+stock.name,sourceLabel));
+      const rate = el('div','future-card-rate'), basis = el('span','future-card-return',(row.estimated ? '≈ ' : '') + futurePercent(row.totalReturnPct) + ' p. a.');
+      const effectiveWeight = el('span','future-card-weight',row.included && weightTotal > 0 && row.weight > 0 ? fmt(row.weight / weightTotal * 100,2) + '%' : row.included ? '—' : '0%'); effectiveWeight.title = 'Effektive Gewichtung im aktuellen Szenario'; effectiveWeight.setAttribute('aria-label','Effektive Gewichtung: '+effectiveWeight.textContent); rate.append(basis,effectiveWeight);
+      const sourceLabel = settings.source === 'manual' ? 'Eigene Renditebasis' : row.estimated ? 'Ersatzbasis · ' + fmt(row.details.sampleYears,2) + ' J Historie' : {'5y':'5 Jahre · Gesamtrendite','10y':'10 Jahre · Gesamtrendite',all:'All Time · Gesamtrendite'}[settings.source]; basis.append(sectionInfoButton('Renditebasis · '+stock.name,sourceLabel));
       rate.title = row.period && row.period.start && row.period.end ? (row.estimated ? 'Ersatzannahme: ' + row.details.reason + ' ' : '') + 'Gesamtrenditebasis: ' + row.period.start + ' bis ' + row.period.end + ' · ' + stock.currency + (row.details && row.details.warning ? ' · ' + row.details.warning : '') : 'Eigene jährliche Gesamtrendite als Ausgangsbasis, inklusive Dividenden.'; rate.querySelector('.section-info').dataset.infoText=sourceLabel+'. '+rate.title; card.append(rate);
       if (futureUsesDividends()) {
       const metrics = el('div','future-card-metrics'), dividend = el('div','future-readonly'), growth = el('div','future-readonly');
-      dividend.append(el('span','', stock.asset_type === 'etf' ? 'Ausschüttungsrendite · netto' : 'Dividendenrendite · netto'), el('strong','',futurePercent(futureNumber(row.dividendYieldPct)===null?null:row.dividendYieldPct*(1-FutureModel.DIVIDEND_TAX_RATE))));
+      dividend.append(el('span','', stock.asset_type === 'etf' ? 'Ausschüttungsrendite · brutto' : 'Dividendenrendite · brutto'), el('strong','',futurePercent(row.dividendYieldPct)));
       dividend.title = row.annualDividend !== null ? 'Ausschüttungen je Aktie nach Ex-Tag in den letzten 12 Monaten ÷ aktueller Kurs. ' + fmt(row.annualDividend,4) + ' ' + stock.currency + ' je Aktie. ' + (row.growth?.source_url || '') : provenance(stock,row.yieldField);
       growth.append(el('span','',row.growth?.status === 'confirmed' ? 'Dividendenwachstum · 10J' : 'Dividendenwachstum'),el('strong',row.growth?.status === 'confirmed' || row.growth?.status === 'no_dividend' ? '' : 'future-growth-estimate',futureGrowthText(row.growth))); growth.title = futureGrowthProvenance(row.growth); metrics.append(dividend,growth); card.append(metrics);
-      growth.firstChild.append(sectionInfoButton('Dividendenwachstum · '+stock.name,futureGrowthProvenance(row.growth)+(row.growth?.warning?' '+row.growth.warning:''))); dividend.firstChild.append(sectionInfoButton('Ausschüttungsrendite · '+stock.name,'Pauschale Netto-Rendite: Brutto-Rendite '+futurePercent(row.dividendYieldPct)+' × 73,625 %. Abzug 25 % Kapitalertragsteuer zuzüglich 5,5 % Solidaritätszuschlag auf die Steuer; ohne Kirchensteuer, Freibeträge, Quellensteueranrechnung oder Fonds-Teilfreistellung. '+dividend.title));
+      growth.firstChild.append(sectionInfoButton('Dividendenwachstum · '+stock.name,futureGrowthProvenance(row.growth)+(row.growth?.warning?' '+row.growth.warning:''))); dividend.firstChild.append(sectionInfoButton('Ausschüttungsrendite · '+stock.name,'Brutto-Ausschüttungsrendite: '+futurePercent(row.dividendYieldPct)+'. '+dividend.title));
       }
       const fields = el('div','future-card-fields future-allocation-fields'), sharesMode = settings.allocationMode === 'shares';
       const quantityLabel = el('label','',sharesMode ? 'Anzahl Shares' : 'Gewichtung'), quantityWrap = el('span','future-small-input'), quantity = el('input'); quantity.id='future-quantity-'+stock.ticker; quantity.type = 'number'; quantity.min = '0'; quantity.max = sharesMode ? '1000000000' : '100'; quantity.step = sharesMode ? 'any' : '0.1'; quantity.value = futureNumber(row.quantity) === null ? '' : String(Math.round(row.quantity * 1e8) / 1e8); quantity.setAttribute('aria-label',stock.name + (sharesMode ? ' Anzahl Shares' : ' Gewichtung in Prozent')); quantityWrap.append(quantity,el('span','',sharesMode ? 'Shares' : '%')); quantityLabel.append(quantityWrap);
       quantity.addEventListener('change',event => { const value = event.target.value.trim() === '' ? null : Number(event.target.value); (sharesMode ? settings.shares : settings.weights)[stock.ticker] = value; if (value > 0) delete settings.excluded[stock.ticker]; else if (value === 0) settings.excluded[stock.ticker] = true; saveFutureSettings(); renderFutureStudio(); });
-      const effective = el('div','future-allocation-value'); effective.append(el('span','',sharesMode ? 'Positionswert' : 'Effektive Gewichtung'), el('strong','',sharesMode ? futureMoney(row.valueEUR,false) : row.included && weightTotal > 0 && row.weight > 0 ? fmt(row.weight / weightTotal * 100,2) + '%' : '0%'));
-      fields.append(quantityLabel,effective); card.append(fields);
-      if (sharesMode) { const price = positive(stock.price), note = el('p','future-card-input-note', (price === null ? 'Kurs fehlt' : fmt(price,2) + ' ' + stock.currency + ' / Share') + (row.included && weightTotal > 0 && row.weight > 0 ? ' · Gewicht ' + fmt(row.weight / weightTotal * 100,2) + '%' : '')); note.title = provenance(stock,'price') + (row.fx && row.fx.as_of ? ' · EUR-Wechselkurs: ' + row.fx.as_of : ''); card.append(note); }
+      fields.append(quantityLabel); card.append(fields);
+      if (sharesMode) { const price = positive(stock.price); quantity.title = (price === null ? 'Kurs fehlt' : fmt(price,2) + ' ' + stock.currency + ' / Share') + ' · ' + provenance(stock,'price') + (row.fx && row.fx.as_of ? ' · EUR-Wechselkurs: ' + row.fx.as_of : ''); }
       if (row.problem && row.problemField !== 'quantity' && (row.included || row.quantity > 0)) card.append(el('p','future-card-warning',row.problem));
       if (!row.included) { const footer=el('div','future-card-removal'),remove=el('button','future-card-remove','Entfernen');remove.type='button';remove.setAttribute('aria-label',stock.name+' entfernen');remove.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();window.ProjectRemoval?.open(stock.ticker,remove);});footer.addEventListener('click',event=>event.stopPropagation());footer.append(remove);card.append(footer); }
       return card;
@@ -2301,18 +2325,19 @@ const PortfolioInput = (() => {
       if(extreme){const highGrowth=included.filter(row=>row.dividendGrowthPct>=20).sort((a,b)=>b.dividendGrowthPct-a.dividendGrowthPct).slice(0,4);extremeNote.textContent='Extremer Modellwert: Historische Steigerungsraten werden unverändert fortgeschrieben'+(highGrowth.length?', besonders '+highGrowth.map(row=>row.stock.name+' ('+futurePercent(row.dividendGrowthPct)+' p. a.)').join(', '):'')+'. Hohe Wachstums- oder Renditeannahmen verstärken sich langfristig und führen hier zu sehr großen Ergebnissen. Sondereffekte und die verwendeten Zeiträume stehen an den Quellen; keine Prognose.';}
       $('future-chart-subtitle').textContent=portfolio().name+' · '+(state.cluster==='Alle'?'alle Kategorien':state.cluster)+' · '+settings.years+' Jahre'+(futureUsesDividends()?' · '+(settings.reinvest?'Dividenden reinvestiert':'Dividenden ausgeschüttet'):'');
       const weightedGrowth=result&&!result.error?result.final.positions.reduce((sum,position)=>sum+position.weight*position.dividendGrowthPct,0):null;
-      $('future-initial-rates').textContent=result&&!result.error?'Renditebasis: '+futurePercent(result.weightedReturnPct)+' p. a.'+(futureUsesDividends()&&settings.reinvest?' · Ausschüttungsrendite netto zu Beginn: '+futurePercent(result.weightedYieldPct*(1-result.dividendTaxRate))+' · Dividendenwachstum: '+futurePercent(weightedGrowth)+' p. a.':''):'';
+      $('future-initial-rates').textContent=result&&!result.error?'Renditebasis: '+futurePercent(result.weightedReturnPct)+' p. a.'+(futureUsesDividends()&&settings.reinvest?' · Ausschüttungsrendite brutto zu Beginn: '+futurePercent(result.weightedYieldPct)+' · Dividendenwachstum: '+futurePercent(weightedGrowth)+' p. a.':''):'';
       const error=$('future-error');error.hidden=!result.error;error.classList.toggle('field-error',inputIssues.length>0);error.replaceChildren();if(result.error){error.append(el('strong','',result.error));if(!inputIssues.length&&problems.length){error.append(el('p','','Prüfe die Datenhinweise, wähle eine andere Renditebasis oder schließe die betroffenen Positionen aus.'));const list=el('ul');problems.forEach(row=>list.append(el('li','',row.stock.name+': '+row.problem)));error.append(list);}}
       $('future-chart-caption').textContent=result.error?'Das Szenario wird mit vollständigen Annahmen berechnet.':!futureUsesDividends()?'Wertentwicklung auf Basis der gewählten Gesamtrendite, vor Steuern.':settings.reinvest?'Reinvestierte Netto-Dividenden sind im Depotwert enthalten. Summe der Netto-Reinvestitionen: '+futureMoney(result.final.dividendsNetCumulative)+'.':'Depotwert + unverzinstes Cash = '+futureMoney(result.final.wealth)+' Gesamtvermögen. Ausgezahlte Netto-Dividenden gesamt: '+futureMoney(result.final.cash)+'.';
       futureChart(result,settings);futureDividendChart(result,settings);futureYearTable(result,settings);
       const cards=$('future-cards');cards.replaceChildren();const total=included.reduce((sum,row)=>sum+(futureNumber(row.weight)!==null&&row.weight>0?row.weight:0),0);for(const row of rows)cards.append(futureCard(row,settings,total));$('future-no-cards').hidden=!!rows.length;
       syncFutureInputErrors(inputIssues);
       $('future-selection-copy').textContent='Kachel anklicken: grau = ausgeschlossen. '+included.length+' von '+rows.length+' sichtbaren Positionen enthalten. '+(settings.allocationMode==='shares'?'Startwert und Gewichte folgen deinen Shares.':'Gewichte gelten für diese Auswahl.');
-      futureMethod(rows,settings);renderFutureCatalogSearch();
+      futureMethod(rows,settings);renderFutureCatalogSearch();renderReturns();
     }
 
         const overviewState={charts:[],request:0};
     function resetProjectView() {
+      for(const id of ['returns-head','returns-body'])$(id).replaceChildren();
       window.StockRequests?.reset();
       renderCards.resetExpansion?.();
       window.ProjectImport?.reset();
