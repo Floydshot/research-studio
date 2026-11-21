@@ -21,7 +21,7 @@ Updates use `If-Match` revisions; stale updates return HTTP 409 instead of overw
 
 The old GitHub Pages address redirects to the Cloudflare application. `legacy.html` retains the previous browser-local view and can export Tech/Value inputs as a JSON file. The import action in the unlocked Floyd Projects menu validates and previews that file, and saves it only after explicit confirmation. A24 is excluded from this migration.
 
-The Overview sums both independent monthly projections for a common selected horizon. It preserves each depot's capital, monthly purchases, saved exclusions, extra positions and reinvestment choice, without changing its individual saved horizon. Private Tech calculations include distributions so the combined Overview includes both depots; the individual Tech interface keeps its concise growth-only layout. The public Tech sandbox retains its prior growth-only calculation. Historical rates remain assumptions rather than predictions.
+The Overview sums both independent monthly projections for a common selected horizon. It preserves each depot's capital, monthly purchases, saved exclusions and extra positions without changing its individual saved horizon. Tech uses the selected total-return basis directly for growth in every workspace and has no separate dividend model. Overview dividends and the reinvestment control come exclusively from Value Stonks. Its charts follow the individual depot presentation: consolidated portfolio value and annual net distributions by the origin of Value's invested capital. Historical rates remain assumptions rather than predictions.
 
 ## Market updates
 
