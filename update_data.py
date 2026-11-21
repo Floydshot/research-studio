@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Refresh the dashboard, retaining the provenance of every fallback.
 
-Run ``python update_data.py`` for Yahoo Finance data, or add ``--seed`` for
-the exact supplied starting values without any network or third-party import.
+Run ``python update_data.py`` for one atomic Yahoo Finance/CNN/ECB snapshot,
+or add ``--seed`` for supplied starting values without network or dependencies.
+``refresh_batch`` identifies the full run; original field and source timestamps
+remain unchanged when a provider fails and confirmed previous values are kept.
 Historical multiples and buy_trigger strings below are user-supplied fixed
 references unless separate issuer evidence and calculation metadata are supplied.
 Stock tranches implement the requested forward-P/E thresholds, not the free-text
@@ -25,6 +27,7 @@ import multiprocessing as mp
 import os
 from pathlib import Path
 import re
+import ssl
 from statistics import median
 import sys
 import tempfile
@@ -5975,8 +5978,12 @@ def fetch_fear_and_greed(timeout: float = 10.0) -> dict[str, Any]:
     if not 0 < timeout <= 12:
         raise ValueError("CNN-Zeitlimit muss größer 0 und höchstens 12 Sekunden sein")
     request = Request(FEAR_GREED_ENDPOINT, headers={
-        "User-Agent": "ResearchStudio/1.0 (+https://floydshot.github.io/research-studio/)",
-        "Accept": "application/json",
+        # CNN's public chart endpoint rejects the previous custom user agent
+        # with HTTP 418. Use its normal browser JSON request headers.
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Origin": "https://edition.cnn.com",
+        "Referer": FEAR_GREED_SOURCE,
     })
     maximum = 2_000_000
     with urlopen(request, timeout=timeout) as response:
@@ -7015,7 +7022,16 @@ def refresh_ecb_fx(previous: Any, fetcher: Callable[[], dict[str, Any]] | None =
                 raise ValueError("Ungültige EZB-Kursantwort")
             supplied["status"] = "live"
             return supplied
-        with urlopen(Request(ECB_FX_SOURCE, headers={"User-Agent": "ResearchStudio/1.0"}), timeout=8) as response:
+        context = ssl.create_default_context()
+        try:
+            # Some local Python distributions omit the ECB issuer's CA from
+            # their system store. Add the Mozilla roots already distributed
+            # with yfinance's HTTPS dependencies; never disable verification.
+            import certifi
+            context.load_verify_locations(cafile=certifi.where())
+        except ImportError:
+            pass
+        with urlopen(Request(ECB_FX_SOURCE, headers={"User-Agent": "ResearchStudio/1.0"}), timeout=8, context=context) as response:
             body = response.read(100_001)
         if len(body) > 100_000:
             raise ValueError("EZB-Antwort zu groß")
@@ -7918,6 +7934,113 @@ def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[st
     return stock
 
 
+def _batch_instant(value: Any) -> datetime | None:
+    """Read a provenance timestamp without treating a missing timezone as fresh."""
+    if not isinstance(value, str):
+        return None
+    try:
+        instant = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return instant.astimezone(timezone.utc) if instant.tzinfo is not None else None
+    except (ValueError, TypeError, OverflowError):
+        return None
+
+
+def static_refresh_fields(stock: dict[str, Any], portfolio_id: str) -> list[str]:
+    """A validated, explicitly labelled annual ROE is not a daily TTM feed."""
+    if portfolio_id != "classic":
+        return []
+    ref, meta = stock.get("annual_roe_reference"), stock.get("field_metadata", {}).get("roe")
+    if not isinstance(ref, dict) or not isinstance(meta, dict) or ref.get("reference_version") != 1 or meta.get("reference_version") != 1:
+        return []
+    if ref.get("currency") != stock.get("currency") or meta.get("currency") != stock.get("currency") or meta.get("as_of") != ref.get("as_of"):
+        return []
+    inputs = ref.get("calculation_inputs") or {}
+    income, opening, closing, value, actual = [finite_number(item) for item in (
+        inputs.get("owner_net_income_eur_million"), inputs.get("owner_equity_open_eur_million"),
+        inputs.get("owner_equity_close_eur_million"), ref.get("value"), stock.get("roe"))]
+    if None in (income, opening, closing, value, actual) or opening + closing <= 0:
+        return []
+    if not math.isclose(value, income / ((opening + closing) / 2) * 100, rel_tol=0, abs_tol=0.000001) or not math.isclose(value, actual, rel_tol=0, abs_tol=0.000001):
+        return []
+    return ["roe"]
+
+
+def required_refresh_fields(stock: dict[str, Any], portfolio_id: str) -> list[str]:
+    """Dynamic inputs used by this security's shopping/outlook views."""
+    if stock.get("asset_type") == "etf":
+        fields = ["price", "sma200", "rsi14", "currency", "distribution_yield_ttm"]
+    else:
+        fields = ["current_pe", "forward_pe", "price", "sma200", "rsi14", "currency",
+                  *(["ps_ratio"] if portfolio_id == "tech" else ["div_yield", "roe"])]
+    static = static_refresh_fields(stock, portfolio_id)
+    return [*[field for field in fields if field not in static], "returns", "dividend_growth", *(["price_returns"] if portfolio_id == "universe" else [])]
+
+
+def finalize_refresh_batch(result: dict[str, Any], started_at: str,
+                           completed_at: str | None = None) -> None:
+    """Assess one published snapshot; never overwrite any source's timestamps.
+
+    A live value must have actually been retrieved during this run. Valid old
+    financial research/reference periods remain untouched and are not required
+    to change each day. Closed-market observations may be up to four days old.
+    """
+    completed_at = completed_at or iso_now()
+    started, completed = _batch_instant(started_at), _batch_instant(completed_at)
+    if started is None or completed is None or completed < started:
+        raise ValueError("Ungültiger Zeitraum des gemeinsamen Datenabrufs")
+
+    def retrieved_in_batch(value: Any) -> bool:
+        instant = _batch_instant(value)
+        return instant is not None and started <= instant <= completed
+
+    counts: Counter[str] = Counter()
+    groups = [*result.get("portfolios", []), dict(id="universe", stocks=result.get("security_universe", {}).get("stocks", []))]
+    for group in groups:
+        for stock in group.get("stocks", []):
+            required = required_refresh_fields(stock, group["id"])
+            missing, any_fresh = [], False
+            for field in required:
+                if field in {"returns", "dividend_growth", "price_returns"}:
+                    item = stock.get(field) or {}
+                    fresh = item.get("source_status") == "live" and retrieved_in_batch(item.get("retrieved_at"))
+                else:
+                    value = stock.get(field)
+                    valid = isinstance(value, str) and bool(value.strip()) if field == "currency" else finite_number(value) is not None
+                    fresh = valid and stock.get("field_sources", {}).get(field) == "live" and retrieved_in_batch(stock.get("field_updated_at", {}).get(field))
+                any_fresh = any_fresh or fresh
+                if not fresh:
+                    missing.append(field)
+            quote_at = _batch_instant(stock.get("as_of"))
+            if quote_at is None or not -300 <= (completed - quote_at).total_seconds() <= FEAR_GREED_MAX_AGE:
+                missing.append("quote_as_of")
+            status = "live" if not missing else "partial" if any_fresh else "stale" if stock.get("source_status") != "initial" else "initial"
+            stock["refresh"] = dict(version=1, batch_id=started_at, status=status,
+                                    required_fields=required, missing_fields=missing,
+                                    static_fields=static_refresh_fields(stock, group["id"]))
+            counts[status] += 1
+
+    cnn, fx = result.get("fear_and_greed") or {}, result.get("fx_rates") or {}
+    cnn_status = cnn.get("source_status", "unavailable")
+    if cnn_status == "live" and not retrieved_in_batch(cnn.get("retrieved_at")):
+        cnn_status = "previous"
+    if cnn_status == "live" and any(fear_greed_score((cnn.get("comparisons") or {}).get(key, {}).get("score")) is None for key in FEAR_GREED_COMPARISONS):
+        cnn_status = "partial"
+    fx_status = fx.get("status", "unavailable")
+    if fx_status == "live" and not retrieved_in_batch(fx.get("updated_at")):
+        fx_status = "previous"
+    total = sum(counts.values())
+    yahoo_status = "live" if total and counts["live"] == total else "partial" if counts["live"] or counts["partial"] else "unavailable"
+    statuses = [yahoo_status, cnn_status, fx_status]
+    result["refresh_batch"] = dict(
+        version=1, id=started_at, started_at=started_at, completed_at=completed_at,
+        status="live" if all(status == "live" for status in statuses) else "partial" if any(status in {"live", "partial"} for status in statuses) else "stale",
+        stock_counts=dict(counts),
+        providers=dict(
+            yahoo=dict(status=yahoo_status, stock_count=total, complete_stock_count=counts["live"]),
+            cnn=dict(status=cnn_status, as_of=cnn.get("as_of"), retrieved_at=cnn.get("retrieved_at")),
+            ecb=dict(status=fx_status, as_of=fx.get("as_of"), retrieved_at=fx.get("updated_at"))))
+
+
 def build_live_data(previous: dict[str, Any] | None = None,
                     fetcher: Callable[[str], dict[str, Any]] = fetch_ticker,
                     now: datetime | None = None,
@@ -7982,6 +8105,7 @@ def build_live_data(previous: dict[str, Any] | None = None,
         universe['updated_at'] = prior_universe.get('updated_at', universe['updated_at'])
     result["fear_and_greed"] = refresh_fear_and_greed(previous.get("fear_and_greed"), fear_greed_fetcher)
     result["fx_rates"] = refresh_ecb_fx(previous.get("fx_rates"), fx_fetcher)
+    finalize_refresh_batch(result, result["last_attempted_at"])
     return result
 
 
@@ -8015,21 +8139,18 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--seed", action="store_true", help="Nur die vorgegebenen Startwerte schreiben; kein Netzwerk")
-    mode.add_argument("--sentiment-only", action="store_true", help="Nur CNN Fear & Greed in vorhandener data.json aktualisieren; Aktien unverändert lassen")
+    mode.add_argument("--sentiment-only", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--output", type=Path, default=Path(__file__).resolve().with_name("data.json"), help="Ziel-JSON; standardmäßig neben diesem Skript")
     parser.add_argument("--ticker-timeout", type=float, default=45.0, help="Gesamtzeitlimit pro Ticker in Sekunden (max. 45)")
     parser.add_argument("--attempts", type=int, default=2, choices=(1, 2, 3), help="Abrufversuche je Endpoint")
     args = parser.parse_args(argv)
     if not 0 < args.ticker_timeout <= 45:
         parser.error("--ticker-timeout muss größer 0 und höchstens 45 sein")
+    if args.sentiment_only:
+        parser.error("Separate CNN-Veröffentlichungen sind deaktiviert; bitte den gemeinsamen Vollabruf ohne --sentiment-only starten")
     try:
         if args.seed:
             result = build_seed_data()
-        elif args.sentiment_only:
-            result = load_previous(args.output)
-            if not result:
-                raise ValueError("--sentiment-only benötigt eine vorhandene Dashboard-data.json")
-            result["fear_and_greed"] = refresh_fear_and_greed(result.get("fear_and_greed"))
         else:
             # Fail early on missing dependencies, rather than failing per holding.
             import pandas  # noqa: F401
@@ -8042,9 +8163,6 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, ValueError, ImportError) as exc:
         print(f"Update fehlgeschlagen: {exc}", file=sys.stderr)
         return 1
-    if args.sentiment_only:
-        print(f"CNN Fear & Greed → {args.output} | Status: {result['fear_and_greed']['source_status']}")
-        return 0 if result["fear_and_greed"]["source_status"] == "live" else 1
     print(f"{EXPECTED_STOCK_COUNT} Werte → {args.output} | Modus: {result['data_mode']} | {result.get('status_counts', {'initial': EXPECTED_STOCK_COUNT})}")
     return 1 if result["data_mode"] == "stale" else 0
 
