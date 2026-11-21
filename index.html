@@ -274,9 +274,8 @@
   </style>
 
   <style>
-    /* One centered Outlook control group and a soft blue value palette. */
-    body[data-studio="future"] #future-panel,body[data-studio="future"] #summary{--teal:#a5c5f0;--outlook-value-blue:#a5c5f0;--outlook-copy-blue:#a5c5f0}
-    html[data-theme="light"] body[data-studio="future"] #future-panel,html[data-theme="light"] body[data-studio="future"] #summary{--teal:#8eafe0;--outlook-value-blue:#6689b8;--outlook-copy-blue:#4e729e}
+    /* Share the saturated blue palette across portfolio projections. */
+    body[data-studio="future"] #future-panel,body[data-studio="future"] #summary,body[data-studio="future"] #overview-panel{--teal:var(--accent-blue);--outlook-value-blue:var(--accent-blue);--outlook-copy-blue:var(--accent-copy-blue)}
     body[data-studio="future"] #summary .teal{color:var(--outlook-value-blue)}
     .future-rate-pill{color:var(--outlook-copy-blue,var(--teal))}
     .future-settings{width:682px;max-width:100%;margin:22px auto 25px;padding:0}
@@ -402,6 +401,20 @@
 
 </style>
 <style>.project-menu #project-import-legacy{border-top:1px solid var(--line);border-radius:0;margin-top:5px;padding-top:10px;color:var(--muted)}</style>
+  <style>
+    :root{--accent-blue:#5895f1;--accent-copy-blue:#6eadff;--teal:var(--accent-copy-blue);--sky:var(--accent-copy-blue);--chart-current:var(--accent-blue);--chart-forward:#326fa8;--dividend-initial-blue:var(--accent-blue);--dividend-contribution-blue:#326fa8;--dividend-reinvestment-blue:#244f83;--fresh-green:#43d5b3}
+    html[data-theme="light"]{--accent-copy-blue:#326fa8;--teal:var(--accent-copy-blue);--sky:var(--accent-copy-blue);--chart-current:var(--accent-blue);--chart-forward:#326fa8;--fresh-green:#087f6b}
+    .heading-line h1{flex:0 0 8ch;min-width:0}
+    .tabs{border-bottom:0}
+    .tab[aria-selected=true]::after{background:var(--accent-blue)}
+    .tab[aria-selected=true] .tab-number,html[data-theme="light"] .tab[aria-selected=true] .tab-number{background:color-mix(in srgb,var(--accent-blue) 12%,transparent);color:var(--accent-copy-blue)}
+    .source-status.live,.metric-source.fresh,.spread.discount,html[data-theme="light"] .source-status.live,html[data-theme="light"] .metric-source.fresh,html[data-theme="light"] .spread.discount{color:var(--accent-copy-blue)}
+    .tranche.emerald,html[data-theme="light"] .tranche.emerald{background:color-mix(in srgb,var(--accent-blue) 10%,transparent);border-color:color-mix(in srgb,var(--accent-blue) 35%,transparent);color:var(--accent-copy-blue)}
+    .status-dot.live{background:var(--fresh-green);box-shadow:0 0 0 4px color-mix(in srgb,var(--fresh-green) 7%,transparent)}
+    .future-year-details,.future-dividends-panel,.overview-dividends-panel{border-top:0}
+    .overview-chart-wrap{height:330px}
+    #future-year-title .section-info{display:none}
+  </style>
 </head>
 <body>
   <div class="shell">
@@ -519,9 +532,9 @@
   <div id="overview-summary" class="summary" aria-label="Beide Depots zusammen"></div>
   <div class="overview-inputs"><h2>Inputs</h2><fieldset class="future-horizon"><legend>Zeitraum</legend><div id="overview-years" class="future-year-buttons"><button type="button" data-years="5">5 J</button><button type="button" data-years="10">10 J</button><button type="button" data-years="15">15 J</button><button type="button" data-years="20">20 J</button><button type="button" data-years="30">30 J</button></div></fieldset></div>
   <div id="overview-depots" class="overview-depots"></div>
-  <section class="chart-panel overview-chart-panel" aria-labelledby="overview-chart-title"><div class="panel-top"><h2 id="overview-chart-title" class="overview-title">Entwicklung der Depots</h2><span id="overview-rate" class="future-rate-pill"></span></div><p id="overview-error" class="overview-error" role="status" hidden></p><div id="overview-chart-wrap" class="overview-chart-wrap"><div id="overview-chart-inner" class="overview-chart-inner"><canvas id="overview-chart" role="img" aria-label="Gesamter Depotwert sowie Tech Stonks und Value Stonks nach Jahren."></canvas></div></div><div id="overview-chart-fallback" class="future-chart-fallback" hidden></div>
-    <section id="overview-dividends-panel" class="overview-dividends-panel" aria-labelledby="overview-dividends-title"><h3 id="overview-dividends-title" class="overview-title">Dividenden pro Jahr (netto)</h3><div id="overview-dividends-wrap" class="overview-chart-wrap"><div id="overview-dividends-inner" class="overview-chart-inner"><canvas id="overview-dividends-chart" role="img" aria-label="Jährliche Netto-Ausschüttungen beider Depots, nach Depot aufgeteilt."></canvas></div></div><div id="overview-dividends-fallback" class="future-chart-fallback" hidden></div></section>
-    <section class="future-year-details" aria-labelledby="overview-year-title"><h3 id="overview-year-title" class="overview-title">Jahreswerte</h3><div class="future-year-scroll"><table class="future-year-table"><caption class="sr-only">Summe beider unabhängigen Depot-Szenarien; Ausschüttungen netto nach pauschal 26,375 Prozent Steuer ohne Kirchensteuer.</caption><thead><tr><th scope="col">Jahr</th><th scope="col">Depotwert</th><th scope="col">Einzahlung</th><th scope="col">Dividenden im Jahr (brutto)</th><th scope="col">Ausschüttung im Jahr (netto)</th></tr></thead><tbody id="overview-year-body"></tbody></table></div></section>
+  <section class="chart-panel overview-chart-panel" aria-labelledby="overview-chart-title"><div class="panel-top"><h2 id="overview-chart-title" class="overview-title">Entwicklung der Depots</h2><span id="overview-rate" class="future-rate-pill"></span></div><p id="overview-error" class="overview-error" role="status" hidden></p><div id="overview-chart-wrap" class="overview-chart-wrap"><div id="overview-chart-inner" class="overview-chart-inner"><canvas id="overview-chart" role="img" aria-label="Modellierter Gesamtwert von Tech Stonks und Value Stonks nach Jahren."></canvas></div></div><div id="overview-chart-fallback" class="future-chart-fallback" hidden></div>
+    <section id="overview-dividends-panel" class="overview-dividends-panel" aria-labelledby="overview-dividends-title"><h3 id="overview-dividends-title" class="overview-title">Dividenden pro Jahr (netto)</h3><div id="overview-dividends-wrap" class="overview-chart-wrap"><div id="overview-dividends-inner" class="overview-chart-inner"><canvas id="overview-dividends-chart" role="img" aria-label="Jährliche Netto-Dividenden aus Value Stonks, nach Startkapital, Einzahlungen und Wiederanlage aufgeteilt."></canvas></div></div><div id="overview-dividends-fallback" class="future-chart-fallback" hidden></div></section>
+    <section class="future-year-details" aria-labelledby="overview-year-title"><h3 id="overview-year-title" class="overview-title">Jahreswerte</h3><div class="future-year-scroll"><table class="future-year-table"><caption class="sr-only">Depotwert und Einzahlungen beider Depots; Dividenden ausschließlich aus Value Stonks, netto nach pauschal 26,375 Prozent Steuer ohne Kirchensteuer.</caption><thead><tr><th scope="col">Jahr</th><th scope="col">Depotwert</th><th scope="col">Einzahlung</th><th scope="col">Dividenden im Jahr (brutto)</th><th scope="col">Ausschüttung im Jahr (netto)</th></tr></thead><tbody id="overview-year-body"></tbody></table></div></section>
   </section>
 </section>
 
@@ -957,11 +970,11 @@
       const marketFresh = ['live','partial'].includes(current) && Number.isFinite(updated) && updated >= due.getTime() && updated <= now + 300000;
       const cnnFresh = validCnnSnapshot(sentiment) && sentiment.source_status === 'live' && cnnTime(sentiment.retrieved_at) >= due.getTime() && now - cnnTime(sentiment.as_of) <= 4 * 86400000;
       const fresh = marketFresh && cnnFresh && !state.refreshFailed;
-      $('status-text').textContent = state.refreshFailed ? 'Aktualisierung fehlgeschlagen' : fresh ? 'Aktualisiert' : !marketFresh ? current === 'initial' ? 'Noch keine aktuellen Daten' : 'Update ausstehend' : 'CNN-Update ausstehend';
+      $('status-text').textContent = state.refreshFailed ? 'Aktualisierung fehlgeschlagen' : fresh ? 'Updated' : !marketFresh ? current === 'initial' ? 'Noch keine aktuellen Daten' : 'Update ausstehend' : 'CNN-Update ausstehend';
       $('status-dot').className = 'status-dot' + (fresh ? ' live' : '');
       const details = [marketFresh ? 'Der planmäßige Marktdatenstand liegt vor.' : 'Der erwartete Marktdatenstand seit ' + dateText(due.toISOString()) + ' (Berlin) liegt noch nicht vor.', cnnFresh ? 'CNN-Abruf bestätigt.' : 'CNN-Abruf nicht aktuell bestätigt.', current === 'partial' ? 'Einzelne Kennzahlen verwenden weiterhin die am Wert gekennzeichneten Vorwerte.' : '', state.refreshFailed ? 'Der letzte Abruf ist fehlgeschlagen; vorhandene Daten bleiben sichtbar.' : ''].filter(Boolean).join(' ');
       $('status-text').title = details;
-      $('timestamp').textContent = 'Letztes Update: ' + (Number.isFinite(updated) && dateText(state.data.updated_at) ? dateText(state.data.updated_at) + ' (Berlin)' : state.data.last_updated || 'Zeitpunkt unbekannt');
+      $('timestamp').textContent = Number.isFinite(updated) && dateText(state.data.updated_at) ? dateText(state.data.updated_at) : state.data.last_updated || 'Zeitpunkt unbekannt';
       $('timestamp').title = ['Marktdaten: ' + (dateText(state.data.updated_at) || 'unbekannt'), validCnnSnapshot(sentiment) ? 'CNN-Stand: ' + dateText(sentiment.as_of) + ' · Abruf: ' + dateText(sentiment.retrieved_at) : 'CNN derzeit nicht bestätigt'].join(' · ');
       const notice = $('data-notice'); notice.replaceChildren();
       if (current === 'live' || current === 'partial') { notice.hidden = true; return; }
@@ -1250,7 +1263,7 @@
     function syncStudioView() {
       const future = state.view === 'future';
       $('studio-title').textContent = future ? 'outlook' : 'shopping';
-      $('studio-subtitle').textContent = future ? 'a look in the glass bowl' : 'buy, hold & butter';
+      $('studio-subtitle').textContent = future ? 'magic glass bowl' : 'buy, hold & butter';
       $('studio-toggle').setAttribute('aria-pressed', String(future));
       const action = future ? 'Zu shopping wechseln' : 'Zu outlook wechseln';
       $('studio-toggle').setAttribute('aria-label', action); $('studio-toggle').title = action;
@@ -1806,7 +1819,7 @@ const PortfolioInput = (() => {
     const futureAxisMoney = value => futureNumber(value) === null ? '—' : new Intl.NumberFormat('de-DE',{notation:Math.abs(value)>=1e12?'scientific':'compact',maximumFractionDigits:1}).format(value)+' €';
     const futurePercent = value => futureNumber(value) === null ? '—' : fmt(value, 2) + '%';
     function futureUsesDividends() { return state.portfolio !== 'tech'; }
-    function futureModelsDividends(id=state.portfolio) { return id !== 'tech' || !!(window.ProjectWorkspaces?.private && window.ProjectWorkspaces.unlocked); }
+    function futureModelsDividends(id=state.portfolio) { return id !== 'tech'; }
     function futureValidInput(value, min, max) { return futureNumber(value) !== null && value >= min && value <= max; }
     function futureInputIssues(settings, initial, rows) {
       const issues=[];
@@ -2125,7 +2138,7 @@ const PortfolioInput = (() => {
       const section=$('future-dividends-panel'),wrap=$('future-dividends-wrap'),fallback=$('future-dividends-fallback');
       section.hidden=!futureUsesDividends()||!result||!!result.error;fallback.replaceChildren();if(section.hidden)return;
       const geometry=futureChartGeometry(settings),years=result.series.filter(row=>row.month>0&&row.month%12===0);
-      const components=[['Aus Startkapital','annualDividendInitialNet','--teal'],['Aus Einzahlungen','annualDividendContributionsNet','--sky'],['Aus Wiederanlage','annualDividendReinvestedNet','--amber']];
+      const components=[['Aus Startkapital','annualDividendInitialNet','--dividend-initial-blue'],['Aus Einzahlungen','annualDividendContributionsNet','--dividend-contribution-blue'],['Aus Wiederanlage','annualDividendReinvestedNet','--dividend-reinvestment-blue']];
       if(!years.every(row=>components.every(([,key])=>futureNumber(row[key])!==null))){wrap.hidden=true;fallback.hidden=false;fallback.append(el('p','','Die Aufteilung der Jahresdividenden ist noch nicht verfügbar.'));return;}
       const fields=components.filter(([,key])=>years.some(row=>row[key]>1e-8)),style=getComputedStyle($('future-panel')),color=key=>style.getPropertyValue(key).trim();
       const heading=row=>'Jahr '+row.year+'    '+futureMoney(row.last12MonthsDividendsNet,false);
@@ -2133,7 +2146,7 @@ const PortfolioInput = (() => {
         try{
           wrap.hidden=false;fallback.hidden=true;
           futureStudio.dividendChart=new Chart($('future-dividends-chart'),{
-            type:'bar',data:{datasets:fields.map(([label,key,shade])=>({label,data:years.map(row=>({x:row.year,y:row[key]})),backgroundColor:color(shade),borderWidth:0,borderRadius:2,maxBarThickness:34,categoryPercentage:.75,barPercentage:.9}))},
+            type:'bar',data:{datasets:fields.map(([label,key,shade])=>({label,data:years.map(row=>({x:row.year,y:row[key]})),backgroundColor:color(shade),hoverBackgroundColor:color(shade),borderWidth:0,borderRadius:2,maxBarThickness:34,categoryPercentage:.75,barPercentage:.9}))},
             options:{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},layout:{autoPadding:false,padding:{top:5,left:0,right:geometry.right,bottom:0}},
               plugins:{legend:{display:false},tooltip:{backgroundColor:color('--surface'),titleColor:color('--text'),bodyColor:color('--text'),borderColor:color('--line'),borderWidth:1,padding:10,titleFont:{weight:'bold',size:12},filter:context=>context.parsed.y>1e-8,callbacks:{title:items=>items.length?heading(years[items[0].dataIndex]):'',label:context=>context.dataset.label+': '+futureMoney(context.parsed.y,false)}}},
               scales:{x:futureYearScale(settings,color,true),y:{stacked:true,beginAtZero:true,afterFit:scale=>{scale.width=geometry.left;},border:{display:false},grid:{color:color('--line-soft')},ticks:{color:color('--muted'),font:{size:9},maxTicksLimit:5,callback:value=>futureAxisMoney(value)}}}}
@@ -2248,30 +2261,53 @@ const PortfolioInput = (() => {
       const root=$('overview-depots');root.replaceChildren();
       for(const entry of entries){const card=el('section','overview-depot'),head=el('div','overview-depot-heading'),edit=el('button','','Anpassen');edit.type='button';edit.addEventListener('click',()=>changePortfolio(entry.id));head.append(el('h3','',entry.name),edit);card.append(head);
         const details=el('dl'),good=!entry.result.error;for(const [label,value]of [['Startkapital',good?futureMoney(entry.result.initial):'—'],['Monatliche Einzahlung',futureMoney(entry.settings.monthly)],['Renditebasis',good?futurePercent(entry.result.weightedReturnPct)+' p. a.':'—']]){const item=el('div');item.append(el('dt','',label),el('dd','',value));details.append(item);}card.append(details);
-        const label=el('label','future-check future-reinvest-label'),toggle=el('input','future-reinvest-switch');toggle.type='checkbox';toggle.setAttribute('role','switch');toggle.setAttribute('aria-label',entry.name+' Dividenden reinvestieren');toggle.checked=entry.settings.reinvest;toggle.addEventListener('change',()=>{futureSettings(entry.id).reinvest=toggle.checked;saveFutureSettings();renderOverview();});label.append(toggle,document.createTextNode('Dividenden reinvestieren'));card.append(label);
+        if(entry.id==='value'){const label=el('label','future-check future-reinvest-label'),toggle=el('input','future-reinvest-switch');toggle.type='checkbox';toggle.setAttribute('role','switch');toggle.setAttribute('aria-label',entry.name+' Dividenden reinvestieren');toggle.checked=entry.settings.reinvest;toggle.addEventListener('change',()=>{futureSettings(entry.id).reinvest=toggle.checked;saveFutureSettings();renderOverview();});label.append(toggle,document.createTextNode('Dividenden reinvestieren'));card.append(label);}
         if(entry.result.error)card.append(el('p','overview-error',entry.result.error));root.append(card);
       }
     }
     function overviewCharts(result,years) {
       for(const chart of overviewState.charts)chart.destroy();overviewState.charts=[];
-      const ids=['overview-chart-wrap','overview-dividends-panel'];for(const id of ids)$(id).hidden=!!result.error;
+      for(const id of ['overview-chart-wrap','overview-dividends-panel'])$(id).hidden=!!result.error;
       for(const id of ['overview-chart-fallback','overview-dividends-fallback']){$(id).hidden=true;$(id).replaceChildren();}
       if(result.error)return;
-      const settings={years},annual=result.series.filter(row=>row.month%12===0),dividends=annual.slice(1),style=getComputedStyle($('future-panel')),color=key=>style.getPropertyValue(key).trim();
-      const colors=[color('--outlook-value-blue')||'#8eafe0',color('--sky')||'#6bbcf7',color('--amber')||'#e4b566'];
-      const keys=[{name:'Gesamt',data:annual.map(row=>({x:row.year,y:row.portfolio}))},...result.parts.map((part,index)=>({name:part.name,data:annual.map(row=>({x:row.year,y:row.parts[index].portfolio}))}))];
+      const settings={years},annual=result.series.filter(row=>row.month%12===0),valueResult=result.parts.find(part=>part.id==='value').result;
+      const dividends=valueResult.series.filter(row=>row.month>0&&row.month%12===0),style=getComputedStyle($('future-panel')),color=key=>style.getPropertyValue(key).trim(),shadeColor=key=>color(key)||color('--teal');
+      const sets=[{label:'Depotwert',key:'portfolio',color:color('--teal'),width:2.5}];
+      if(valueResult.reinvest&&result.monthly>0)sets.push({label:'Einzahlungen',key:'contributions',color:color('--muted'),width:1.5,dash:[5,4]});
+      const components=[['Aus Startkapital','annualDividendInitialNet','--dividend-initial-blue'],['Aus Einzahlungen','annualDividendContributionsNet','--dividend-contribution-blue'],['Aus Wiederanlage','annualDividendReinvestedNet','--dividend-reinvestment-blue']];
+      const fields=components.filter(([,key])=>dividends.some(row=>row[key]>1e-8)),heading=row=>'Jahr '+row.year+'    '+futureMoney(row.last12MonthsDividendsNet,false);
       for(const id of ['overview-chart-inner','overview-dividends-inner'])$(id).style.minWidth=(110+years*24)+'px';
-      const common=(bars)=>({responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},layout:{autoPadding:false,padding:{top:5,left:0,right:16,bottom:0}},scales:{x:futureYearScale(settings,color,bars),y:{stacked:bars,beginAtZero:true,afterFit:scale=>{scale.width=80;},border:{display:false},grid:{color:color('--line-soft')},ticks:{color:color('--muted'),font:{size:10},maxTicksLimit:6,callback:value=>futureAxisMoney(value)}}}});
+      const common=bars=>({responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},layout:{autoPadding:false,padding:{top:5,left:0,right:16,bottom:0}},scales:{x:futureYearScale(settings,color,bars),y:{stacked:bars,beginAtZero:true,afterFit:scale=>{scale.width=80;},border:{display:false},grid:{color:color('--line-soft')},ticks:{color:color('--muted'),font:{size:bars?9:10},maxTicksLimit:bars?5:6,callback:value=>futureAxisMoney(value)}}}});
       if(window.Chart){try{
-        overviewState.charts.push(new Chart($('overview-chart'),{type:'line',data:{datasets:keys.map((set,index)=>({label:set.name,data:set.data,borderColor:colors[index],backgroundColor:colors[index],borderWidth:index===0?2.5:1.5,pointRadius:0,pointHitRadius:8,tension:.15,fill:false}))},options:{...common(false),plugins:{legend:{display:true,position:'bottom',labels:{color:color('--muted'),boxWidth:13,boxHeight:2,font:{size:10}}},tooltip:{backgroundColor:color('--surface'),titleColor:color('--text'),bodyColor:color('--text'),callbacks:{title:items=>items.length?(items[0].parsed.x===0?'Start':'Jahr '+items[0].parsed.x):'',label:context=>context.dataset.label+': '+futureMoney(context.parsed.y,false)}}}}}));
-        overviewState.charts.push(new Chart($('overview-dividends-chart'),{type:'bar',data:{datasets:result.parts.map((part,index)=>({label:part.name,data:dividends.map(row=>({x:row.year,y:row.parts[index].last12MonthsDividendsNet})),backgroundColor:colors[index+1],borderWidth:0,borderRadius:2,maxBarThickness:34,categoryPercentage:.75,barPercentage:.9}))},options:{...common(true),plugins:{legend:{display:false},tooltip:{backgroundColor:color('--surface'),titleColor:color('--text'),bodyColor:color('--text'),titleFont:{weight:'bold'},filter:context=>context.parsed.y>1e-8,callbacks:{title:items=>items.length?'Jahr '+items[0].parsed.x+'    '+futureMoney(dividends[items[0].dataIndex].last12MonthsDividendsNet,false):'',label:context=>context.dataset.label+': '+futureMoney(context.parsed.y,false)}}}}}));return;
+        $('overview-dividends-wrap').hidden=false;
+        overviewState.charts.push(new Chart($('overview-chart'),{
+          type:'line',data:{datasets:sets.map(set=>({label:set.label,data:annual.map(row=>({x:row.year,y:row[set.key]})),borderColor:set.color,backgroundColor:set.color,borderWidth:set.width,borderDash:set.dash||[],pointRadius:0,pointHitRadius:8,tension:.15,fill:false}))},
+          options:{...common(false),plugins:{legend:{display:sets.length>1,position:'bottom',align:'start',labels:{color:color('--muted'),boxWidth:13,boxHeight:2,padding:17,font:{size:10}}},tooltip:{backgroundColor:color('--surface'),titleColor:color('--text'),bodyColor:color('--text'),borderColor:color('--line'),borderWidth:1,padding:11,titleFont:{size:11,weight:'bold'},bodyFont:{size:10},callbacks:{title:items=>items.length?(items[0].parsed.x===0?'Start':'Jahr '+items[0].parsed.x):'',label:context=>context.dataset.label+': '+futureMoney(context.parsed.y,false)}}}}
+        }));
+        overviewState.charts.push(new Chart($('overview-dividends-chart'),{
+          type:'bar',data:{datasets:fields.map(([label,key,shade])=>({label,data:dividends.map(row=>({x:row.year,y:row[key]})),backgroundColor:shadeColor(shade),hoverBackgroundColor:shadeColor(shade),borderWidth:0,borderRadius:2,maxBarThickness:34,categoryPercentage:.75,barPercentage:.9}))},
+          options:{...common(true),plugins:{legend:{display:false},tooltip:{backgroundColor:color('--surface'),titleColor:color('--text'),bodyColor:color('--text'),borderColor:color('--line'),borderWidth:1,padding:10,titleFont:{weight:'bold',size:12},filter:context=>context.parsed.y>1e-8,callbacks:{title:items=>items.length?heading(dividends[items[0].dataIndex]):'',label:context=>context.dataset.label+': '+futureMoney(context.parsed.y,false)}}}}
+        }));return;
       }catch(_){for(const chart of overviewState.charts)chart.destroy();overviewState.charts=[];}}
       $('overview-chart-wrap').hidden=true;$('overview-dividends-wrap').hidden=true;
-      const ns='http://www.w3.org/2000/svg',maxLine=Math.max(1,...annual.map(row=>row.portfolio)),maxBar=Math.max(1,...dividends.map(row=>row.last12MonthsDividendsNet));
-      for(const [id,max,isBars]of [['overview-chart-fallback',maxLine,false],['overview-dividends-fallback',maxBar,true]]){const fallback=$(id);fallback.hidden=false;const{svg,x}=futureAlignedSvg(fallback,settings,isBars?'Netto-Ausschüttungen beider Depots':'Entwicklung beider Depots');const axis=document.createElementNS(ns,'path');axis.setAttribute('d','M 80 15 V 280 H 744');axis.setAttribute('class','future-svg-axis');axis.setAttribute('fill','none');svg.append(axis);
-        for(let step=0;step<=4;step++){const text=document.createElementNS(ns,'text');text.setAttribute('x','72');text.setAttribute('y',String(284-step*65));text.setAttribute('text-anchor','end');text.setAttribute('class','future-svg-text');text.textContent=futureAxisMoney(max*step/4);svg.append(text);}for(let year=0;year<=years;year++){const text=document.createElementNS(ns,'text');text.setAttribute('x',String(x(year)));text.setAttribute('y','305');text.setAttribute('text-anchor','middle');text.setAttribute('class','future-svg-text');text.textContent=String(year);svg.append(text);}
-        if(isBars){for(const row of dividends){const group=document.createElementNS(ns,'g'),title=document.createElementNS(ns,'title');title.textContent='Jahr '+row.year+' · '+futureMoney(row.last12MonthsDividendsNet,false);group.append(title);group.setAttribute('tabindex','0');let bottom=280;for(let i=0;i<row.parts.length;i++){const h=row.parts[i].last12MonthsDividendsNet/max*260,rect=document.createElementNS(ns,'rect');rect.setAttribute('x',String(x(row.year)-Math.min(17,200/years)));rect.setAttribute('y',String(bottom-h));rect.setAttribute('width',String(Math.min(34,400/years)));rect.setAttribute('height',String(h));rect.setAttribute('fill',colors[i+1]);group.append(rect);bottom-=h;}svg.append(group);}}
-        else{keys.forEach((set,index)=>{const line=document.createElementNS(ns,'polyline');line.setAttribute('points',set.data.map(row=>x(row.x)+','+(280-row.y/max*260)).join(' '));line.setAttribute('stroke',colors[index]);line.setAttribute('stroke-width',index===0?'2.5':'1.5');line.setAttribute('fill','none');const title=document.createElementNS(ns,'title');title.textContent=set.name;line.append(title);svg.append(line);});}fallback.append(svg);
+      const ns='http://www.w3.org/2000/svg',maxLine=Math.max(1,...annual.flatMap(row=>sets.map(set=>row[set.key]))),maxBar=Math.max(1,...dividends.map(row=>row.last12MonthsDividendsNet));
+      for(const [id,max,isBars]of [['overview-chart-fallback',maxLine,false],['overview-dividends-fallback',maxBar,true]]){
+        const fallback=$(id);fallback.hidden=false;const{svg,x}=futureAlignedSvg(fallback,settings,isBars?'Netto-Dividenden aus Value Stonks pro Jahr':'Depotentwicklung nach Jahren',isBars?260:320);
+        const axis=document.createElementNS(ns,'path');axis.setAttribute('d','M 80 15 V 280 H 744');axis.setAttribute('class','future-svg-axis');axis.setAttribute('fill','none');svg.append(axis);
+        for(let step=0;step<=4;step++){const text=document.createElementNS(ns,'text');text.setAttribute('x','72');text.setAttribute('y',String(284-step*65));text.setAttribute('text-anchor','end');text.setAttribute('class','future-svg-text');text.textContent=futureAxisMoney(max*step/4);svg.append(text);}
+        for(let year=0;year<=years;year++){const tick=document.createElementNS(ns,'path');tick.setAttribute('d','M '+x(year)+' 280 v 4');tick.setAttribute('class','future-svg-axis');svg.append(tick);const text=document.createElementNS(ns,'text');text.setAttribute('x',String(x(year)));text.setAttribute('y','305');text.setAttribute('text-anchor','middle');text.setAttribute('class','future-svg-text');text.textContent=String(year);svg.append(text);}
+        if(isBars){
+          const step=664/(years+.5),width=Math.min(34,step*.675);
+          for(const row of dividends){const group=document.createElementNS(ns,'g'),caption=heading(row)+' · '+fields.filter(([,key])=>row[key]>1e-8).map(([label,key])=>label+': '+futureMoney(row[key],false)).join(' · '),title=document.createElementNS(ns,'title');group.setAttribute('tabindex','0');group.setAttribute('aria-label',caption);group.dataset.year=String(row.year);title.textContent=caption;group.append(title);let height=0;
+            for(const[,key,shade]of fields){const h=row[key]/max*250;if(h<=0)continue;const rect=document.createElementNS(ns,'rect');rect.setAttribute('x',String(x(row.year)-width/2));rect.setAttribute('y',String(280-height-h));rect.setAttribute('width',String(width));rect.setAttribute('height',String(h));rect.setAttribute('fill',shadeColor(shade));group.append(rect);height+=h;}
+            svg.append(group);
+          }
+        }else{
+          for(const set of sets){const line=document.createElementNS(ns,'polyline');line.setAttribute('points',annual.map(row=>x(row.year).toFixed(2)+','+(280-row[set.key]/max*260).toFixed(2)).join(' '));line.setAttribute('stroke',set.color);line.setAttribute('stroke-width',String(set.width));line.setAttribute('fill','none');if(set.dash)line.setAttribute('stroke-dasharray',set.dash.join(' '));svg.append(line);}
+          for(const row of annual){const point=document.createElementNS(ns,'circle'),caption=(row.year===0?'Start':'Jahr '+row.year)+' · '+sets.map(set=>set.label+': '+futureMoney(row[set.key],false)).join(' · '),title=document.createElementNS(ns,'title');point.setAttribute('cx',String(x(row.year)));point.setAttribute('cy',String(280-row.portfolio/max*260));point.setAttribute('r','7');point.setAttribute('fill','transparent');point.setAttribute('tabindex','0');point.setAttribute('aria-label',caption);title.textContent=caption;point.append(title);svg.append(point);}
+        }
+        fallback.append(svg);
+        if(!isBars&&sets.length>1){const legend=el('ul','legend');for(const set of sets){const item=el('li'),swatch=el('span','legend-swatch');swatch.style.backgroundColor=set.color;item.append(swatch,document.createTextNode(set.label));legend.append(item);}fallback.append(legend);}
       }
     }
     function renderOverview() {
