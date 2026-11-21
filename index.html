@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark light">
+  <meta name="stock-requests-enabled" content="true">
   <meta name="theme-color" content="#0b1119">
   <meta name="description" content="floyd projects — shopping. Aktienportfolios mit Bewertungen, Renditen und Zukunftsszenarien.">
   <title>floyd projects · shopping</title>
@@ -542,7 +543,7 @@
     <div id="future-chart-fallback" class="future-chart-fallback" hidden></div>
     <section id="future-dividends-panel" class="future-dividends-panel" aria-labelledby="future-dividends-title"><h3 id="future-dividends-title" class="title-with-info">Dividenden pro Jahr (netto)</h3><p id="future-dividends-copy" hidden></p><div id="future-dividends-wrap" class="future-dividends-wrap" role="region" aria-label="Jahresdividenden, horizontal scrollbar" tabindex="0"><div id="future-dividends-inner" class="future-dividends-inner"><canvas id="future-dividends-chart" role="img" aria-label="Jährliche Netto-Dividenden aus Startkapital, Einzahlungen und Wiederanlage nach pauschaler Ausschüttungssteuer. Brutto und Netto stehen in der Jahrestabelle darunter."></canvas></div></div><div id="future-dividends-fallback" class="future-chart-fallback" hidden></div></section>
     <div class="future-chart-caption" hidden><span id="future-chart-caption"></span><span>Nominal · Ausschüttungen nach pauschaler Steuer · ohne Gebühren</span></div>
-    <section class="future-year-details" aria-labelledby="future-year-title"><h3 id="future-year-title" class="title-with-info">Jahreswerte <button type="button" class="section-info" data-info-title="Jahreswerte" data-info-sources="future-year-note" aria-label="Informationen zu Jahreswerte" title="Informationen zu Jahreswerte"><span aria-hidden="true">i</span></button></h3><p id="future-year-note" hidden></p><div class="future-year-scroll"><table class="future-year-table" aria-describedby="future-year-note"><caption class="sr-only">Depotwert und jährliche Brutto- und Netto-Ausschüttungen ab Jahr 1</caption><thead><tr><th scope="col">Jahr</th><th scope="col">Depotwert</th><th scope="col">Dividenden im Jahr (brutto)</th><th scope="col">Ausschüttung im Jahr (netto)</th></tr></thead><tbody id="future-year-body"></tbody></table></div></section>
+    <section class="future-year-details" aria-labelledby="future-year-title"><h3 id="future-year-title" class="title-with-info">Jahreswerte <button type="button" class="section-info" data-info-title="Jahreswerte" data-info-sources="future-year-note" aria-label="Informationen zu Jahreswerte" title="Informationen zu Jahreswerte"><span aria-hidden="true">i</span></button></h3><p id="future-year-note" hidden></p><div class="future-year-scroll"><table class="future-year-table" aria-describedby="future-year-note"><caption class="sr-only">Depotwert und jährliche Brutto- und Netto-Ausschüttungen ab Jahr 1; monatlicher Netto-Durchschnitt als Jahres-Netto geteilt durch 12.</caption><thead><tr><th scope="col">Jahr</th><th scope="col">Depotwert</th><th scope="col">Dividenden im Jahr (brutto)</th><th scope="col">Ausschüttung im Jahr (netto)</th><th scope="col" title="Monatsdurchschnitt: Jahres-Netto geteilt durch 12, keine konkreten Zahlungstermine.">Ausschüttung im Monat (netto)</th></tr></thead><tbody id="future-year-body"></tbody></table></div></section>
   </section>
   <div class="future-positions-heading"><div><h2 class="title-with-info">Positionen im Szenario</h2><p id="future-selection-copy" hidden>Kachel anklicken, um eine Position aus- oder einzuschließen.</p></div></div>
   <div class="future-position-controls"><div id="future-cluster-slot"></div><div class="future-selection-actions"><button type="button" id="future-include-all">Alle einschließen</button><button type="button" id="future-equal-weights">Gleich gewichten</button><button type="button" id="future-input-open">Portfolio input</button></div></div>
@@ -572,7 +573,7 @@
   <div id="overview-depots" class="overview-depots"></div>
   <section class="chart-panel overview-chart-panel" aria-labelledby="overview-chart-title"><div class="panel-top"><h2 id="overview-chart-title" class="overview-title">Entwicklung der Depots</h2><span id="overview-rate" class="future-rate-pill"></span></div><p id="overview-error" class="overview-error" role="status" hidden></p><div id="overview-chart-wrap" class="overview-chart-wrap"><div id="overview-chart-inner" class="overview-chart-inner"><canvas id="overview-chart" role="img" aria-label="Modellierter Gesamtwert von Tech Stonks und Value Stonks nach Jahren."></canvas></div></div><div id="overview-chart-fallback" class="future-chart-fallback" hidden></div>
     <section id="overview-dividends-panel" class="overview-dividends-panel" aria-labelledby="overview-dividends-title"><h3 id="overview-dividends-title" class="overview-title">Dividenden pro Jahr (netto)</h3><div id="overview-dividends-wrap" class="overview-chart-wrap"><div id="overview-dividends-inner" class="overview-chart-inner"><canvas id="overview-dividends-chart" role="img" aria-label="Jährliche Netto-Dividenden aus Value Stonks, nach Startkapital, Einzahlungen und Wiederanlage aufgeteilt."></canvas></div></div><div id="overview-dividends-fallback" class="future-chart-fallback" hidden></div></section>
-    <section class="future-year-details" aria-labelledby="overview-year-title"><h3 id="overview-year-title" class="overview-title">Jahreswerte</h3><div class="future-year-scroll"><table class="future-year-table"><caption class="sr-only">Depotwert und Einzahlungen beider Depots; Dividenden ausschließlich aus Value Stonks, netto nach pauschal 26,375 Prozent Steuer ohne Kirchensteuer.</caption><thead><tr><th scope="col">Jahr</th><th scope="col">Depotwert</th><th scope="col">Einzahlung</th><th scope="col">Dividenden im Jahr (brutto)</th><th scope="col">Ausschüttung im Jahr (netto)</th></tr></thead><tbody id="overview-year-body"></tbody></table></div></section>
+    <section class="future-year-details" aria-labelledby="overview-year-title"><h3 id="overview-year-title" class="overview-title">Jahreswerte</h3><div class="future-year-scroll"><table class="future-year-table"><caption class="sr-only">Depotwert und Einzahlungen beider Depots; Dividenden ausschließlich aus Value Stonks, netto nach pauschal 26,375 Prozent Steuer ohne Kirchensteuer; monatlicher Netto-Durchschnitt als Jahres-Netto geteilt durch 12.</caption><thead><tr><th scope="col">Jahr</th><th scope="col">Depotwert</th><th scope="col">Einzahlung</th><th scope="col">Dividenden im Jahr (brutto)</th><th scope="col">Ausschüttung im Jahr (netto)</th><th scope="col" title="Monatsdurchschnitt: Jahres-Netto geteilt durch 12, keine konkreten Zahlungstermine.">Ausschüttung im Monat (netto)</th></tr></thead><tbody id="overview-year-body"></tbody></table></div></section>
   </section>
 </section>
 
@@ -580,7 +581,7 @@
       </div>
       <p id="announcer" class="sr-only" aria-live="polite"></p>
     </main>
-    <footer class="site-footer">©Floyd Vantures 2026</footer>
+    <footer class="site-footer">©Floyd Ventures 2026</footer>
   </div>
 <dialog id="project-import-dialog" class="project-import-dialog" aria-labelledby="project-import-title" aria-describedby="project-import-help">
   <h2 id="project-import-title">Depot-Eingaben übernehmen</h2>
@@ -1968,8 +1969,11 @@ const PortfolioInput = (() => {
           button.disabled=contained.has(stock.ticker);button.setAttribute('aria-label',stock.name+' ('+stock.ticker+') '+(button.disabled?'bereits im Szenario':'hinzufügen'));button.addEventListener('click',()=>addFutureCatalogStock(stock.ticker));item.append(button);list.append(item);
         }
       }else{
-        const item=el('li','future-catalog-request'),text=el('span','','Noch nicht im System.'),button=el('button','future-request-button','stonk request');
-        button.type='button';button.addEventListener('click',()=>window.StockRequests?.open(query,button));item.append(text,button);list.append(item);
+        const enabled=window.StockRequests?.enabled!==false;
+        const item=el('li','future-catalog-request'),text=el('span','','Noch nicht im System.'),button=el(enabled?'button':'a','future-request-button','stonk request');
+        if(enabled){button.type='button';button.addEventListener('click',()=>window.StockRequests?.open(query,button));}
+        else{const url=new URL('https://github.com/Floydshot/research-studio/issues/new');url.searchParams.set('title','Stonk request: '+query.slice(0,160));url.searchParams.set('body','Angefragte Position: '+query+'\n\nBitte Gesellschaft und Börsennotierung prüfen.');button.href=url.href;button.target='_blank';button.rel='noopener noreferrer';}
+        item.append(text,button);list.append(item);
       }
     }
     function initFutureCatalogSearch() {
@@ -2147,14 +2151,38 @@ const PortfolioInput = (() => {
         ticks:{color:color('--muted'),stepSize:1,autoSkip:false,minRotation:0,maxRotation:0,font:{size:9},callback:value=>String(value)}};
     }
     function futurePortfolioAxis(initial,values) {
-      const quantum=50000,start=Number.isFinite(initial)?initial:0,points=[start,...values.filter(Number.isFinite)];
-      const units=value=>{const scaled=value/quantum,nearest=Math.round(scaled);return Math.abs(scaled-nearest)<=Number.EPSILON*8*Math.max(1,Math.abs(scaled))?nearest:scaled;};
-      const floor=value=>Math.floor(units(value))*quantum,ceil=value=>Math.ceil(units(value))*quantum;
-      const min=Math.min(floor(start),floor(Math.min(...points))),ceiling=Math.max(min+quantum,ceil(Math.max(...points)));
-      const target=Math.max(1,(ceiling-min)/quantum/5),magnitude=Math.pow(10,Math.floor(Math.log10(target)));
-      const step=quantum*magnitude*([1,2,5,10].find(multiplier=>multiplier*magnitude>=target)||10),count=Math.max(1,Math.ceil((ceiling-min)/step-Number.EPSILON*8));
-      const max=min+count*step,ticks=Array.from({length:count+1},(_,index)=>min+index*step);
-      return {min,max,step,ticks,y:value=>280-(value-min)/(max-min)*260};
+      const start=Number.isFinite(initial)?initial:0;
+      let low=start,high=start;for(const value of Array.isArray(values)?values:[])if(Number.isFinite(value)){low=Math.min(low,value);high=Math.max(high,value);}
+      if(low===high){const room=Math.max(4,Math.abs(low)*.1);if(Number.isFinite(high+room)&&high+room>high)high+=room;else low-=room;}
+      const scale=Math.max(1,Math.abs(low),Math.abs(high)),span=high/scale-low/scale;
+      const target=Math.max(1,scale*Number.EPSILON*8,span/4*scale),power=Math.floor(Math.log10(target));
+      const snap=value=>{const nearest=Math.round(value);return Math.abs(value-nearest)<=Number.EPSILON*8*Math.max(1,Math.abs(value))?nearest:value;};
+      let best=null;
+      for(const exponent of [power-1,power,power+1])for(const multiplier of [1,2,2.5,5]){
+        const magnitude=Math.pow(10,exponent),step=multiplier*magnitude;
+        if(!Number.isFinite(step)||step<1||(step<10&&!Number.isInteger(step)))continue;
+        // Round the baseline more finely than the tick spacing, preserving
+        // starts such as 150,000 EUR even when ticks are 200,000 EUR apart.
+        const baselineMagnitude=Math.pow(10,Math.floor(Math.log10(Math.max(1,Math.abs(low))))-2);
+        const quantum=Math.max(1,Math.min(magnitude/10,baselineMagnitude));let baseUnits=Math.floor(snap(low/quantum)),min=baseUnits*quantum;
+        if(min>low){baseUnits--;min=baseUnits*quantum;}
+        if(!Number.isFinite(min))continue;
+        let count=Math.max(3,Math.ceil(snap(high/step-min/step))),max=min+count*step;
+        if(max<high){count++;max=min+count*step;}
+        if(count>5||!Number.isFinite(max)||max<=min||max<high)continue;
+        const ticks=Array.from({length:count+1},(_,index)=>index===count?max:min+index*step);
+        if(ticks.some((value,index)=>!Number.isFinite(value)||(index>0&&value<=ticks[index-1])))continue;
+        const padding=Math.max(0,((max/scale-min/scale)-span)/span),score=Math.abs(count-4)+(count===5?.15:0)+padding*.2;
+        if(!best||score<best.score)best={min:Object.is(min,-0)?0:min,max,step,ticks,score};
+      }
+      if(!best){
+        // At finite-number limits, a rounded endpoint can overflow. Keep the
+        // real bounds and interpolate without subtracting opposite extremes.
+        const ticks=Array.from({length:5},(_,index)=>low*(1-index/4)+high*(index/4));
+        best={min:low,max:high,step:span/4*scale,ticks};
+      }
+      const {min,max,step,ticks}=best,axisScale=Math.max(1,Math.abs(min),Math.abs(max)),bottom=min/axisScale,range=max/axisScale-bottom;
+      return {min,max,step,ticks,y:value=>280-(value/axisScale-bottom)/range*260};
     }
     function futurePortfolioAxisLabel(value) { return Math.abs(value)<1e12?new Intl.NumberFormat('de-DE',{maximumFractionDigits:0}).format(value)+' €':futureAxisMoney(value); }
     function futurePortfolioScale(axis,color,left=80) {
@@ -2234,12 +2262,12 @@ const PortfolioInput = (() => {
     }
     function futureYearTable(result, settings) {
       const body=$('future-year-body'),note=$('future-year-note'),table=body.closest('table'),dividends=futureUsesDividends();body.replaceChildren();
-      const header=el('tr');for(const title of dividends?['Jahr','Depotwert','Dividenden im Jahr (brutto)','Ausschüttung im Jahr (netto)']:['Jahr','Depotwert','Einzahlung','Rendite']){const th=el('th','',title);th.scope='col';header.append(th);}table.querySelector('thead').replaceChildren(header);
-      table.querySelector('caption').textContent=dividends?'Depotwert und jährliche Brutto- und Netto-Ausschüttungen ab Jahr 1':'Depotwert, Einzahlungen und Wertzuwachs im jeweiligen Jahr ab Jahr 1';
-      note.textContent=dividends?'Jahresbeträge: brutto und netto nach pauschal 26,375 % Steuer ohne Kirchensteuer.':'Einzahlung je Jahr ohne Startkapital; Rendite = Depotwert am Jahresende minus Vorjahreswert minus Einzahlungen, vor Steuern.';
+      const header=el('tr');for(const title of dividends?['Jahr','Depotwert','Dividenden im Jahr (brutto)','Ausschüttung im Jahr (netto)','Ausschüttung im Monat (netto)']:['Jahr','Depotwert','Einzahlung','Rendite']){const th=el('th','',title);th.scope='col';if(dividends&&title==='Ausschüttung im Monat (netto)')th.title='Monatsdurchschnitt: Jahres-Netto geteilt durch 12, keine konkreten Zahlungstermine.';header.append(th);}table.querySelector('thead').replaceChildren(header);
+      table.querySelector('caption').textContent=dividends?'Depotwert und jährliche Brutto- und Netto-Ausschüttungen ab Jahr 1; monatlicher Netto-Durchschnitt als Jahres-Netto geteilt durch 12.':'Depotwert, Einzahlungen und Wertzuwachs im jeweiligen Jahr ab Jahr 1';
+      note.textContent=dividends?'Brutto und netto nach pauschal 26,375 % Steuer ohne Kirchensteuer; Monatsdurchschnitt = Jahres-Netto ÷ 12, keine Zahlungstermine.':'Einzahlung je Jahr ohne Startkapital; Rendite = Depotwert am Jahresende minus Vorjahreswert minus Einzahlungen, vor Steuern.';
       if(!result||result.error)return;
       for(let year=1;year<=settings.years;year++){const row=result.series.find(item=>item.month===year*12),previous=result.series.find(item=>item.month===(year-1)*12);if(!row||!previous)continue;const paidIn=row.contributions-previous.contributions,annualGain=row.portfolio-previous.portfolio-paidIn;
-        const values=dividends?[futureMoney(row.portfolio),futureMoney(row.last12MonthsDividends,false),futureMoney(row.last12MonthsDividendsNet,false)]:[futureMoney(row.portfolio),futureMoney(paidIn,false),futureMoney(annualGain,false)];
+        const values=dividends?[futureMoney(row.portfolio),futureMoney(row.last12MonthsDividends,false),futureMoney(row.last12MonthsDividendsNet,false),futureMoney(row.last12MonthsDividendsNet/12,false)]:[futureMoney(row.portfolio),futureMoney(paidIn,false),futureMoney(annualGain,false)];
         const tr=el('tr'),label=el('th','','Jahr '+year);label.scope='row';tr.append(label);for(const value of values)tr.append(el('td','',value));body.append(tr);}
     }
     function futureMethod(rows, settings) {
@@ -2390,7 +2418,7 @@ const PortfolioInput = (() => {
       $('overview-dividends-wrap').hidden=false;
       overviewSummary(result,years);overviewDepotCards(entries);$('overview-years').querySelectorAll('[data-years]').forEach(button=>button.setAttribute('aria-pressed',String(Number(button.dataset.years)===years)));
       $('overview-error').hidden=!result.error;$('overview-error').textContent=result.error||'';$('overview-rate').textContent=!result.error&&result.weightedReturnPct!==null?'Renditebasis: '+futurePercent(result.weightedReturnPct)+' p. a.':'';
-      overviewCharts(result,years);const body=$('overview-year-body');body.replaceChildren();if(!result.error)for(const row of result.annual){const tr=el('tr'),label=el('th','','Jahr '+row.year);label.scope='row';tr.append(label);for(const value of [futureMoney(row.portfolio),futureMoney(row.paidIn,false),futureMoney(row.last12MonthsDividends,false),futureMoney(row.last12MonthsDividendsNet,false)])tr.append(el('td','',value));body.append(tr);}
+      overviewCharts(result,years);const body=$('overview-year-body');body.replaceChildren();if(!result.error)for(const row of result.annual){const tr=el('tr'),label=el('th','','Jahr '+row.year);label.scope='row';tr.append(label);for(const value of [futureMoney(row.portfolio),futureMoney(row.paidIn,false),futureMoney(row.last12MonthsDividends,false),futureMoney(row.last12MonthsDividendsNet,false),futureMoney(row.last12MonthsDividendsNet/12,false)])tr.append(el('td','',value));body.append(tr);}
     }
 
 
