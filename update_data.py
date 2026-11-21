@@ -4675,6 +4675,307 @@ def _completed_return_history(history: Any, info: dict[str, Any], now: datetime)
     return history.loc[mask]
 
 
+# Outlook dividend and currency inputs. All cash histories use ex dates.
+DIVIDEND_GROWTH_VERSION = 1
+ECB_FX_SOURCE = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
+DIVIDEND_GROWTH_METHOD = (
+    "Geometrisches jährliches Wachstum (CAGR) der rollierenden 12-Monats-Barausschüttung je Aktie: "
+    "(Enddividende / Anfangsdividende)^(1 / Jahre) − 1. Der reguläre Zeitraum sind zehn Kalenderjahre "
+    "bis zum letzten abgeschlossenen Handelstag. Cash-Ereignisse werden dem Ex-Tag zugeordnet, "
+    "nicht dem späteren Zahlungstag; linke Jahresgrenze offen, rechte Grenze geschlossen. "
+    "Yahoo-Cashbeträge sind bereits auf die aktuelle Aktienbasis splitbereinigt und werden nicht "
+    "erneut durch Splits dividiert. Enthalten sind gemeldete Sonderdividenden und Kapitalrückzahlungen; "
+    "brutto vor Steuern/Depotgebühren, in der jeweiligen Handelswährung. Kürzere Historien oder ein "
+    "Null-Anfangswert verwenden den frühesten vollständigen positiven 12M-Jahresanker innerhalb "
+    "der zehn Jahre mit der üblichen Anzahl von Zahlungen. Eine solche Ersatzrate ist keine 10J-Rate."
+)
+DIVIDEND_PRIMARY_SOURCES = {
+    "AMZN": "https://ir.aboutamazon.com/faqs/default.aspx",
+    "AMD": "https://ir.amd.com/contacts-faq/faq",
+    "NOW": "https://s205.q4cdn.com/916135447/files/doc_downloads/annual-meeting-of-share-holders/2026/NOW-2025-Annual-Report-bookmarked.pdf",
+    "ANET": "https://s21.q4cdn.com/861911615/files/doc_financials/2025/ar/Arista-2026-Proxy-Statement-2025-Annual-Report-Bookmarked.pdf",
+    "PANW": "https://www.sec.gov/Archives/edgar/data/1327567/000132756726000023/panw-20260731.htm",
+    "CRWD": "https://www.sec.gov/Archives/edgar/data/1535527/000153552726000010/crwd-20260131.htm",
+    "NET": "https://www.sec.gov/Archives/edgar/data/1477333/000147733326000016/cloud-20251231.htm",
+    "GOOGL": "https://abc.xyz/assets/e1/57/8a65483e43feaa709f6cc5cc0737/annualreport2024-web.pdf",
+    "META": "https://www.sec.gov/Archives/edgar/data/1326801/000132680124000012/meta-20231231.htm",
+    "DTG.DE": "https://www.daimlertruck.com/en/investors/share/dividend",
+    "NVDA": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/",
+    "MSFT": "https://www.microsoft.com/investor/reports/ar26/",
+    "AAPL": "https://investor.apple.com/dividend-history/",
+    "ALV.DE": "https://www.allianz.com/en/investor_relations/share/dividend.html",
+    "MUV2.DE": "https://www.munichre.com/de/unternehmen/investoren/aktien/dividende.html",
+    "8766.T": "https://www.tokiomarinehd.com/en/ir/stock/return.html",
+    "D05.SI": "https://www.dbs.com/investors/dividend/default.page",
+    "TSM": "https://investor.tsmc.com/english/dividend",
+    "JEPQ": JEPQ_RETURN_CASH_SOURCE,
+    "VOW3.DE": "https://annualreport2016.volkswagenag.com/notes/balance-sheet-disclosures/liabilities/equity.html",
+}
+
+
+def unavailable_dividend_growth(ticker: str, reason: str) -> dict[str, Any]:
+    return dict(version=DIVIDEND_GROWTH_VERSION, ticker=ticker, status="unavailable", source_status="unavailable",
+                rate_pct=None, projection_rate_pct=None, years=None, start=None, end=None,
+                start_annual_dividend=None, end_annual_dividend=None, currency=None,
+                method=DIVIDEND_GROWTH_METHOD, source_url=f"https://finance.yahoo.com/quote/{quote(ticker, safe='')}/history/",
+                retrieved_at=None, warning=reason, observations=[])
+
+
+def calculate_dividend_growth(history: Any, ticker: str, info: dict[str, Any] | None = None,
+                              retrieved_at: str | None = None, issuer_cash: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Compare uniform, already split-normalized 12M cash per listed share."""
+    import pandas as pd
+    stamp = retrieved_at or iso_now()
+    now = datetime.fromisoformat(stamp)
+    if now.tzinfo is None:
+        raise ValueError("Dividenden-Abrufzeitpunkt hat keine Zeitzone")
+    if history is None or history.empty or "Dividends" not in history or "Close" not in history:
+        raise ValueError("Vollständige Kurs-/Dividendenhistorie fehlt")
+    frame = history.sort_index().copy()
+    frame = frame.loc[~frame.index.duplicated(keep="last")]
+    frame = _completed_return_history(frame, info or {}, now)
+    if frame.empty:
+        raise ValueError("Keine abgeschlossene Dividendensitzung")
+    dates = pd.DatetimeIndex([pd.Timestamp(index.date()) for index in frame.index])
+    if dates.duplicated().any():
+        raise ValueError("Doppelte lokale Handelstage")
+    cash = pd.Series(pd.to_numeric(frame["Dividends"], errors="coerce").to_numpy(), index=dates)
+    corrections = []
+    if ticker == "JEPQ":
+        if (not isinstance(issuer_cash, dict) or issuer_cash.get("provider") != "JPMorgan Asset Management"
+                or issuer_cash.get("source_url") != JEPQ_RETURN_CASH_SOURCE):
+            raise ValueError("JEPQ benötigt bestätigte Emittenten-Ausschüttungen")
+        # The issuer endpoint covers the latest rolling year, not inception.
+        # Keep older Yahoo events, and replace (never add) the covered tail.
+        issuer_dates = [pd.Timestamp(item["date"]) for item in issuer_cash.get("events", [])]
+        if not issuer_dates:
+            raise ValueError("Keine JEPQ-Emittentenereignisse")
+        cash.loc[(cash.index >= min(issuer_dates)) & (cash.index <= max(issuer_dates))] = 0.0
+        for item in issuer_cash.get("events", []):
+            date = pd.Timestamp(item["date"])
+            amount = finite_number(item.get("dividend"))
+            gain = finite_number(item.get("capital_gain"))
+            if amount is None or amount < 0 or gain is None or gain < 0:
+                raise ValueError("Ungültiges JEPQ-Cashereignis")
+            if date in cash.index:
+                cash.loc[date] = amount + gain
+        if not (cash > 0).any() or (dates[-1] - cash[cash > 0].index[-1]).days > 45:
+            raise ValueError("JEPQ-Emittentenereignisse sind nicht aktuell vollständig")
+    elif "Capital Gains" in frame:
+        gains = pd.Series(pd.to_numeric(frame["Capital Gains"], errors="coerce").to_numpy(), index=dates)
+        if ((gains > 0) & (cash > 0) & ((gains - cash).abs() < 1e-7)).any():
+            raise ValueError("Nicht eindeutig getrennte doppelte Barausschüttung")
+        cash += gains
+    if ticker == TOKIO_TICKER:
+        date = pd.Timestamp("2026-09-29")
+        if date in cash.index:
+            amount = finite_number(cash.loc[date])
+            split = finite_number(frame.loc[frame.index[dates.get_loc(date)], "Stock Splits"]) if "Stock Splits" in frame else None
+            if amount is not None and math.isclose(amount, 122.5, abs_tol=1e-6) and split == 15:
+                cash.loc[date] = amount / 15
+                corrections.append(dict(date="2026-09-29", original=amount, normalized=amount / 15,
+                                        source_url=TOKIO_DIVIDEND_SOURCE, reason="Einzeln bestätigtes fehlerhaftes 15:1-Splitereignis"))
+            elif amount is None or not math.isclose(amount, 122.5 / 15, abs_tol=.01):
+                raise ValueError("Tokio-Splitdividende nicht auf einheitlicher Aktienbasis bestätigt")
+    if not cash.map(lambda value: finite_number(value) is not None and value >= 0).all():
+        raise ValueError("Negative oder fehlende historische Cashereignisse")
+    currency = (info or {}).get("currency")
+    if not isinstance(currency, str) or not re.fullmatch(r"[A-Z]{3}", currency):
+        raise ValueError("Währung der Dividendenhistorie fehlt")
+    end, first = dates[-1], dates[0]
+    source_url = f"https://finance.yahoo.com/quote/{quote(ticker, safe='')}/history/"
+    def observation(date: Any) -> dict[str, Any]:
+        left = date - pd.DateOffset(years=1)
+        in_window = (dates > left) & (dates <= date)
+        complete = first <= left + pd.Timedelta(days=5) and int(in_window.sum()) >= 180
+        values = cash.loc[in_window]
+        event_count = int((values > 0).sum())
+        # This fund distributes monthly. A missing month is not a genuine zero.
+        if ticker == "JEPQ" and event_count < 12:
+            complete = False
+        return dict(as_of=date.date().isoformat(), window_start_exclusive=left.date().isoformat(),
+                    annual_dividend=round(float(values.sum()), 10) if complete else None,
+                    event_count=event_count, complete=bool(complete))
+    observations = [observation(end - pd.DateOffset(years=back)) for back in range(10, -1, -1)]
+    latest = observations[-1]
+    if not latest["complete"]:
+        raise ValueError("Keine vollständige aktuelle 12M-Dividendenhistorie")
+    annual = latest["annual_dividend"]
+    recent_dates = cash[(cash > 0) & (dates > end - pd.DateOffset(years=5))].index
+    gaps = [(recent_dates[i] - recent_dates[i - 1]).days for i in range(1, len(recent_dates))]
+    cadence = median(gaps) if gaps else 365
+    expected = min([1, 2, 4, 12], key=lambda frequency: abs(365.2425 / frequency - cadence))
+    start_observation = observations[0]
+    status, rate, projected, years, reason = "confirmed", None, None, 10.0, ""
+    if not (cash > 0).any():
+        if ticker not in {"AMZN", "NOW", "AMD", "ANET", "PANW", "CRWD", "NET"}:
+            raise ValueError("Leere Cashhistorie eines nicht als Nichtzahler bestätigten Wertpapiers; keine Null-Dividende erfinden")
+        status, projected, years = "no_dividend", 0.0, None
+        reason = "Keine gemeldeten Barausschüttungen in der verfügbaren Historie; es wird keine künftige Dividende erfunden. Kein definiertes Dividendenwachstum."
+        start_observation = dict(as_of=None, annual_dividend=None)
+    else:
+        if not start_observation["complete"] or start_observation["annual_dividend"] <= 0:
+            candidates = [row for row in observations[:-1] if row["complete"] and row["annual_dividend"] > 0 and row["event_count"] >= expected]
+            if candidates:
+                start_observation = candidates[0]
+                years = float(10 - observations.index(start_observation))
+                status = "short_history"
+                reason = ("Keine definierte vollständige 10J-CAGR (zu kurze Börsen-/Dividendenhistorie oder Null-Anfangsdividende). "
+                          "Ersatzrate aus dem frühesten vollständigen positiven 12M-Jahresanker mit üblicher Zahl von Ausschüttungen.")
+            else:
+                status, projected, years = "assumption", 0.0, None
+                reason = "Noch keine zwei vollständigen positiven 12M-Jahresanker: neutral 0% Dividendendynamik als ausdrücklich markierte Annahme, keine historische 10J-Rate."
+                start_observation = dict(as_of=None, annual_dividend=None)
+        if years is not None:
+            initial_cash = start_observation["annual_dividend"]
+            rate = -100.0 if annual == 0 else (math.pow(annual / initial_cash, 1 / years) - 1) * 100
+            rate = round(rate, 8)
+            projected = rate
+    warning = reason + (" " if reason else "") + "Ex-Tag-Basis, brutto; gemeldete Sonder-/Kapitalrückzahlungen sind enthalten. Keine Prognose oder Garantie."
+    if ticker == "NVDA":
+        warning += " Die 2026 erfolgte Anhebung der Quartalsdividende von 0,01 auf 0,25 USD beeinflusst die CAGR stark; nicht als nachhaltige Wachstumszusage verstehen."
+    if ticker == "VOW3.DE":
+        warning += " Die niedrige Ausgangszahlung von 0,17 EUR im Jahr2016 (Geschäftsjahr2015) ist außergewöhnlich; die daraus hohe Zehnjahresrate ist kein normalisiertes oder verlässliches künftiges Wachstum."
+    if ticker == "D05.SI":
+        warning += " DBS: 1:10-Bonusaktien 2024 sind bereits in Yahoo-DPS berücksichtigt; aktuelle 0,15 SGD Kapitalrückzahlung je Quartal ist zeitlich bis2027 geplant und wird im Szenario dennoch nur als unveränderte historische Basis fortgeschrieben."
+    if ticker == "TSM":
+        warning += " TSM an der NYSE: USD-Cash je ADS (ein ADS repräsentiert fünf Stammaktien); historische USD-Zahlungen enthalten Wechselkurseinflüsse und gegebenenfalls Depotbankeffekte. Keine TWD-Stammdividenden mit USD-ADS-Kursen gemischt."
+    result = dict(version=DIVIDEND_GROWTH_VERSION, ticker=ticker, status=status, source_status="live",
+                  rate_pct=rate, projection_rate_pct=projected, years=years, start=start_observation["as_of"],
+                  end=end.date().isoformat(), start_annual_dividend=start_observation["annual_dividend"],
+                  end_annual_dividend=annual, currency=currency, method=DIVIDEND_GROWTH_METHOD,
+                  source_url=source_url, retrieved_at=stamp, warning=warning, observations=observations,
+                  share_basis="Aktuelle gelistete Aktien-/ADS-Basis; Cashbeträge bereits splitbereinigt",
+                  date_basis="ex_dividend_date", expected_payments_per_year=expected,
+                  history_since=first.date().isoformat(), cash_events=[dict(date=index.date().isoformat(), amount=round(float(value), 10), source_url=JEPQ_RETURN_CASH_SOURCE if ticker == "JEPQ" and index in issuer_dates else source_url) for index, value in cash.items() if value > 0 and index > end - pd.DateOffset(years=11)])
+    if ticker == "JEPQ":
+        result["cash_source_url"] = JEPQ_RETURN_CASH_SOURCE
+        result["issuer_cash_first_date"] = min(issuer_dates).date().isoformat()
+        result["warning"] += " JEPQ: jüngste Emittentenereignisse ersetzen den Yahoo-Cash-Tail; ältere Vergleichszahlungen aus Yahoo-Historie. Optionsprämien-/Kapitalerträge sind Fonds-Ausschüttungen, keine Unternehmensdividenden."
+    if ticker in DIVIDEND_PRIMARY_SOURCES:
+        result["primary_source_url"] = DIVIDEND_PRIMARY_SOURCES[ticker]
+    result["source_urls"] = list(dict.fromkeys([source_url] + ([result["cash_source_url"]] if "cash_source_url" in result else []) + ([result["primary_source_url"]] if "primary_source_url" in result else [])))
+    if corrections:
+        result["cash_corrections"] = corrections
+    return result
+
+
+def valid_dividend_growth(value: Any, ticker: str, currency: str | None = None) -> dict[str, Any] | None:
+    if not isinstance(value, dict) or value.get("version") != DIVIDEND_GROWTH_VERSION or value.get("ticker") != ticker:
+        return None
+    if value.get("status") not in {"confirmed", "short_history", "no_dividend", "assumption"}:
+        return None
+    if value.get("source_url") != f"https://finance.yahoo.com/quote/{quote(ticker, safe='')}/history/":
+        return None
+    if currency and value.get("currency") != currency:
+        return None
+    annual = finite_number(value.get("end_annual_dividend"))
+    projected = finite_number(value.get("projection_rate_pct"))
+    if annual is None or annual < 0 or projected is None or projected < -100:
+        return None
+    try:
+        end = datetime.fromisoformat(value["end"]).date()
+        stamp = datetime.fromisoformat(value["retrieved_at"])
+        if stamp.tzinfo is None or end > stamp.date():
+            return None
+        if value["status"] in {"confirmed", "short_history"}:
+            start = datetime.fromisoformat(value["start"]).date()
+            initial = finite_number(value.get("start_annual_dividend"))
+            years = finite_number(value.get("years"))
+            rate = finite_number(value.get("rate_pct"))
+            if initial is None or initial <= 0 or years is None or not 0 < years <= 10 or rate is None or start >= end:
+                return None
+            expected = -100 if annual == 0 else (math.pow(annual / initial, 1 / years) - 1) * 100
+            if not math.isclose(rate, expected, abs_tol=1e-6) or not math.isclose(rate, projected, abs_tol=1e-6):
+                return None
+            if value["status"] == "confirmed" and years != 10:
+                return None
+        elif value.get("rate_pct") is not None or projected != 0:
+            return None
+        if value["status"] == "no_dividend" and annual != 0:
+            return None
+    except (KeyError, ValueError, TypeError, OverflowError):
+        return None
+    return deepcopy(value)
+
+
+def apply_dividend_growth(stock: dict[str, Any], previous: dict[str, Any], payload: dict[str, Any]) -> None:
+    fresh = valid_dividend_growth(payload.get("dividend_growth"), stock["ticker"], stock.get("currency"))
+    prior = valid_dividend_growth(previous.get("dividend_growth"), stock["ticker"], stock.get("currency"))
+    chosen = fresh or prior
+    if chosen:
+        chosen["source_status"] = "live" if fresh else "previous"
+        if not fresh:
+            chosen["refresh_note"] = payload.get("dividend_growth_error") or "Kein neuer bestätigter Dividendenstand; Vorwert mit ursprünglichem Datum."
+        stock["dividend_growth"] = chosen
+        stock["dividend_annual"] = chosen["end_annual_dividend"]
+        price = finite_number(stock.get("price"))
+        stock["dividend_annual_yield_pct"] = chosen["end_annual_dividend"] / price * 100 if price is not None and price > 0 else None
+    else:
+        stock["dividend_growth"] = unavailable_dividend_growth(stock["ticker"], payload.get("dividend_growth_error") or "Dividendenhistorie noch nicht bestätigt")
+        stock["dividend_annual"] = None
+        stock["dividend_annual_yield_pct"] = None
+
+
+def parse_ecb_fx(body: bytes, retrieved_at: str | None = None) -> dict[str, Any]:
+    import xml.etree.ElementTree as ET
+    root = ET.fromstring(body)
+    dated = next((node for node in root.iter() if node.attrib.get("time")), None)
+    if dated is None:
+        raise ValueError("EZB-Datum fehlt")
+    date = datetime.strptime(dated.attrib["time"], "%Y-%m-%d").date()
+    stamp = retrieved_at or iso_now()
+    if date > datetime.fromisoformat(stamp).date():
+        raise ValueError("EZB-Kurs liegt in der Zukunft")
+    rates = {"EUR": 1.0}
+    for node in dated:
+        code, rate = node.attrib.get("currency"), finite_number(node.attrib.get("rate"))
+        if code in {"USD", "JPY", "CHF", "SGD"} and rate is not None and rate > 0:
+            rates[code] = rate
+    if set(rates) != {"EUR", "USD", "JPY", "CHF", "SGD"}:
+        raise ValueError("Benötigte EZB-Währungen fehlen")
+    return dict(base="EUR", rates=rates, as_of=date.isoformat(), source_url=ECB_FX_SOURCE,
+                updated_at=stamp, status="live", method="1 EUR = rate Einheiten Fremdwährung; EUR-Wert = nativer Kurs × Stückzahl ÷ rate. Referenzkurse, keine handelbaren Brokerkurse.")
+
+
+def valid_ecb_fx(value: Any) -> dict[str, Any] | None:
+    if not isinstance(value, dict) or value.get("base") != "EUR" or value.get("source_url") != ECB_FX_SOURCE or not isinstance(value.get("rates"), dict):
+        return None
+    if value["rates"].get("EUR") != 1 or any(finite_number(value["rates"].get(code)) is None or not 0 < value["rates"][code] < 1e9 for code in ["USD", "JPY", "CHF", "SGD"]):
+        return None
+    try:
+        date = datetime.strptime(value["as_of"], "%Y-%m-%d").date()
+        stamp = datetime.fromisoformat(value["updated_at"])
+        if stamp.tzinfo is None or date > stamp.date():
+            return None
+    except (KeyError, ValueError, TypeError):
+        return None
+    return deepcopy(value)
+
+
+def refresh_ecb_fx(previous: Any, fetcher: Callable[[], dict[str, Any]] | None = None) -> dict[str, Any]:
+    try:
+        if fetcher:
+            supplied = valid_ecb_fx(fetcher())
+            if supplied is None:
+                raise ValueError("Ungültige EZB-Kursantwort")
+            supplied["status"] = "live"
+            return supplied
+        with urlopen(Request(ECB_FX_SOURCE, headers={"User-Agent": "ResearchStudio/1.0"}), timeout=8) as response:
+            body = response.read(100_001)
+        if len(body) > 100_000:
+            raise ValueError("EZB-Antwort zu groß")
+        return parse_ecb_fx(body)
+    except Exception as exc:
+        fallback = valid_ecb_fx(previous)
+        if fallback:
+
+            fallback.update(status="previous", refresh_note=f"EZB-Abruf: {type(exc).__name__}; Vorwert mit ursprünglichem Datum")
+            return fallback
+        return dict(base="EUR", rates={"EUR": 1.0}, as_of=None, updated_at=None, status="unavailable", source_url=ECB_FX_SOURCE,
+                    refresh_note=f"Kein bestätigter EZB-Kurs: {type(exc).__name__}")
+
+
 def calculate_period_returns(history: Any, ticker: str, info: dict[str, Any] | None = None,
                              retrieved_at: str | None = None, issuer_cash: dict[str, Any] | None = None) -> dict[str, Any]:
     """Reinvest cash dividends on raw split-adjusted Close, never Adj Close."""
@@ -5122,6 +5423,10 @@ def _fetch_worker(ticker: str, pipe: Any, attempts: int) -> None:
             metadata = security.get_history_metadata()
             return_info = {**(metadata if isinstance(metadata, dict) else {}), **info}
             issuer_cash = fetch_jepq_return_cash() if ticker == "JEPQ" else None
+            try:
+                pipe.send(dict(dividend_growth=calculate_dividend_growth(long_history, ticker, return_info, iso_now(), issuer_cash)))
+            except Exception as exc:
+                pipe.send(dict(dividend_growth_error=f"Dividendenwachstum: {type(exc).__name__}: {str(exc)[:180]}"))
             pipe.send(dict(returns=calculate_period_returns(long_history, ticker, return_info, iso_now(), issuer_cash)))
         except Exception as exc:
             pipe.send(dict(returns_error=f"Gesamtrendite-Historie: {type(exc).__name__}: {str(exc)[:180]}"))
@@ -5297,6 +5602,7 @@ def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[st
     # The run stamp is its start, while this optional endpoint arrives later.
     # Validate against the actual merge time without changing its source stamp.
     apply_period_returns(stock, previous, payload, iso_now())
+    apply_dividend_growth(stock, previous, payload)
     add_derived(stock, portfolio_id)
     return stock
 
@@ -5304,7 +5610,8 @@ def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[st
 def build_live_data(previous: dict[str, Any] | None = None,
                     fetcher: Callable[[str], dict[str, Any]] = fetch_ticker,
                     now: datetime | None = None,
-                    fear_greed_fetcher: Callable[[], dict[str, Any]] | None = None) -> dict[str, Any]:
+                    fear_greed_fetcher: Callable[[], dict[str, Any]] | None = None,
+                    fx_fetcher: Callable[[], dict[str, Any]] | None = None) -> dict[str, Any]:
     now = now or datetime.now(timezone.utc)
     result = build_seed_data(now)
     result["warnings"] = [REFERENCE_WARNING]
@@ -5346,6 +5653,7 @@ def build_live_data(previous: dict[str, Any] | None = None,
         result["last_updated"] = previous.get("last_updated", result["last_updated"])
         result["updated_at"] = previous.get("updated_at", result["updated_at"])
     result["fear_and_greed"] = refresh_fear_and_greed(previous.get("fear_and_greed"), fear_greed_fetcher)
+    result["fx_rates"] = refresh_ecb_fx(previous.get("fx_rates"), fx_fetcher)
     return result
 
 
