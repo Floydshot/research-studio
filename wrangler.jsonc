@@ -1,0 +1,31 @@
+{
+  "name": "research-studio",
+  "main": "dist/worker.mjs",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "observability": {
+    "enabled": true
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "PASSWORD_VERIFIER",
+        "class_name": "ProjectPasswordVerifier"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["ProjectPasswordVerifier"]
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "research-studio-projects",
+      "database_id": "011bb335-898a-48f9-93f5-370642123ca5"
+    }
+  ],
+  "account_id": "2fe4d69eba1a2de495dbb5d0c90b370c"
+}
