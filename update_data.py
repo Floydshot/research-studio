@@ -362,7 +362,7 @@ PORTFOLIOS = [
         reference("TSMC", "TSM", SEMICONDUCTOR, None, "Forward-KGV ≤ 20, TTM-KGV ≤ 25, Kurs ≤ SMA 200 und RSI (14) ≤ 45; alle vier Bedingungen gemeinsam.", None, None),
         reference("Palo Alto Networks", "PANW", CYBERSECURITY, 173.8, "EV/FCF < 30x–32x (Earnings-Dip nutzen)", 271.9, 93.5, hist_ps=11.5, ps_ratio=18.2),
         reference("CrowdStrike", "CRWD", CYBERSECURITY, 200.0, "Strikte Disziplin: P/S < 25x oder P/FCF < 35x", 250.0, 208.3, hist_ps=27.1, ps_ratio=43.2),
-        reference("Cloudflare", "NET", CYBERSECURITY, 210.0, "Kompression auf P/S 20x–25x abwarten", 260.0, 226.9, hist_ps=31.1, ps_ratio=41.7),
+        reference("Cloudflare", "NET", CYBERSECURITY, 210.0, "Kompression auf P/S 20x–25x abwarten", None, 226.9, hist_ps=31.1, ps_ratio=41.7),
     ]),
     dict(id="value", name="Value Stonks", cluster_order=[EU_INSURANCE, REINSURANCE, ASIA, US_BANKS, US_INSURANCE, "Income-ETFs"], stocks=[
         reference("AXA SA", "CS.PA", EU_INSURANCE, 11.2, "Forward P/E < 9,5x & Div.-Rendite > 5,7%", 8.5, 8.3, hist_div=5.4, div_yield=6.0, roe=15.0),
@@ -7630,6 +7630,18 @@ def _fetch_worker(ticker: str, pipe: Any, attempts: int) -> None:
                 pipe.send(dict(issuer_metrics=metrics, warnings=notes))
             except Exception as exc:
                 pipe.send(dict(warnings=[f"Tokio Marine IFRS: {type(exc).__name__}: {str(exc)[:180]}"]))
+        if ticker in {"NET", "D05.SI"}:
+            # Recheck issuer disclosures in every full daily batch. A loss is
+            # an economic N/A, while DBS' disclosed cumulative ROE is not TTM.
+            try:
+                if ticker == "NET":
+                    from issuer_net import fetch_net_earnings
+                    pipe.send(dict(net_earnings=fetch_net_earnings()))
+                else:
+                    from issuer_dbs import fetch_dbs_roe
+                    pipe.send(dict(dbs_roe=fetch_dbs_roe()))
+            except Exception as exc:
+                pipe.send(dict(warnings=[f"{ticker} Emittentenbericht: {type(exc).__name__}: {str(exc)[:150]}"]))
         # Optional long-term history comes last, preserving the fundamentals
         # already sent even if this endpoint reaches the overall watchdog.
         try:
@@ -7800,6 +7812,114 @@ def enrich_reserve_stock(stock: dict[str, Any], payload: dict[str, Any], stamp: 
             sector["regular_dividend_reference"] = deepcopy(reference)
     stock["sector_valuation"] = sector
 
+
+def valid_researched_metric(value: Any, ticker: str, field: str, stamp: str,
+                            info: dict[str, Any] | None = None) -> dict[str, Any] | None:
+    """Accept only dated, period-specific observations from these two issuers."""
+    if not isinstance(value, dict) or value.get("validation_version") != 1:
+        return None
+    expected = {("NET", "current_pe"): ("gaap_ttm_earnings", "USD"),
+                ("D05.SI", "roe"): ("issuer_reported_roe", "SGD")}.get((ticker, field))
+    if not expected or (value.get("fact_type"), value.get("currency")) != expected:
+        return None
+    allowed = {"www.dbs.com"} if ticker == "D05.SI" else {"www.sec.gov", "sec.gov", "data.sec.gov", "cloudflare.net", "www.cloudflare.net", "www.cloudflare.com"}
+    urls = value.get("source_urls") or [value.get("source_url")]
+    if not isinstance(urls, list) or not urls or value.get("source_url") not in urls:
+        return None
+    for url in urls:
+        try:
+            parsed = urlparse(url) if isinstance(url, str) else None
+            safe = parsed and parsed.scheme == "https" and parsed.hostname in allowed and not parsed.username and not parsed.password and parsed.port in (None, 443)
+        except ValueError:
+            safe = False
+        if not safe:
+            return None
+    now, retrieved = _batch_instant(stamp), _batch_instant(value.get("retrieved_at"))
+    try:
+        start, end, report = [datetime.strptime(value.get(key, ""), "%Y-%m-%d").date()
+                              for key in ("period_start", "period_end", "report_date")]
+    except (ValueError, TypeError):
+        return None
+    if not now or not retrieved or retrieved > now or not start < end <= report <= retrieved.date() <= now.date() or not 0 <= (now.date() - end).days <= 185:
+        return None
+    if not value.get("provider") or not value.get("accounting_basis") or not value.get("method") or not value.get("share_basis"):
+        return None
+    if info:
+        quarter = finite_number(info.get("mostRecentQuarter"))
+        if quarter:
+            try:
+                if datetime.fromtimestamp(quarter, timezone.utc).date() > end:
+                    return None
+            except (ValueError, OSError, OverflowError):
+                return None
+    if field == "roe":
+        number = finite_number(value.get("value"))
+        if number is None or not -1000 <= number <= 1000 or value.get("annualized") is not True:
+            return None
+    else:
+        if finite_number(value.get("ttm_net_income_usd")) is None or not 360 <= (end - start).days <= 366:
+            return None
+    return deepcopy(value)
+
+
+def confirmed_nonpositive_pe(stock: dict[str, Any], stamp: str | None = None) -> bool:
+    """A sourced loss is resolved, never a numeric valuation or a buy signal."""
+    if stock.get("ticker") != "NET" or stock.get("current_pe") is not None or stock.get("currency") != "USD":
+        return False
+    meta = stock.get("field_metadata", {}).get("current_pe")
+    checked = valid_researched_metric(meta, "NET", "current_pe", stamp or iso_now())
+    return bool(checked and checked["ttm_net_income_usd"] <= 0 and meta.get("not_applicable") is True
+                and stock.get("field_sources", {}).get("current_pe") == "not_applicable"
+                and stock.get("field_updated_at", {}).get("current_pe") == meta.get("retrieved_at"))
+
+
+def apply_researched_metrics(stock: dict[str, Any], previous: dict[str, Any],
+                             payload: dict[str, Any], stamp: str) -> None:
+    """Prefer fresh issuer evidence; retain original dates if its fetch fails."""
+    ticker, info = stock["ticker"], payload.get("info") or {}
+    if ticker not in {"NET", "D05.SI"}:
+        return
+    metadata = stock.setdefault("field_metadata", {})
+    field = "current_pe" if ticker == "NET" else "roe"
+    candidate = payload.get("net_earnings" if ticker == "NET" else "dbs_roe")
+    fresh = valid_researched_metric(candidate, ticker, field, stamp, info)
+    if fresh and fresh["currency"] != stock.get("currency"):
+        fresh = None
+    if ticker == "D05.SI":
+        if fresh:
+            stock["roe"] = fresh["value"]
+            stock["field_sources"]["roe"] = "live"
+            stock["field_updated_at"]["roe"] = fresh["retrieved_at"]
+            metadata["roe"] = fresh
+        elif stock["field_sources"].get("roe") == "previous":
+            prior = valid_researched_metric(previous.get("field_metadata", {}).get("roe"), ticker, field, stamp)
+            if prior and stock.get("roe") == prior["value"]:
+                metadata["roe"] = prior
+        return
+
+    # An absent/negative vendor multiple must never revive the original 260x.
+    raw = finite_number(stock.get("current_pe"))
+    if raw is not None and (raw <= 0 or stock["field_sources"].get(field) == "initial"):
+        stock[field] = None
+        stock["field_sources"][field] = "unavailable"
+        stock["field_updated_at"][field] = None
+    if fresh and fresh["ttm_net_income_usd"] <= 0:
+        fresh.update(label="P/E", not_applicable=True,
+                     not_applicable_reason="Kein sinnvolles P/E bei negativem oder fehlendem GAAP-Gewinn.")
+        stock[field] = None
+        stock["field_sources"][field] = "not_applicable"
+        stock["field_updated_at"][field] = fresh["retrieved_at"]
+        metadata[field] = fresh
+    elif not fresh:
+        prior = valid_researched_metric(previous.get("field_metadata", {}).get(field), ticker, field, stamp, info)
+        trailing_eps = finite_number(info.get("trailingEps"))
+        if prior and prior.get("not_applicable") is True and prior["ttm_net_income_usd"] <= 0 and not (trailing_eps is not None and trailing_eps > 0):
+            stock[field] = None
+            stock["field_sources"][field] = "not_applicable"
+            stock["field_updated_at"][field] = prior["retrieved_at"]
+            metadata[field] = prior
+
+
 def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[str, Any], portfolio_id: str, stamp: str) -> dict[str, Any]:
     stock = {**deepcopy(seed), "field_sources": dict(seed["field_sources"]), "field_updated_at": dict(seed["field_updated_at"]), "warnings": list(payload.get("warnings", []))}
     info = payload.get("info") or {}
@@ -7881,6 +8001,7 @@ def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[st
         stock["as_of"] = previous.get("as_of")
     else:
         stock["as_of"] = None
+    apply_researched_metrics(stock, previous, payload, iso_now())
     if portfolio_id == 'classic':
         apply_classic_annual_roe(stock, previous)
     if portfolio_id == 'universe':
@@ -7904,7 +8025,13 @@ def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[st
             method="Summe tatsächlicher Barausschüttungen der letzten zwölf Monate am Ex-Tag / Kurs × 100. Sonder-/Zusatzdividenden enthalten; kein garantierter künftiger Ertrag. Reguläre Dividendenreferenz separat.")
     required = ["price", "sma200", "rsi14", "currency", "distribution_yield_ttm"] if is_etf else ["current_pe", "forward_pe", "price", "sma200", "rsi14", "currency", *( ["ps_ratio"] if portfolio_id == "tech" else ["div_yield", "roe"])]
     sources = [stock["field_sources"][field] for field in required]
-    if all(source == "live" for source in sources):
+    def resolved(field: str) -> bool:
+        if stock["field_sources"][field] == "live":
+            return True
+        verified = _batch_instant(stock["field_updated_at"].get(field))
+        started = _batch_instant(stamp)
+        return field == "current_pe" and confirmed_nonpositive_pe(stock) and verified is not None and started is not None and verified >= started
+    if all(resolved(field) for field in required):
         stock["source_status"] = "live"
     elif "live" in sources:
         stock["source_status"] = "partial"
@@ -7912,7 +8039,7 @@ def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[st
         stock["source_status"] = "stale"
     else:
         stock["source_status"] = "initial"
-    fallback_fields = [field for field in required if stock["field_sources"][field] != "live"]
+    fallback_fields = [field for field in required if not resolved(field)]
     if fallback_fields:
         stock["warnings"].append("Nicht frisch verfügbar (Quelle je Feld gekennzeichnet): " + ", ".join(fallback_fields) + ".")
     if stock["field_sources"]["price"] != stock["field_sources"]["sma200"] and stock["price"] and stock["sma200"]:
@@ -8007,6 +8134,8 @@ def finalize_refresh_batch(result: dict[str, Any], started_at: str,
                     value = stock.get(field)
                     valid = isinstance(value, str) and bool(value.strip()) if field == "currency" else finite_number(value) is not None
                     fresh = valid and stock.get("field_sources", {}).get(field) == "live" and retrieved_in_batch(stock.get("field_updated_at", {}).get(field))
+                    if field == "current_pe" and confirmed_nonpositive_pe(stock, completed_at):
+                        fresh = retrieved_in_batch(stock.get("field_updated_at", {}).get(field))
                 any_fresh = any_fresh or fresh
                 if not fresh:
                     missing.append(field)
@@ -8016,6 +8145,7 @@ def finalize_refresh_batch(result: dict[str, Any], started_at: str,
             status = "live" if not missing else "partial" if any_fresh else "stale" if stock.get("source_status") != "initial" else "initial"
             stock["refresh"] = dict(version=1, batch_id=started_at, status=status,
                                     required_fields=required, missing_fields=missing,
+                                    not_applicable_fields=["current_pe"] if confirmed_nonpositive_pe(stock, completed_at) else [],
                                     static_fields=static_refresh_fields(stock, group["id"]))
             counts[status] += 1
 
