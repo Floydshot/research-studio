@@ -1,11 +1,23 @@
 name: Update stocks and deploy dashboard
+run-name: ${{ inputs.scheduler_day != '' && inputs.request_id != '' && format('refresh-{0}-{1}', inputs.scheduler_day, inputs.request_id) || format('Research Studio {0}', github.event_name) }}
 
 on:
   schedule:
-    # Every day at fixed UTC: 08:30 CEST / 07:30 CET (Europe/Berlin).
-    # GitHub schedules are best effort and may start later than scheduled.
-    - cron: '30 6 * * *'
+    # Fallback only: refresh_due.py handles Berlin DST and prevents early or
+    # duplicate data fetches. Delayed schedules can still recover later today.
+    - cron: '30 5,6 * * *'
   workflow_dispatch:
+    inputs:
+      scheduler_day:
+        description: 'External scheduler Berlin date (YYYY-MM-DD); leave both inputs blank for a forced manual refresh'
+        required: false
+        type: string
+        default: ''
+      request_id:
+        description: 'External scheduler correlation ID; leave blank for a forced manual refresh'
+        required: false
+        type: string
+        default: ''
   push:
     branches: [main]
     paths:
@@ -15,6 +27,7 @@ on:
       - data.json
       - update_data.py
       - requirements.txt
+      - scripts/refresh_due.py
       - .github/workflows/daily_update.yml
 
 permissions:
@@ -25,6 +38,7 @@ permissions:
 concurrency:
   group: stock-dashboard-main
   cancel-in-progress: false
+  queue: max
 
 jobs:
   update-and-stage:
@@ -41,27 +55,35 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Decide whether market data is due
+        id: refresh-plan
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          SCHEDULER_DAY: ${{ inputs.scheduler_day }}
+          REQUEST_ID: ${{ inputs.request_id }}
+        run: python3 scripts/refresh_due.py --data data.json --event-name "$EVENT_NAME" --scheduler-day "$SCHEDULER_DAY" --request-id "$REQUEST_ID"
+
       - name: Set up Python 3.11
-        if: github.event_name != 'push'
+        if: steps.refresh-plan.outputs.refresh == 'true'
         uses: actions/setup-python@v7
         with:
           python-version: '3.11'
           cache: pip
 
       - name: Install dependencies
-        if: github.event_name != 'push'
+        if: steps.refresh-plan.outputs.refresh == 'true'
         run: python -m pip install --disable-pip-version-check -r requirements.txt
 
       - name: Refresh market data
         id: market-data
-        if: github.event_name != 'push'
+        if: steps.refresh-plan.outputs.refresh == 'true'
         # Publish explicit stale status on a total provider outage, then flag
         # the run as failed after deployment so it remains visible in Actions.
         continue-on-error: true
         run: python update_data.py
 
       - name: Commit updated dataset
-        if: github.event_name != 'push'
+        if: steps.refresh-plan.outputs.refresh == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -89,6 +111,15 @@ jobs:
           mkdir -p _site
           cp -- public-redirect.html _site/index.html
           cp -- data.json legacy.html _site/
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('_site/data.json').read_text(encoding='utf-8'))
+          batch = data.get('refresh_batch')
+          if not isinstance(batch, dict) or batch.get('version') != 1 or batch.get('id') != batch.get('started_at'):
+              raise SystemExit('Cannot stage refresh status without a valid shared batch')
+          Path('_site/refresh-status.json').write_text(json.dumps({'refresh_batch': batch}, ensure_ascii=False, allow_nan=False) + '\n', encoding='utf-8')
+          PY
           touch _site/.nojekyll
 
       # Preserve the actual build-attempt name as a job output. Re-running only
