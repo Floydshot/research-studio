@@ -41,6 +41,12 @@ The scheduler uses a separate D1 day/lease table for idempotency, correlates dis
 
 GitHub's own 05:30/06:30 UTC schedules remain a fallback, with a Berlin-time/freshness guard in `scripts/refresh_due.py`; early seasonal triggers and already-published daily batches are skipped. Workflow concurrency keeps all pending runs instead of replacing a queued refresh with a later UI push. A manual workflow dispatch with no scheduler inputs always forces a full refresh. The Worker proxies the public JSON with a short cache. New researched universe entries participate through `RESERVE_REFERENCES`; private holdings and login configuration never belong in the dataset or public repository.
 
+`issuer_net.py` rechecks Cloudflare's latest SEC filing and USD GAAP `NetIncomeLoss` contexts on every full run. TTM earnings use the previous full year minus prior-year YTD plus current YTD, never rounded EPS or adjusted earnings. A bounded official quarterly-release fallback preserves its rounding uncertainty. A confirmed nonpositive result clears the old initial P/E, suppresses the P/E bar/discount, and displays an economic N/A with its source; it counts as complete only when the evidence was retrieved in that batch. A source outage keeps the original evidence date and remains partial.
+
+`issuer_dbs.py` discovers DBS' latest quarterly financial PDF from its official index and reads the cumulative reported ROE with the annualisation and ordinary-shareholder footnotes checked. This period-specific issuer observation takes precedence over the vendor field and is explicitly labelled, e.g. `ROE · 9M 2026`, rather than called TTM. Unsupported layouts, newer conflicting provider periods and stale reports fail closed.
+
+Checks: `python -m unittest scripts/test_issuer_net.py scripts/test_issuer_dbs.py scripts/test_researched_metrics.py`.
+
 ## Stock requests
 
 The Outlook catalog opens an in-app request form instead of redirecting to GitHub. `POST /api/projects/{open|floyd|ts}/stock-requests` only accepts a bounded stock name, a client-generated UUID and an empty honeypot. Private routes require the existing profile session. Same-origin checks, transactional limits of five requests per source IP per UTC day and thirty globally, and a 24-hour name duplicate check bound notification volume. D1 stores only requests and delivery state in separate tables; this endpoint cannot alter holdings, the researched catalog or source code.
