@@ -33,7 +33,13 @@ The Overview sums both independent monthly projections for the shared selected h
 
 ## Market updates
 
-`.github/workflows/daily_update.yml` refreshes `data.json` every day at 06:30 UTC and on manual workflow dispatch. The Worker proxies that public JSON with a short cache. New researched universe entries participate through `RESERVE_REFERENCES`; private holdings and login configuration never belong in this dataset or the public GitHub repository.
+The primary market-data trigger is the Cloudflare Worker's scheduled handler in `server/refresh-scheduler.mjs`. Its UTC polling window covers both European seasons; a `Europe/Berlin` check starts the daily refresh at 07:30 local time and watches it until 08:25. The handler dispatches `.github/workflows/daily_update.yml`, where Python still performs the complete Yahoo/CNN/ECB update and Pages publication. Runner and provider latency affect completion time; the trigger time is not a guarantee that the dataset is finished at exactly 07:30.
+
+Activation requires the encrypted Worker secret `GITHUB_REFRESH_TOKEN`: a fine-grained GitHub token limited to `Floydshot/research-studio` with Actions write access. It does not need Contents write access. Provision the secret without printing it, adding it to source, or passing it in command-line arguments; preserve the existing login and mail secrets. Without this credential the scheduled handler fails closed while normal dashboard/API requests continue to work. Configuring this additional access requires the owner's explicit approval.
+
+The scheduler uses a separate D1 day/lease table for idempotency, correlates dispatches using `refresh-<Berlin date>-<request ID>`, avoids dispatching over an active run, and limits retries to three attempts. It checks the published `refresh-status.json`, a small sidecar generated from the same dataset and deployed in the same Pages artifact. An accepted dispatch alone is not success: the feed must contain a completed post-07:30 batch with successful provider retrievals. Known partial stock fields remain honestly flagged and do not cause endless retries. Scheduler queries never read private portfolio state or mail requests.
+
+GitHub's own 05:30/06:30 UTC schedules remain a fallback, with a Berlin-time/freshness guard in `scripts/refresh_due.py`; early seasonal triggers and already-published daily batches are skipped. Workflow concurrency keeps all pending runs instead of replacing a queued refresh with a later UI push. A manual workflow dispatch with no scheduler inputs always forces a full refresh. The Worker proxies the public JSON with a short cache. New researched universe entries participate through `RESERVE_REFERENCES`; private holdings and login configuration never belong in the dataset or public repository.
 
 ## Stock requests
 
