@@ -26,6 +26,8 @@ on:
       - legacy.html
       - data.json
       - update_data.py
+      - issuer_dbs.py
+      - issuer_net.py
       - requirements.txt
       - scripts/refresh_due.py
       - .github/workflows/daily_update.yml
