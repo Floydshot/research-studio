@@ -31,6 +31,14 @@ The old GitHub Pages address redirects to the Cloudflare application. `legacy.ht
 
 The Overview sums both independent monthly projections for the shared selected horizon. Changing the horizon in any Outlook view updates all three views while preserving each depot's capital, monthly purchases, saved exclusions and extra positions. Tech uses the selected total-return basis directly for growth in every workspace and has no separate dividend model. Overview dividends and the reinvestment control come exclusively from Value Stonks. Its charts follow the individual depot presentation: consolidated portfolio value and annual net distributions by the origin of Value's invested capital. Historical rates remain assumptions rather than predictions.
 
+## Custom depots
+
+Private Floyd and TS workspaces can create up to 20 named custom depots with `+ New Depot`. Each depot has an immutable UUID, a growth/dividend type, and its own scenario, positions, shares, allocations and rate overrides. New depots start with zero capital and no positions; the existing catalog search and Portfolio input add researched securities. Custom definitions stay in the private project state, never in the public market-data feed. Open Projects retains its shared preset views.
+
+The `Add to Overview` switch applies to each built-in or custom depot and defaults to enabled. Overview sums only included depots, including their independent savings and dividend reinvestment choices; growth depots contribute no separate dividend payouts. Zero-funded empty depots add zero, while funded depots without positions require correction when included. The selected horizon is shared across every depot and Overview. Private state uses the existing authenticated revision/CAS storage across devices; older clients and legacy imports preserve custom collections and omitted inclusion settings.
+
+Custom depot checks: `node scripts/test-custom-depots-api.mjs`, `node scripts/test-custom-depots-overview.cjs`, `node scripts/test-custom-depots-dialog.cjs`, and `node scripts/test-custom-depots-integration.cjs`.
+
 ## Market updates
 
 The primary market-data trigger is the Cloudflare Worker's scheduled handler in `server/refresh-scheduler.mjs`. Its UTC polling window covers both European seasons; a `Europe/Berlin` check starts the daily refresh at 07:30 local time and watches it until 08:25. The handler dispatches `.github/workflows/daily_update.yml`, where Python still performs the complete Yahoo/CNN/ECB update and Pages publication. Runner and provider latency affect completion time; the trigger time is not a guarantee that the dataset is finished at exactly 07:30.
