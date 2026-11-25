@@ -2,7 +2,7 @@
   'use strict';
   const LIMIT = 65536, TICKER = /^[A-Za-z0-9.^=-]{1,24}$/;
   const FORBIDDEN = new Set(['__proto__', 'prototype', 'constructor']);
-  const FIELDS = new Set(['schemaVersion', 'allocationMode', 'initial', 'monthly', 'source', 'manual', 'years', 'extend', 'reinvest', 'excluded', 'removed', 'weights', 'shares', 'returnOverrides', 'extraTickers', 'migrated']);
+  const FIELDS = new Set(['schemaVersion', 'allocationMode', 'initial', 'monthly', 'source', 'manual', 'years', 'extend', 'reinvest', 'includeInOverview', 'excluded', 'removed', 'weights', 'shares', 'returnOverrides', 'extraTickers', 'migrated']);
   const $ = id => document.getElementById(id);
   let config = null, pending = null, generation = 0, initialized = false, applying = false, status = 'idle';
   function invalid() { throw new Error('Bitte eine gültige Depot-Datei auswählen.'); }
@@ -24,7 +24,7 @@
     for (const [key, allowed] of [['allocationMode', ['weights', 'shares']], ['source', ['manual', '5y', '10y', 'all']], ['years', [5, 10, 15, 20, 30]]]) if (value[key] !== undefined) {
       if (!allowed.includes(value[key])) invalid(); result[key] = value[key];
     }
-    for (const key of ['extend', 'reinvest', 'migrated']) if (value[key] !== undefined) { if (typeof value[key] !== 'boolean') invalid(); result[key] = value[key]; }
+    for (const key of ['extend', 'reinvest', 'migrated', 'includeInOverview']) if (value[key] !== undefined) { if (typeof value[key] !== 'boolean') invalid(); result[key] = value[key]; }
     for (const key of ['excluded', 'removed', 'weights', 'shares', 'returnOverrides']) if (value[key] !== undefined) {
       if (!plain(value[key]) || Object.keys(value[key]).length > 100) invalid();
       result[key] = {};
