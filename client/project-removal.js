@@ -2,13 +2,14 @@
   'use strict';
 
   const TICKER = /^[A-Za-z0-9.^=-]{1,24}$/;
+  const CUSTOM_DEPOT_ID = /^depot-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
   const $ = id => document.getElementById(id);
   let config = null, initialized = false, pending = null, generation = 0, status = 'idle';
 
   function currentContext() {
     try {
       const value = config?.getContext();
-      if (!value || value.ready !== true || !['open', 'floyd', 'ts'].includes(value.projectId) || !['tech', 'value'].includes(value.portfolioId)) return null;
+      if (!value || value.ready !== true || !['open', 'floyd', 'ts'].includes(value.projectId) || !(['tech', 'value'].includes(value.portfolioId) || typeof value.portfolioId === 'string' && CUSTOM_DEPOT_ID.test(value.portfolioId) && ['floyd', 'ts'].includes(value.projectId))) return null;
       return { projectId: value.projectId, portfolioId: value.portfolioId, era: value.era };
     } catch (_) { return null; }
   }
