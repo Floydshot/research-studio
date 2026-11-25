@@ -11,17 +11,21 @@ import { handleStockRequests } from './stock-requests.mjs';
  * Regional Sites secrets use SECRET_<NAME>.get(); their presence takes
  * precedence and an unavailable regional binding always fails closed.
  *
- * PUT /api/projects/:project/state accepts {settings:{tech,value,overview?}} and requires
+ * PUT /api/projects/:project/state accepts {settings:{tech,value,overview?,customDepots?}} and requires
  * If-Match: <revision>. Numeric nulls are allowed as unfinished input drafts.
  * Public market data and the public Open Projects scenario are not stored here.
  */
 
 const ENCODER = new TextEncoder();
 const MAX_BODY_BYTES = 65536;
+const MAX_SETTINGS_BODY_BYTES = 524288;
 const SESSION_MS = 12 * 60 * 60 * 1000;
 const ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
 const TICKER = /^[A-Za-z0-9.^=-]{1,24}$/;
+const CUSTOM_DEPOT_ID = /^depot-[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
+const CUSTOM_DEPOT_KEYS = new Set(['id', 'name', 'dividends', 'settings']);
+const RESERVED_DEPOT_NAMES = new Set(['tech stonks', 'value stonks', 'overview', 'a24']);
 const FORBIDDEN_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 const PRIVATE_PROJECTS = new Set(['floyd', 'ts']);
 const INITIAL_SETTINGS = '{"tech":{},"value":{}}';
@@ -119,10 +123,10 @@ function assertSameOrigin(request) {
   }
 }
 
-async function readJson(request) {
+async function readJson(request, maximum = MAX_BODY_BYTES) {
   if (!(request.headers.get('Content-Type') || '').toLowerCase().split(';')[0].trim().endsWith('/json')) throw new ApiError(415, 'Bitte JSON-Daten senden.');
   const declared = request.headers.get('Content-Length');
-  if (declared !== null && (!/^\d+$/.test(declared) || Number(declared) > MAX_BODY_BYTES)) throw new ApiError(413, 'Die Eingabe ist zu groß.');
+  if (declared !== null && (!/^\d+$/.test(declared) || Number(declared) > maximum)) throw new ApiError(413, 'Die Eingabe ist zu groß.');
   const chunks = []; let length = 0;
   if (request.body) {
     const reader = request.body.getReader();
@@ -130,7 +134,7 @@ async function readJson(request) {
       while (true) {
         const { done, value } = await reader.read(); if (done) break;
         length += value.byteLength;
-        if (length > MAX_BODY_BYTES) { await reader.cancel(); throw new ApiError(413, 'Die Eingabe ist zu groß.'); }
+        if (length > maximum) { await reader.cancel(); throw new ApiError(413, 'Die Eingabe ist zu groß.'); }
         chunks.push(value);
       }
     } finally { reader.releaseLock(); }
@@ -157,7 +161,8 @@ function sanitizeScenario(input) {
   for (const [key, allowed] of [['allocationMode', ['weights', 'shares']], ['source', ['manual', '5y', '10y', 'all']], ['years', [5, 10, 15, 20, 30]]]) {
     if (input[key] !== undefined) { if (!allowed.includes(input[key])) inputError(); result[key] = input[key]; }
   }
-  for (const key of ['extend', 'reinvest', 'migrated']) if (input[key] !== undefined) {
+  result.includeInOverview = true;
+  for (const key of ['extend', 'reinvest', 'migrated', 'includeInOverview']) if (input[key] !== undefined) {
     if (typeof input[key] !== 'boolean') inputError(); result[key] = input[key];
   }
   for (const key of ['excluded', 'removed', 'weights', 'shares', 'returnOverrides']) if (input[key] !== undefined) {
@@ -186,6 +191,20 @@ export function sanitizeProjectSettings(input) {
   if (input.overview !== undefined) {
     if (!plainObject(input.overview) || ![5, 10, 15, 20, 30].includes(input.overview.years)) inputError();
     result.overview = { years: input.overview.years };
+  }
+  if (input.customDepots !== undefined) {
+    if (!Array.isArray(input.customDepots) || input.customDepots.length > 20) inputError();
+    const ids = new Set(), names = new Set(RESERVED_DEPOT_NAMES);
+    result.customDepots = input.customDepots.map(depot => {
+      if (!plainObject(depot) || Object.keys(depot).some(key => !CUSTOM_DEPOT_KEYS.has(key))) inputError();
+      if (typeof depot.id !== 'string' || !CUSTOM_DEPOT_ID.test(depot.id) || ids.has(depot.id)) inputError();
+      if (typeof depot.name !== 'string' || /[\p{Cc}\p{Cf}\p{Cs}<>]/u.test(depot.name)) inputError();
+      const name = depot.name.normalize('NFKC').trim().replace(/\s+/gu, ' ');
+      const normalizedName = name.toLocaleLowerCase('de-DE');
+      if (!name || [...name].length > 48 || names.has(normalizedName) || typeof depot.dividends !== 'boolean') inputError();
+      ids.add(depot.id); names.add(normalizedName);
+      return { id: depot.id, name, dividends: depot.dividends, settings: sanitizeScenario(depot.settings) };
+    });
   }
   return result;
 }
@@ -332,7 +351,7 @@ export async function handleProjectApi(request, env) {
     const match = /^(?:"(\d+)"|(\d+))$/.exec(request.headers.get('If-Match') || '');
     const expected = match ? Number(match[1] ?? match[2]) : NaN;
     if (!Number.isSafeInteger(expected) || expected < 0) throw new ApiError(428, 'Bitte Projekt neu laden.');
-    const body = await readJson(request);
+    const body = await readJson(request, MAX_SETTINGS_BODY_BYTES);
     if (!plainObject(body)) inputError();
     const settings = sanitizeProjectSettings(body.settings);
     // Missing persisted maps identify an older client. Preserve the current maps
@@ -342,7 +361,25 @@ export async function handleProjectApi(request, env) {
     const valueRemovedProvided = plainObject(body.settings.value) && Object.prototype.hasOwnProperty.call(body.settings.value, 'removed');
     const techReturnsProvided = plainObject(body.settings.tech) && Object.prototype.hasOwnProperty.call(body.settings.tech, 'returnOverrides');
     const valueReturnsProvided = plainObject(body.settings.value) && Object.prototype.hasOwnProperty.call(body.settings.value, 'returnOverrides');
-    const update = await env.DB.prepare("UPDATE project_states SET settings=json_set(?, '$.tech.removed',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.tech.removed'),'{}') END), '$.value.removed',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.value.removed'),'{}') END), '$.tech.returnOverrides',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.tech.returnOverrides'),'{}') END), '$.value.returnOverrides',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.value.returnOverrides'),'{}') END)),revision=revision+1,updated_at=? WHERE project=? AND revision=? RETURNING revision,settings").bind(JSON.stringify(settings), techRemovedProvided ? 1 : 0, JSON.stringify(settings.tech.removed || {}), valueRemovedProvided ? 1 : 0, JSON.stringify(settings.value.removed || {}), techReturnsProvided ? 1 : 0, JSON.stringify(settings.tech.returnOverrides || {}), valueReturnsProvided ? 1 : 0, JSON.stringify(settings.value.returnOverrides || {}), Date.now(), project, expected).first();
+    const techOverviewProvided = plainObject(body.settings.tech) && Object.prototype.hasOwnProperty.call(body.settings.tech, 'includeInOverview');
+    const valueOverviewProvided = plainObject(body.settings.value) && Object.prototype.hasOwnProperty.call(body.settings.value, 'includeInOverview');
+    const customDepotsProvided = Object.prototype.hasOwnProperty.call(body.settings, 'customDepots');
+    const update = await env.DB.prepare(`UPDATE project_states SET settings=json_set(?,
+      '$.tech.removed',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.tech.removed'),'{}') END),
+      '$.value.removed',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.value.removed'),'{}') END),
+      '$.tech.returnOverrides',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.tech.returnOverrides'),'{}') END),
+      '$.value.returnOverrides',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.value.returnOverrides'),'{}') END),
+      '$.tech.includeInOverview',json(CASE WHEN ? THEN ? WHEN json_type(settings,'$.tech.includeInOverview')='false' THEN 'false' ELSE 'true' END),
+      '$.value.includeInOverview',json(CASE WHEN ? THEN ? WHEN json_type(settings,'$.value.includeInOverview')='false' THEN 'false' ELSE 'true' END),
+      '$.customDepots',json(CASE WHEN ? THEN ? ELSE COALESCE(json_extract(settings,'$.customDepots'),'[]') END)
+      ),revision=revision+1,updated_at=? WHERE project=? AND revision=? RETURNING revision,settings`).bind(
+      JSON.stringify(settings), techRemovedProvided ? 1 : 0, JSON.stringify(settings.tech.removed || {}),
+      valueRemovedProvided ? 1 : 0, JSON.stringify(settings.value.removed || {}),
+      techReturnsProvided ? 1 : 0, JSON.stringify(settings.tech.returnOverrides || {}),
+      valueReturnsProvided ? 1 : 0, JSON.stringify(settings.value.returnOverrides || {}),
+      techOverviewProvided ? 1 : 0, JSON.stringify(settings.tech.includeInOverview),
+      valueOverviewProvided ? 1 : 0, JSON.stringify(settings.value.includeInOverview),
+      customDepotsProvided ? 1 : 0, JSON.stringify(settings.customDepots || []), Date.now(), project, expected).first();
     if (!update) throw new ApiError(409, 'Projekt wurde inzwischen geändert. Bitte neu laden.');
     return json({ project, revision: update.revision, settings: JSON.parse(update.settings) }, 200, { ETag: '"' + update.revision + '"' });
   } catch (error) {
