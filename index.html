@@ -444,9 +444,8 @@
   .future-card .future-allocation-fields>label{max-width:150px;width:100%}
 </style>
 <style id="shopping-card-layout">
-  .shopping-card-sort{display:flex;align-items:center;flex-wrap:wrap;gap:10px 22px;margin:0 0 14px;--outlook-value-blue:var(--accent-blue)}
-  .shopping-card-sort .future-check{white-space:nowrap;font-size:11px}
-  @media(max-width:700px){.shopping-card-sort{gap:10px 18px}.shopping-card-sort .future-check{font-size:10px}}
+  .shopping-details-heading{flex-wrap:wrap;row-gap:10px}
+  .shopping-card-sort{margin-left:auto}
   .stock-card{display:flex;flex-direction:column;align-self:start}
   .stock-card .metrics{margin-bottom:0}
   .stock-card .valuation-row{margin:15px 0 0}
@@ -627,8 +626,7 @@
 
           <div id="research-content">
           <section id="research-chart" class="chart-panel" aria-labelledby="chart-title"><div class="panel-top"><div><h2 id="chart-title" class="section-title title-with-info">Bewertung im Vergleich<button type="button" class="section-info" data-info-title="Bewertung im Vergleich" data-info-sources="chart-subtitle research-chart-notes research-explanation" aria-label="Informationen zu Bewertung im Vergleich" title="Informationen zu Bewertung im Vergleich"><span aria-hidden="true">i</span></button></h2><p id="chart-subtitle" hidden class="section-desc">Kurs-Gewinn-Verhältnis · niedriger = günstiger im Gewinnvergleich</p></div><div class="metric-switch" role="group" aria-label="Chart-Metrik"><button type="button" id="metric-pe" class="metric-btn" aria-pressed="true" data-metric="pe">KGV · P/E</button><button type="button" id="metric-secondary" class="metric-btn" aria-pressed="false" data-metric="secondary">Umsatz · P/S</button></div></div><div class="chart-meta"><ul id="legend" class="legend" aria-label="Diagramm-Legende"></ul><div id="selection-label" class="selection-label"></div></div><div id="chart-scroll" class="chart-scroll"><div id="chart-inner" class="chart-inner"><canvas id="valuation-chart" role="img" aria-label="Bewertungsvergleich der gefilterten Aktien. Alle Werte stehen auch in den Detailkacheln."></canvas></div></div><div id="chart-fallback" class="chart-fallback" hidden></div><div id="research-chart-notes" class="chart-note" hidden><span>Historische Referenzen: feste Nutzervorgaben (5J/10J), Zeitraum nicht unabhängig verifiziert.</span><span id="chart-interaction">Aktie im Chart oder auf der Kachel auswählen ↗</span></div></section>
-          <div class="details-heading"><h2 class="title-with-info">Werte im Detail<button type="button" class="section-info" data-info-title="Werte im Detail" data-info-text="Kennzahlen, Abkürzungen und Bewertungsabstände der Kacheln." aria-label="Informationen zu Werte im Detail" title="Informationen zu Werte im Detail"><span aria-hidden="true">i</span></button></h2></div>
-          <div class="shopping-card-sort" role="group" aria-label="Reihenfolge der Kacheln"><label class="future-check future-reinvest-label"><input id="shopping-sort-pe" class="future-reinvest-switch" type="checkbox" role="switch" checked> P/E</label><label class="future-check future-reinvest-label"><input id="shopping-sort-recommendation" class="future-reinvest-switch" type="checkbox" role="switch"> individual recommendation</label></div>
+          <div class="details-heading shopping-details-heading"><h2 class="title-with-info">Werte im Detail<button type="button" class="section-info" data-info-title="Werte im Detail" data-info-text="Kennzahlen, Abkürzungen und Bewertungsabstände der Kacheln." aria-label="Informationen zu Werte im Detail" title="Informationen zu Werte im Detail"><span aria-hidden="true">i</span></button></h2><div class="metric-switch shopping-card-sort" role="group" aria-label="Reihenfolge der Kacheln"><button id="shopping-sort-pe" class="metric-btn" type="button" aria-pressed="true">P/E</button><button id="shopping-sort-recommendation" class="metric-btn" type="button" aria-pressed="false">individual recommendation</button></div></div>
           <div id="cards" class="cards" aria-live="polite" aria-label="Aktien und ETFs im Bewertungsvergleich"></div>
           <div id="empty" class="empty" hidden><strong>Keine passenden Werte</strong><p>Für diese Kombination aus Cluster und Suche gibt es keine Treffer.</p><button type="button" id="reset-filters">Filter zurücksetzen</button></div>
           <div id="research-returns-slot"><section id="returns-panel" class="returns-panel" aria-labelledby="returns-title">
@@ -1299,8 +1297,8 @@
     }
     function renderCards() {
       const container = $('cards'); container.replaceChildren();
-      $('shopping-sort-pe').checked=state.cardSort!=='recommendation';
-      $('shopping-sort-recommendation').checked=state.cardSort==='recommendation';
+      $('shopping-sort-pe').setAttribute('aria-pressed',String(state.cardSort!=='recommendation'));
+      $('shopping-sort-recommendation').setAttribute('aria-pressed',String(state.cardSort==='recommendation'));
       shoppingCardStocks().forEach(stock => {
         const etf = isETF(stock), recommendation=shoppingRecommendation(stock), card = el('article', 'stock-card' + (etf ? ' fund-card' : '') + (state.selected === stock.ticker ? ' selected' : ''));
         card.tabIndex = 0; card.setAttribute('role', 'button'); card.setAttribute('aria-pressed', String(state.selected === stock.ticker)); card.setAttribute('aria-label', stock.name + ' (' + stock.ticker + ') im Diagramm auswählen'); card.dataset.ticker = stock.ticker;
@@ -1609,7 +1607,7 @@
     document.querySelectorAll('[data-metric]').forEach(button => button.addEventListener('click', () => { state.metric = button.dataset.metric; renderChart(); }));
     $('sort').setAttribute('aria-label','Reihenfolge im Bewertungsvergleich');$('sort').title='Reihenfolge im Bewertungsvergleich';
     $('sort').addEventListener('change', event => { state.sort = event.target.value; render(); });
-    for(const [id,mode] of [['shopping-sort-pe','historical'],['shopping-sort-recommendation','recommendation']])$(id).addEventListener('change',()=>{state.cardSort=mode;renderCards();$('announcer').textContent=mode==='historical'?'Kacheln nach P/E-Abschlag zur historischen Referenz sortiert.':'Kacheln nach Kaufempfehlung sortiert.';});
+    for(const [id,mode] of [['shopping-sort-pe','historical'],['shopping-sort-recommendation','recommendation']])$(id).addEventListener('click',()=>{state.cardSort=mode;renderCards();$('announcer').textContent=mode==='historical'?'Kacheln nach P/E-Abschlag zur historischen Referenz sortiert.':'Kacheln nach Kaufempfehlung sortiert.';});
     $('search').addEventListener('input', event => { state.search = event.target.value; render(); });
     $('reset-filters').addEventListener('click', () => { state.cluster = 'Alle'; state.search = ''; $('search').value = ''; renderFilters(); render(); $('search').focus(); });
     window.addEventListener('load', () => { if (!state.data) return; if (state.view === 'future') renderFutureStudio(); else if (window.Chart && !state.chart) renderChart(); });
