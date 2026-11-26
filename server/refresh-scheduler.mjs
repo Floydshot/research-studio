@@ -31,14 +31,17 @@ export function berlinRefreshWindow(timestamp) {
   return { day, dueAt, windowEndsAt, inWindow: timestamp >= dueAt && timestamp < windowEndsAt };
 }
 
-/** A partial stock batch is valid when market quotes, CNN and ECB were fetched. */
+/** Complete only after every security and all shared providers are current. */
 export function refreshBatchIsCurrent(payload, window, now) {
   const batch = payload?.refresh_batch;
-  if (!batch || batch.version !== 1 || !['live', 'partial'].includes(batch.status) || batch.id !== batch.started_at) return false;
+  if (!batch || batch.version !== 1 || batch.status !== 'live' || batch.id !== batch.started_at) return false;
   const started = Date.parse(batch.started_at), completed = Date.parse(batch.completed_at);
   if (!Number.isFinite(started) || !Number.isFinite(completed) || started < window.dueAt || completed < started || completed > now + CLOCK_SKEW_MS) return false;
   const { yahoo, cnn, ecb } = batch.providers || {};
-  if (!yahoo || !['live', 'partial'].includes(yahoo.status) || !Number.isSafeInteger(yahoo.complete_stock_count) || yahoo.complete_stock_count < 1) return false;
+  if (!yahoo || yahoo.status !== 'live' || !Number.isSafeInteger(yahoo.stock_count) || yahoo.stock_count < 1 || yahoo.complete_stock_count !== yahoo.stock_count) return false;
+  const counts = batch.stock_counts;
+  if (!counts || typeof counts !== 'object' || Array.isArray(counts) || counts.live !== yahoo.stock_count ||
+      !Object.entries(counts).every(([status, count]) => ['live', 'partial', 'stale', 'initial'].includes(status) && Number.isSafeInteger(count) && count >= 0 && (status === 'live' || count === 0))) return false;
   return [cnn, ecb].every(provider => {
     const retrieved = Date.parse(provider?.retrieved_at);
     return provider?.status === 'live' && Number.isFinite(retrieved) && retrieved >= started && retrieved <= completed;
