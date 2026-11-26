@@ -450,6 +450,23 @@
   @media(max-width:700px){.stock-card .valuation-row{margin-top:12px}}
   .stock-card .stock-stale-status{color:#d3636d}
   html[data-theme="light"] .stock-card .stock-stale-status{color:#b83243}
+  .stock-card .shopping-recommendation-row{display:flex;align-items:center;min-height:25px;margin:0 0 10px}
+  .stock-card .shopping-recommendation{max-width:100%;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stock-card .shopping-recommendation.emerald{color:#6bdfb4;background:#17332c;border-color:#25513f}
+  .stock-card .shopping-recommendation.orange{color:#f0b58a;background:#35251c;border-color:#6c4830}
+  html[data-theme="light"] .stock-card .shopping-recommendation.emerald{color:#146541;background:#e3f5eb;border-color:#add6be}
+  html[data-theme="light"] .stock-card .shopping-recommendation.orange{color:#955019;background:#fff0e3;border-color:#e5bf9a}
+  .shopping-indicator{flex:none;min-width:0;margin-top:5px}
+  .shopping-indicator-toggle{display:flex;align-items:center;justify-content:flex-end;min-height:21px;list-style:none;cursor:pointer;color:var(--faint);border-radius:3px}
+  .shopping-indicator-toggle::-webkit-details-marker{display:none}
+  .shopping-indicator-toggle:hover{color:var(--text)}
+  .shopping-indicator-chevron{width:17px;height:17px;display:grid;place-items:center;font-size:17px;line-height:1;transition:transform .14s}
+  .shopping-indicator[open] .shopping-indicator-chevron{transform:rotate(180deg)}
+  .shopping-indicator-copy{padding-top:8px;border-top:1px solid var(--line-soft);cursor:default}
+  .shopping-indicator-copy .trigger-text{min-height:0;margin:0;overflow-wrap:anywhere}
+  .shopping-indicator-note{margin:7px 0 0;color:var(--faint);font-size:9px;line-height:1.6;overflow-wrap:anywhere}
+  .shopping-indicator-sources{display:flex;flex-wrap:wrap;gap:4px 10px;margin:6px 0 0;font-size:9px}
+  @media(max-width:700px){.stock-card .shopping-recommendation{font-size:8px}.stock-card .shopping-recommendation-row{margin-bottom:8px}}
 </style>
 <style id="uniform-position-cards">
   .cards,.future-cards{grid-auto-rows:1fr;align-items:stretch}
@@ -922,6 +939,9 @@
             [/Div\.-Rendite/,'Div.-Rendite','Jährliche Dividende im Verhältnis zum Kurs.'],
             [/Div\. \(Prognose\)/,'Div. (Prognose)','Erwartete jährliche Dividende im Verhältnis zum Kurs.'],
             [/\bROE\b/,'ROE','Eigenkapitalrendite: Jahresgewinn geteilt durch das durchschnittliche Eigenkapital.'],
+            [/\bRSI\b/,'RSI','Relative Stärke der jüngsten Kursbewegungen auf einer Skala von 0 bis 100.'],
+            [/\bSMA\b/,'SMA','Einfacher gleitender Kursdurchschnitt über die genannte Zahl an Handelstagen oder Wochen.'],
+            [/\bEMA\b/,'EMA','Gleitender Kursdurchschnitt, der jüngere Kurse stärker gewichtet.'],
             [/Fonds-KGV/,'Fonds-KGV','Bewertung der im ETF enthaltenen Aktien anhand ihrer Gewinne.'],
             [/\bETF\b/,'ETF','Börsengehandelter Fonds.'],
             [/12M/,'12M','Die letzten zwölf Monate.'],
@@ -1171,6 +1191,58 @@
       for (const group of state.data.portfolios) { const count = $('count-' + group.id), name = $('tab-' + group.id)?.querySelector('.portfolio-name'); if (count) count.textContent = group.stocks.length; if (name) name.textContent = group.name; }
     }
     function trancheKey(stock) { if (individualOnlyPortfolio()) return 'individual'; if (isETF(stock)) return 'unavailable'; if (['buy', 'dip', 'watch', 'unavailable', 'individual'].includes(stock.tranche_key)) return stock.tranche_key; const f = positive(stock.forward_pe); if (f === null) return 'unavailable'; return !futureUsesDividends() ? f < 24 ? 'buy' : f <= 29 ? 'dip' : 'watch' : f <= 11.3 ? 'buy' : f <= 13 ? 'dip' : 'watch'; }
+    function shoppingRecommendation(stock) {
+      const result = (key, basis, reason='') => ({key,basis,reason,
+        label:{buy:'Sofort kaufen',dip:'Bei Rücksetzer nachkaufen',watch:'Abwarten',unavailable:'Daten prüfen',individual:'Individuell prüfen',etf:'ETF separat bewerten'}[key],
+        color:{buy:'emerald',dip:'sky',watch:'amber',unavailable:'orange',individual:'slate',etf:'slate'}[key]});
+      if(isETF(stock))return result('etf','ETF-Einordnung');
+      if(individualOnlyPortfolio()||stock.tranche_policy==='individual_only'||stock.tranche_key==='individual')return result('individual','Individueller Vorschlag');
+      const personal=Object.prototype.hasOwnProperty.call(stock,'buy_indicator'),basis=personal?'Persönlicher Indikator':'Forward-P/E-Regel';
+      const unavailable=()=>result('unavailable',basis,'Für die Einstufung fehlen aktuelle, vollständige Eingangsdaten.');
+      if(state.refreshFailed||!shoppingStockFresh(stock)||!['live','partial'].includes(mode()))return unavailable();
+      const now=Date.now(),start=cnnTime(state.data.refresh_batch?.started_at),end=cnnTime(state.data.refresh_batch?.completed_at);
+      const recent=value=>{const time=cnnTime(value);return Number.isFinite(time)&&time<=now+300000&&now-time<=4*86400000;};
+      const inBatch=value=>{const time=cnnTime(value);return Number.isFinite(time)&&time>=start&&time<=end&&time<=now+300000;};
+      const fresh=field=>stock.field_sources?.[field]==='live'&&inBatch(stock.field_updated_at?.[field]);
+      if(!recent(stock.as_of)||typeof stock.currency!=='string'||!stock.currency.trim()||
+        !['current_pe','forward_pe','price','currency'].every(fresh)||
+        ['current_pe','forward_pe','price'].some(field=>positive(stock[field])===null))return unavailable();
+      if(personal){
+        const indicator=stock.buy_indicator,keys=['current_pe','forward_pe','sma200','rsi14'];
+        if(!['TSM','GS','JPM','MS','AFL'].includes(stock.ticker)||!indicator||indicator.version!==1||!['eligible','watch'].includes(indicator.status)||
+          indicator.currency!==stock.currency||stock.currency!=='USD'||indicator.as_of!==stock.as_of||!inBatch(indicator.evaluated_at)||
+          !['sma200','rsi14'].every(fresh)||positive(stock.sma200)===null||number(stock.rsi14)===null||stock.rsi14<0||stock.rsi14>100||
+          stock.ticker==='TSM'&&!recent(stock.technicals_as_of)||!Array.isArray(indicator.conditions)||indicator.conditions.length!==keys.length)return unavailable();
+        const seen=new Set(),reference=positive(stock.hist_pe),thresholds={current_pe:stock.ticker==='TSM'?25:reference===null?null:reference*.85,forward_pe:stock.ticker==='TSM'?20:reference,sma200:positive(stock.sma200),rsi14:stock.ticker==='TSM'?45:50};
+        for(const condition of indicator.conditions){
+          if(!condition||!keys.includes(condition.key)||seen.has(condition.key))return unavailable();
+          seen.add(condition.key);
+          const actual=number(condition.actual),threshold=positive(condition.threshold),value=number(stock[condition.key==='sma200'?'price':condition.key]);
+          if(actual===null||threshold===null||thresholds[condition.key]===null||Math.abs(threshold-thresholds[condition.key])>0.000001||actual!==value||typeof condition.passed!=='boolean'||condition.passed!==(actual<=threshold))return unavailable();
+        }
+        const passed=indicator.conditions.every(condition=>condition.passed);
+        if((indicator.status==='eligible')!==passed)return unavailable();
+        return result(passed?'buy':'watch',basis);
+      }
+      const key=trancheKey(stock);
+      return ['buy','dip','watch'].includes(key)?result(key,basis):unavailable();
+    }
+    function shoppingIndicatorDetails(stock, recommendation) {
+      const details=el('details','shopping-indicator'),summary=el('summary','shopping-indicator-toggle');
+      summary.title='Persönlicher Nachkauf-Indikator';
+      summary.append(el('span','sr-only','Persönlicher Nachkauf-Indikator für '+stock.name));
+      const chevron=el('span','shopping-indicator-chevron','⌄');chevron.setAttribute('aria-hidden','true');summary.append(chevron);details.append(summary);
+      const copy=el('div','shopping-indicator-copy');
+      copy.append(el('span','trigger-label',isETF(stock)?'ETF-Einordnung':'Persönlicher Nachkauf-Indikator'),el('p','trigger-text',stock.buy_trigger||'Keine bestätigte individuelle Regel verfügbar.'));
+      copy.append(el('p','shopping-indicator-note',recommendation.basis==='Forward-P/E-Regel'?'Einstufung nach Forward-P/E-Regel; persönlicher Indikator als eigener, nicht rückgetesteter Vorschlag.':isETF(stock)?'Für diesen ETF wird kein automatisches Kaufsignal berechnet.':'Eigener Vorschlag, nicht rückgetestet.'));
+      if(recommendation.reason)copy.append(el('p','shopping-indicator-note',recommendation.reason));
+      const urls=new Map();
+      for(const item of [...(Array.isArray(stock.buy_trigger_sources)?stock.buy_trigger_sources:[]),...(Array.isArray(stock.buy_indicator?.sources)?stock.buy_indicator.sources:[])]){
+        const url=httpsSource(typeof item==='string'?item:item?.url);if(url&&!urls.has(url))urls.set(url,typeof item==='object'&&typeof item.label==='string'?item.label:'Unternehmensquelle');
+      }
+      if(urls.size){const links=el('p','shopping-indicator-sources');for(const[url,label]of urls){const link=el('a','',label+' ↗');link.href=url;link.target='_blank';link.rel='noopener noreferrer';links.append(link);}copy.append(links);}
+      details.append(copy);details.addEventListener('click',event=>event.stopPropagation());details.addEventListener('keydown',event=>event.stopPropagation());return details;
+    }
     function renderSummary() {
       const data = state.visible, forward = data.map(stock => positive(stock.forward_pe)).filter(value => value !== null).sort((a, b) => a - b);
       const median = forward.length ? (forward[Math.floor((forward.length - 1) / 2)] + forward[Math.ceil((forward.length - 1) / 2)]) / 2 : null;
@@ -1214,13 +1286,14 @@
     function renderCards() {
       const container = $('cards'); container.replaceChildren();
       state.visible.forEach(stock => {
-        const etf = isETF(stock), card = el('article', 'stock-card' + (etf ? ' fund-card' : '') + (state.selected === stock.ticker ? ' selected' : ''));
+        const etf = isETF(stock), recommendation=shoppingRecommendation(stock), card = el('article', 'stock-card' + (etf ? ' fund-card' : '') + (state.selected === stock.ticker ? ' selected' : ''));
         card.tabIndex = 0; card.setAttribute('role', 'button'); card.setAttribute('aria-pressed', String(state.selected === stock.ticker)); card.setAttribute('aria-label', stock.name + ' (' + stock.ticker + ') im Diagramm auswählen'); card.dataset.ticker = stock.ticker;
-        card.addEventListener('click', event => { if (!event.target.closest('button,a,input,select,textarea,summary')) select(stock.ticker); }); card.addEventListener('keydown', event => { if (event.target === card && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); select(stock.ticker); } });
+        card.addEventListener('click', event => { if (!event.target.closest('button,a,input,select,textarea,details,summary')) select(stock.ticker); }); card.addEventListener('keydown', event => { if (event.target === card && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); select(stock.ticker); } });
         const head = el('div', 'stock-head'); head.append(companyLogo(stock.ticker, 'stock-symbol')); const names = el('div', 'stock-names'), name = el('h3', 'stock-title', etf ? stock.ticker + ' · Income ETF' : stock.name); name.title = stock.name; names.append(name, el('div', 'stock-ticker', stock.ticker + (etf ? ' · ETF · US' : ''))); head.append(names);
         const price = el('div', 'stock-price'); price.title = provenance(stock, 'price'); price.append(el('div', 'price-value', number(stock.price) === null ? '—' : moneyAmount(stock.price) + (stock.currency ? ' ' + stock.currency : ''))); head.append(price); card.append(head);
         const cluster = el('div', 'stock-cluster'), clusterName = el('span', 'stock-cluster-name', stock.cluster); clusterName.title = stock.cluster; cluster.append(clusterName);
         if (!shoppingStockFresh(stock)) cluster.append(el('span', 'source-status stock-stale-status', 'not up to date')); card.append(cluster);
+        const recommendationRow=el('div','shopping-recommendation-row'),badge=el('span','tranche shopping-recommendation '+recommendation.color,recommendation.label);badge.title=recommendation.basis+(recommendation.reason?' · '+recommendation.reason:'');recommendationRow.append(badge);card.append(recommendationRow);
         const metrics = el('div', 'metrics');
         if (etf) {
           metrics.append(metricCell(stock, 'Fonds-KGV', peText(stock.current_pe), 'current_pe'), metricCell(stock, 'Rendite 12M', percent(stock.distribution_yield_ttm), 'distribution_yield_ttm', false, true), metricCell(stock, 'Auszahl./Anteil', number(stock.distributions_per_share_ttm) === null ? '—' : moneyAmount(stock.distributions_per_share_ttm) + (stock.currency ? ' ' + stock.currency : ''), 'distributions_per_share_ttm'), metricCell(stock, 'Kurs', number(stock.price) === null ? '—' : moneyAmount(stock.price), 'price'));
@@ -1230,7 +1303,7 @@
           const valuation = el('div', 'valuation-row'), historical = issuerMetric(stock, 'hist_pe'); const spread = historicalPESpread(stock); const methodsDiffer = historical && historical.comparable_to_current === false, loss = issuerMetric(stock, 'current_pe')?.not_applicable === true; const spreadNode = el('span', 'spread' + (spread === null ? '' : spread < 0 ? ' discount' : ' premium'), loss ? 'P/E bei Verlust nicht sinnvoll' : methodsDiffer ? stock.ticker === '8766.T' ? 'IFRS / J-GAAP' : 'KGV-Basis abweichend' : spread === null ? 'P/E-Abstand nicht verfügbar' : signedPercent(spread) + ' P/E vs Hist. P/E'); spreadNode.title = loss ? provenance(stock, 'current_pe') : methodsDiffer ? historical.comparison_note || 'Aktuelles und historisches KGV haben unterschiedliche Berechnungsgrundlagen; kein direkter Bewertungsabstand ableitbar.' : historical ? 'Vergleich des aktuellen P/E mit ' + (historical.label || 'der belegten historischen Referenz') + (historical.period ? ' (' + historical.period + ')' : '') + '. ' + (historical.comparison_note || '') + ' Kein Kurspotenzial.' : 'Vergleich des aktuellen P/E mit der festen historischen Nutzervorgabe; kein Kurspotenzial.'; valuation.append(spreadNode);
           const companion = !futureUsesDividends() ? metricLabel(stock, 'hist_ps', 'Hist. P/S') + ' ' + (number(stock.hist_ps) === null ? '—' : fmt(stock.hist_ps) + '×') : metricLabel(stock, 'roe', 'ROE') + ' ' + percent(stock.roe); const companionNode = el('span', '', companion); companionNode.title = !futureUsesDividends() ? issuerMetric(stock, 'hist_ps') ? provenance(stock, 'hist_ps') : number(stock.hist_ps) === null ? 'Keine historische KUV-Referenz hinterlegt.' : 'Feste Nutzervorgabe (5J/10J)' : provenance(stock, 'roe'); valuation.append(companionNode); card.append(valuation);
         }
-        container.append(card);
+        card.append(shoppingIndicatorDetails(stock,recommendation));container.append(card);
       });
       $('empty').hidden = !!state.visible.length;
     }
