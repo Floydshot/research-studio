@@ -40,7 +40,7 @@ def instant(value: Any) -> datetime | None:
 
 
 def refresh_is_current(payload: Any, due: datetime, now: datetime) -> bool:
-    """Accept a fresh full-provider batch, including honest per-stock gaps."""
+    """Complete only after every security and all shared providers are current."""
     batch = payload.get("refresh_batch") if isinstance(payload, dict) else None
     if not isinstance(batch, dict) or batch.get("version") != 1:
         return False
@@ -49,16 +49,25 @@ def refresh_is_current(payload: Any, due: datetime, now: datetime) -> bool:
         return False
     if not due <= started <= completed <= now + CLOCK_SKEW:
         return False
-    if batch.get("status") not in ("live", "partial"):
+    if batch.get("status") != "live":
         return False
     providers = batch.get("providers")
     if not isinstance(providers, dict):
         return False
     yahoo = providers.get("yahoo")
-    if not isinstance(yahoo, dict) or yahoo.get("status") not in ("live", "partial"):
+    if not isinstance(yahoo, dict) or yahoo.get("status") != "live":
         return False
-    count = yahoo.get("complete_stock_count")
-    if isinstance(count, bool) or not isinstance(count, int) or count < 1:
+    count, complete = yahoo.get("stock_count"), yahoo.get("complete_stock_count")
+    if (type(count) is not int or not 1 <= count <= 2**53 - 1 or
+            type(complete) is not int or complete != count):
+        return False
+    counts = batch.get("stock_counts")
+    if (not isinstance(counts, dict) or type(counts.get("live")) is not int or
+            counts["live"] != count or any(
+                status not in {"live", "partial", "stale", "initial"} or
+                type(value) is not int or value < 0 or value > 2**53 - 1 or
+                (status != "live" and value != 0)
+                for status, value in counts.items())):
         return False
     for name in ("cnn", "ecb"):
         provider = providers.get(name)
