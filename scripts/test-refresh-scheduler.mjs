@@ -29,9 +29,10 @@ function batch(due = winterDue) {
   const started = new Date(due + 5_000).toISOString();
   const retrieved = new Date(due + 30_000).toISOString();
   return { refresh_batch: {
-    version: 1, id: started, started_at: started, completed_at: new Date(due + minute).toISOString(), status: 'partial',
+    version: 1, id: started, started_at: started, completed_at: new Date(due + minute).toISOString(), status: 'live',
+    stock_counts: { live: 54 },
     providers: {
-      yahoo: { status: 'partial', complete_stock_count: 52, stock_count: 54 },
+      yahoo: { status: 'live', complete_stock_count: 54, stock_count: 54 },
       cnn: { status: 'live', retrieved_at: retrieved }, ecb: { status: 'live', retrieved_at: retrieved }
     }
   } };
@@ -84,14 +85,44 @@ for (const [date, due] of [
 }
 
 const fresh = batch(), window = berlinRefreshWindow(winterDue);
-eq(refreshBatchIsCurrent(fresh, window, winterDue + 2 * minute), true, 'known partial stock batch accepted');
+eq(refreshBatchIsCurrent(fresh, window, winterDue + 2 * minute), true, 'all securities and shared providers are current');
+const partial = structuredClone(fresh);
+partial.refresh_batch.status = 'partial';
+partial.refresh_batch.stock_counts = { live: 34, partial: 20 };
+Object.assign(partial.refresh_batch.providers.yahoo, { status: 'partial', complete_stock_count: 34 });
+eq(refreshBatchIsCurrent(partial, window, winterDue + 2 * minute), false, 'honest partial stock batch must be repaired');
+const completeWithZeroes = structuredClone(fresh);
+completeWithZeroes.refresh_batch.stock_counts = { live: 54, partial: 0, stale: 0, initial: 0 };
+eq(refreshBatchIsCurrent(completeWithZeroes, window, winterDue + 2 * minute), true, 'explicit zero gaps are complete');
 for (const mutate of [
+  value => { value.refresh_batch.status = 'partial'; },
   value => { value.refresh_batch.status = 'stale'; },
   value => { value.refresh_batch.id = 'wrong'; },
   value => { value.refresh_batch.started_at = new Date(winterDue - minute).toISOString(); value.refresh_batch.id = value.refresh_batch.started_at; },
   value => { value.refresh_batch.providers.yahoo.complete_stock_count = 0; },
   value => { value.refresh_batch.providers.yahoo.complete_stock_count = '52'; },
   value => { value.refresh_batch.providers.yahoo.complete_stock_count = true; },
+  value => { value.refresh_batch.providers.yahoo.status = 'partial'; },
+  value => { delete value.refresh_batch.providers.yahoo.stock_count; },
+  value => { value.refresh_batch.providers.yahoo.stock_count = 0; value.refresh_batch.providers.yahoo.complete_stock_count = 0; },
+  value => { value.refresh_batch.providers.yahoo.stock_count = '54'; },
+  value => { value.refresh_batch.providers.yahoo.stock_count = true; },
+  value => { value.refresh_batch.providers.yahoo.stock_count = 53; },
+  value => { value.refresh_batch.providers.yahoo.stock_count = Number.MAX_SAFE_INTEGER + 1; value.refresh_batch.providers.yahoo.complete_stock_count = Number.MAX_SAFE_INTEGER + 1; },
+  value => { delete value.refresh_batch.stock_counts; },
+  value => { value.refresh_batch.stock_counts = null; },
+  value => { value.refresh_batch.stock_counts = []; },
+  value => { value.refresh_batch.stock_counts = {}; },
+  value => { value.refresh_batch.stock_counts.live = '54'; },
+  value => { value.refresh_batch.stock_counts.live = true; },
+  value => { value.refresh_batch.stock_counts.live = 53; },
+  value => { value.refresh_batch.stock_counts.partial = 1; },
+  value => { value.refresh_batch.stock_counts.stale = 1; },
+  value => { value.refresh_batch.stock_counts.initial = 1; },
+  value => { value.refresh_batch.stock_counts.partial = -1; },
+  value => { value.refresh_batch.stock_counts.partial = 0.5; },
+  value => { value.refresh_batch.stock_counts.partial = false; },
+  value => { value.refresh_batch.stock_counts.unknown = 0; },
   value => { value.refresh_batch.providers.cnn.status = 'previous'; },
   value => { value.refresh_batch.providers.ecb.retrieved_at = new Date(winterDue - minute).toISOString(); },
   value => { value.refresh_batch.completed_at = new Date(winterDue + 20 * minute).toISOString(); }
@@ -114,6 +145,16 @@ eq((await f.run()).outcome, 'already_complete'); eq(f.state.requests.length, cou
 
 f = fixture({ now: winterDue + 2 * minute, payload: fresh, sidecarMissing: true });
 eq((await f.run()).outcome, 'complete'); eq(f.state.requests.length, 2, 'rollout supports old Pages without sidecar');
+
+f = fixture({ now: winterDue + 2 * minute, payload: partial });
+eq((await f.run()).outcome, 'dispatched', 'partial publication starts a bounded repair attempt');
+eq(f.state.posts.length, 1); eq(f.db.row().outcome, 'dispatched');
+f.clock.value += 10 * minute;
+eq((await f.run()).attempts, 2, 'still-partial publication remains eligible for the next repair');
+eq(f.state.posts.length, 2);
+f.state.payload = fresh;
+eq((await f.run()).outcome, 'complete', 'repair stops after full publication');
+eq(f.state.posts.length, 2);
 
 // Both generations of the dispatch API are accepted, with least-privilege inputs.
 for (const dispatchStatus of [200, 204]) {
