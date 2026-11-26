@@ -25,9 +25,9 @@ def utc(value):
 def batch(start="2026-11-23T06:30:00Z", end="2026-11-23T06:31:00Z"):
     return {"refresh_batch": {
         "version": 1, "id": start, "started_at": start, "completed_at": end,
-        "status": "partial", "stock_counts": {"live": 52, "partial": 2},
+        "status": "live", "stock_counts": {"live": 54},
         "providers": {
-            "yahoo": {"status": "partial", "complete_stock_count": 52},
+            "yahoo": {"status": "live", "stock_count": 54, "complete_stock_count": 54},
             "cnn": {"status": "live", "retrieved_at": end},
             "ecb": {"status": "live", "retrieved_at": end}
         }
@@ -64,10 +64,43 @@ class RefreshDueTests(unittest.TestCase):
     def test_delayed_fallback_recovers_same_day(self):
         self.assertTrue(self.decision("2026-11-23T15:00:00Z").refresh)
 
-    def test_honest_partial_stock_gaps_do_not_duplicate(self):
+    def test_fully_current_batch_prevents_duplicate(self):
         result = self.decision("2026-11-23T07:30:00Z", batch())
         self.assertFalse(result.refresh)
         self.assertEqual(result.reason, "batch_already_current")
+
+    def test_honest_partial_stock_gaps_request_repair(self):
+        value = batch()
+        value["refresh_batch"].update(status="partial", stock_counts={"live": 34, "partial": 20})
+        value["refresh_batch"]["providers"]["yahoo"].update(status="partial", complete_stock_count=34)
+        self.assertTrue(self.decision("2026-11-23T07:30:00Z", value).refresh)
+
+    def test_explicit_zero_gaps_are_complete(self):
+        value = batch()
+        value["refresh_batch"]["stock_counts"] = {"live": 54, "partial": 0, "stale": 0, "initial": 0}
+        self.assertFalse(self.decision("2026-11-23T07:30:00Z", value).refresh)
+
+    def test_stock_count_metadata_must_prove_every_security_complete(self):
+        for field, replacement in [("status", "partial"), ("stock_count", None), ("stock_count", 0),
+                                   ("stock_count", "54"), ("stock_count", True), ("stock_count", 53),
+                                   ("stock_count", 2**53), ("complete_stock_count", 0),
+                                   ("complete_stock_count", 53), ("complete_stock_count", "54"),
+                                   ("complete_stock_count", True)]:
+            value = batch()
+            value["refresh_batch"]["providers"]["yahoo"][field] = replacement
+            with self.subTest(field=field, replacement=replacement):
+                self.assertTrue(self.decision("2026-11-23T07:30:00Z", value).refresh)
+        for counts in [None, [], {}, {"live": "54"}, {"live": True}, {"live": 53},
+                       {"live": 54, "partial": 1}, {"live": 54, "stale": 1}, {"live": 54, "initial": 1},
+                       {"live": 54, "partial": -1}, {"live": 54, "partial": 0.5},
+                       {"live": 54, "partial": False}, {"live": 54, "unknown": 0}]:
+            value = batch()
+            value["refresh_batch"]["stock_counts"] = counts
+            with self.subTest(counts=counts):
+                self.assertTrue(self.decision("2026-11-23T07:30:00Z", value).refresh)
+        value = batch()
+        del value["refresh_batch"]["stock_counts"]
+        self.assertTrue(self.decision("2026-11-23T07:30:00Z", value).refresh)
 
     def test_naive_or_invalid_batch_timestamps_are_not_fresh(self):
         for timestamp in [None, "2026-11-23T07:30:00", "not-a-date", "2026-99-31T00:00:00Z"]:
