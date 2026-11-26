@@ -1200,6 +1200,7 @@
       const personal=Object.prototype.hasOwnProperty.call(stock,'buy_indicator'),basis=personal?'Persönlicher Indikator':'Forward-P/E-Regel';
       const unavailable=()=>result('unavailable',basis,'Für die Einstufung fehlen aktuelle, vollständige Eingangsdaten.');
       if(state.refreshFailed||!shoppingStockFresh(stock)||!['live','partial'].includes(mode()))return unavailable();
+      if(stock.field_sources?.current_pe==='not_applicable')return result('individual',basis,'Eine P/E-basierte Kaufempfehlung ist hier nicht sinnvoll.');
       const now=Date.now(),start=cnnTime(state.data.refresh_batch?.started_at),end=cnnTime(state.data.refresh_batch?.completed_at);
       const recent=value=>{const time=cnnTime(value);return Number.isFinite(time)&&time<=now+300000&&now-time<=4*86400000;};
       const inBatch=value=>{const time=cnnTime(value);return Number.isFinite(time)&&time>=start&&time<=end&&time<=now+300000;};
