@@ -36,6 +36,7 @@ from typing import Any, Callable
 from urllib.request import Request, urlopen
 from urllib.parse import quote, urljoin, urlparse
 from zoneinfo import ZoneInfo
+from refresh_repair import repair_incomplete_stocks
 
 
 BERLIN = ZoneInfo("Europe/Berlin")
@@ -7463,15 +7464,18 @@ def valid_price_returns(value: Any, ticker: str, stamp: str) -> dict[str, Any] |
 def apply_period_returns(stock: dict[str, Any], previous: dict[str, Any], payload: dict[str, Any], stamp: str) -> None:
     fresh = valid_period_returns(payload.get("returns"), stock["ticker"], stamp)
     prior = valid_period_returns(previous.get("returns"), stock["ticker"], stamp)
+    rejection = payload.get("returns_error") or (
+        "Abgerufene Gesamtrendite-Antwort hat die Prüfung von Struktur, Datums-/Periodenangaben oder Zahlenwerten nicht bestanden; erneuter Abruf erforderlich."
+        if "returns" in payload and fresh is None else None)
     if fresh and (not prior or fresh["as_of"] >= prior["as_of"]):
         fresh["source_status"] = "live"
         stock["returns"] = fresh
     elif prior:
         prior["source_status"] = "previous"
-        prior["refresh_note"] = payload.get("returns_error") or "Kein neuerer bestätigter Gesamtrendite-Datenstand; geprüfter Vorwert mit ursprünglichem Stichtag."
+        prior["refresh_note"] = rejection or "Kein neuerer bestätigter Gesamtrendite-Datenstand; geprüfter Vorwert mit ursprünglichem Stichtag."
         stock["returns"] = prior
     else:
-        stock["returns"] = unavailable_period_returns(stock["ticker"], payload.get("returns_error") or "Gesamtrenditehistorie noch nicht verfügbar")
+        stock["returns"] = unavailable_period_returns(stock["ticker"], rejection or "Gesamtrenditehistorie noch nicht verfügbar")
 
 
 def apply_reserve_price_returns(stock: dict[str, Any], previous: dict[str, Any],
@@ -8189,6 +8193,8 @@ def build_live_data(previous: dict[str, Any] | None = None,
                        for stock in prior_universe.get('stocks', [])
                        if isinstance(stock, dict) and 'ticker' in stock})
     groups = [*result['portfolios'], dict(id='universe', stocks=result['security_universe']['stocks'])]
+    seeds = {(group['id'], stock['ticker']): deepcopy(stock)
+             for group in groups for stock in group['stocks']}
     unique_tickers = list(dict.fromkeys(stock['ticker'] for group in groups for stock in group['stocks']))
     # One bounded request pipeline per distinct security. Four workers keep a
     # larger watchlist within the workflow timeout; overlaps reuse one payload.
@@ -8207,6 +8213,11 @@ def build_live_data(previous: dict[str, Any] | None = None,
                     merged = merge_stock(seed, prior, dict(warnings=[f"Ticker-Fehler: {type(exc).__name__}: {str(exc)[:180]}"]), group['id'], result['last_attempted_at'])
                 group['stocks'][index] = merged
                 print(f"  {merged['source_status']}: {merged['tranche']}", flush=True)
+    repairs = repair_incomplete_stocks(result, seeds=seeds, previous=old_stocks,
+                                       fetcher=fetcher, merge_stock=merge_stock,
+                                       finalize_refresh_batch=finalize_refresh_batch,
+                                       started_at=result["last_attempted_at"])
+    print("Refresh repair check: " + json.dumps(repairs, ensure_ascii=False), flush=True)
     stocks = [stock for group in result["portfolios"] for stock in group["stocks"]]
     counts = Counter(stock["source_status"] for stock in stocks)
     result["status_counts"] = dict(counts)
@@ -8236,6 +8247,8 @@ def build_live_data(previous: dict[str, Any] | None = None,
     result["fear_and_greed"] = refresh_fear_and_greed(previous.get("fear_and_greed"), fear_greed_fetcher)
     result["fx_rates"] = refresh_ecb_fx(previous.get("fx_rates"), fx_fetcher)
     finalize_refresh_batch(result, result["last_attempted_at"])
+    if result["data_mode"] != "stale":
+        result["data_mode"] = result["refresh_batch"]["status"]
     return result
 
 
@@ -8294,7 +8307,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Update fehlgeschlagen: {exc}", file=sys.stderr)
         return 1
     print(f"{EXPECTED_STOCK_COUNT} Werte → {args.output} | Modus: {result['data_mode']} | {result.get('status_counts', {'initial': EXPECTED_STOCK_COUNT})}")
-    return 1 if result["data_mode"] == "stale" else 0
+    # Publish honest partial data, but keep the scheduled repair path open.
+    # A successful process must mean every required stock/provider input was
+    # verified, not merely that at least one Yahoo request returned a value.
+    return 1 if not args.seed and result.get("refresh_batch", {}).get("status") != "live" else 0
 
 
 if __name__ == "__main__":
