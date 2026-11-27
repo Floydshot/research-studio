@@ -7650,7 +7650,12 @@ def _fetch_worker(ticker: str, pipe: Any, attempts: int) -> None:
         # already sent even if this endpoint reaches the overall watchdog.
         try:
             security = yf.Ticker(ticker)
-            long_history = security.history(period="max", interval="1d", auto_adjust=False, actions=True, timeout=12)
+            # Keep provider rows with missing prices. Otherwise yfinance can
+            # silently drop an incomplete *previous* session once today's bar
+            # arrives, making an older return history appear freshly complete.
+            # calculate_period_returns must see the gap and reject it until
+            # the provider supplies that session's actual closing price.
+            long_history = security.history(period="max", interval="1d", auto_adjust=False, actions=True, keepna=True, timeout=12)
             metadata = security.get_history_metadata()
             return_info = {**(metadata if isinstance(metadata, dict) else {}), **info}
             if ticker in RESERVE_TICKERS:
