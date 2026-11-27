@@ -37,6 +37,7 @@ from urllib.request import Request, urlopen
 from urllib.parse import quote, urljoin, urlparse
 from zoneinfo import ZoneInfo
 from refresh_repair import repair_incomplete_stocks
+from history_corrections import apply_history_corrections
 
 
 BERLIN = ZoneInfo("Europe/Berlin")
@@ -7608,8 +7609,14 @@ def _fetch_worker(ticker: str, pipe: Any, attempts: int) -> None:
                         # Yahoo Close is split-adjusted, without Adj Close's
                         # dividend adjustment; it matches the current quote.
                         is_etf = ticker in ETF_TICKERS
-                        history = security.history(period="1y", interval="1d", auto_adjust=False, actions=is_etf, timeout=12)
+                        history = security.history(period="1y", interval="1d", auto_adjust=False, actions=is_etf, keepna=ticker == "D05.SI", timeout=12)
+                        history, price_corrections = apply_history_corrections(
+                            history, ticker, currency=info.get("currency"),
+                            isin="SG1L01001701" if ticker == "D05.SI" else None,
+                            auto_adjust=False, retrieved_at=iso_now())
                         technicals, notes = calculate_technicals(history)
+                        if price_corrections:
+                            technicals["price_corrections"] = price_corrections
                         if is_etf:
                             distributions, distribution_notes = calculate_distributions(history)
                             technicals.update(distributions)
@@ -7658,6 +7665,10 @@ def _fetch_worker(ticker: str, pipe: Any, attempts: int) -> None:
             long_history = security.history(period="max", interval="1d", auto_adjust=False, actions=True, keepna=True, timeout=12)
             metadata = security.get_history_metadata()
             return_info = {**(metadata if isinstance(metadata, dict) else {}), **info}
+            long_history, price_corrections = apply_history_corrections(
+                long_history, ticker, currency=return_info.get("currency"),
+                isin="SG1L01001701" if ticker == "D05.SI" else None,
+                auto_adjust=False, retrieved_at=iso_now())
             if ticker in RESERVE_TICKERS:
                 try:
                     pipe.send(calculate_reserve_history_payload(long_history, ticker, return_info, iso_now()))
@@ -7670,7 +7681,15 @@ def _fetch_worker(ticker: str, pipe: Any, attempts: int) -> None:
                     pipe.send(dict(dividend_growth=calculate_dividend_growth(long_history, ticker, return_info, iso_now(), issuer_cash)))
                 except Exception as exc:
                     pipe.send(dict(dividend_growth_error=f"Dividendenwachstum: {type(exc).__name__}: {str(exc)[:180]}"))
-                pipe.send(dict(returns=calculate_period_returns(long_history, ticker, return_info, iso_now(), issuer_cash)))
+                returns = calculate_period_returns(long_history, ticker, return_info, iso_now(), issuer_cash)
+                if price_corrections:
+                    returns["price_corrections"] = price_corrections
+                    returns["available_history"]["price_corrections"] = deepcopy(price_corrections)
+                    returns["method"] += (
+                        " DBS: fehlender Yahoo-Schlusskurs vom 23.11.2026 durch den belegten "
+                        "SGX-Schlusskurs von 65,76 SGD ersetzt; fünf benachbarte Kurse bestätigen "
+                        "die gleiche Aktienbasis. Quelle: " + price_corrections[0]["source_url"])
+                pipe.send(dict(returns=returns))
         except Exception as exc:
             pipe.send(dict(returns_error=f"Gesamtrendite-Historie: {type(exc).__name__}: {str(exc)[:180]}"))
         if ticker == TSM_TICKER:
@@ -8011,6 +8030,19 @@ def merge_stock(seed: dict[str, Any], previous: dict[str, Any], payload: dict[st
     else:
         stock["as_of"] = None
     apply_researched_metrics(stock, previous, payload, iso_now())
+    if technicals.get("price_corrections"):
+        for field in ("sma200", "rsi14"):
+            if stock["field_sources"].get(field) == "live":
+                stock.setdefault("field_metadata", {})[field] = dict(
+                    label="Yahoo-Tageskurse mit belegter DBS-Schlusskurskorrektur",
+                    currency=stock.get("currency"), history_as_of=technicals.get("history_as_of"),
+                    retrieved_at=payload.get("history_retrieved_at"),
+                    source_url=f"https://finance.yahoo.com/quote/{quote(stock['ticker'], safe='')}/history/",
+                    price_corrections=deepcopy(technicals["price_corrections"]))
+    for field in ("sma200", "rsi14"):
+        prior_metadata = previous.get("field_metadata", {}).get(field, {})
+        if stock["field_sources"].get(field) == "previous" and prior_metadata.get("price_corrections"):
+            stock.setdefault("field_metadata", {})[field] = deepcopy(prior_metadata)
     if portfolio_id == 'classic':
         apply_classic_annual_roe(stock, previous)
     if portfolio_id == 'universe':
@@ -8112,6 +8144,45 @@ def required_refresh_fields(stock: dict[str, Any], portfolio_id: str) -> list[st
     return [*[field for field in fields if field not in static], "returns", "dividend_growth", *(["price_returns"] if portfolio_id == "universe" else [])]
 
 
+def recent_return_price_gap(value: Any) -> bool:
+    """A recent bad close cannot be resolved by one still-valid daily return.
+
+    Anchor the ten-day check to the observed history end, not the wall clock.
+    Explicit pre-IPO gaps and old, labelled historical discontinuities remain
+    distinguishable from a recent price error invalidating observed periods.
+    """
+    if not isinstance(value, dict):
+        return False
+    notes, periods = value.get("quality_notes", []), value.get("periods", {})
+    if not isinstance(notes, list) or not isinstance(periods, dict):
+        return False
+    try:
+        end = datetime.strptime(value.get("as_of", ""), "%Y-%m-%d").date()
+    except (ValueError, TypeError):
+        return False
+    for note in notes:
+        if not isinstance(note, dict) or note.get("reason") != "Ungültiger Schlusskurs im Zeitraum":
+            continue
+        try:
+            bad = datetime.strptime(note.get("date", ""), "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            continue
+        if not 0 <= (end - bad).days <= 10:
+            continue
+        for period in periods.values():
+            if (not isinstance(period, dict) or period.get("value") is not None or
+                    period.get("reason") != note["reason"]):
+                continue
+            try:
+                start = datetime.strptime(period.get("start", ""), "%Y-%m-%d").date()
+                period_end = datetime.strptime(period.get("end", ""), "%Y-%m-%d").date()
+            except (ValueError, TypeError):
+                continue
+            if period_end == end and start < bad <= period_end:
+                return True
+    return False
+
+
 def finalize_refresh_batch(result: dict[str, Any], started_at: str,
                            completed_at: str | None = None) -> None:
     """Assess one published snapshot; never overwrite any source's timestamps.
@@ -8139,6 +8210,8 @@ def finalize_refresh_batch(result: dict[str, Any], started_at: str,
                 if field in {"returns", "dividend_growth", "price_returns"}:
                     item = stock.get(field) or {}
                     fresh = item.get("source_status") == "live" and retrieved_in_batch(item.get("retrieved_at"))
+                    if field in {"returns", "price_returns"} and recent_return_price_gap(item):
+                        fresh = False
                 else:
                     value = stock.get(field)
                     valid = isinstance(value, str) and bool(value.strip()) if field == "currency" else finite_number(value) is not None
